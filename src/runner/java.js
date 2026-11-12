@@ -1,5 +1,5 @@
 // Runs real Java in the browser with CheerpJ (https://cheerpj.com).
-// The CheerpJ runtime comes from its CDN; javac comes from public/tools.jar (JDK 8).
+// The CheerpJ runtime comes from its CDN; javac comes from public/tools.jar (Eclipse Temurin OpenJDK 8u512).
 // CheerpJ maps "/app/..." to this web server's root, "/str/..." to in-memory files,
 // and "/files/..." to a writable IndexedDB folder.
 
@@ -89,7 +89,7 @@ async function doRun(source) {
   );
   const compileLog = out.textContent.replaceAll('/str/', '');
   if (code !== 0) {
-    return { ok: false, phase: 'compile', output: '', error: compileLog.trim(), ms: performance.now() - t0 };
+    return { ok: false, phase: 'compile', output: '', error: compileLog.trim(), line: +(compileLog.match(/Main\.java:(\d+)/)?.[1] || 0), ms: performance.now() - t0 };
   }
 
   out.textContent = '';
@@ -97,7 +97,7 @@ async function doRun(source) {
   await new Promise((r) => setTimeout(r, 30)); // let the last console write land
   const output = out.textContent;
   const crashed = runCode !== 0 || /Exception in thread/.test(output);
-  return { ok: !crashed, phase: 'run', output, error: crashed ? output.trim() : '', ms: performance.now() - t0 };
+  return { ok: !crashed, phase: 'run', output, error: crashed ? output.trim() : '', line: +(output.match(/Main\.java:(\d+)\)/)?.[1] || 0), ms: performance.now() - t0 };
 }
 
 /** Turns common javac / runtime errors into short Korean explanations. */

@@ -37,11 +37,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-## javac (`public/tools.jar`, JDK 8u131)
+## javac (`public/tools.jar`) — Eclipse Temurin OpenJDK 8u512-b09
 
-- 브라우저 안에서 자바 코드를 컴파일하는 데 쓴다.
-- [leaningtech/javafiddle](https://github.com/leaningtech/javafiddle) 저장소(`static/tools.jar`)에서 가져온 파일이다. Java 와 javac 는 Oracle 및 그 계열사의 상표다.
-- 이 파일의 라이선스와 저작권은 원래 배포자(Oracle / OpenJDK)에게 있다. cotudy 의 LICENSE 는 이 파일에 적용되지 않는다.
+- 브라우저 안에서 자바 코드를 컴파일하는 데 쓴다. [Eclipse Temurin](https://adoptium.net/) JDK 8u512-b09 의 `lib/tools.jar` 를 그대로 넣었다.
+- 라이선스: **GNU General Public License v2 + Classpath Exception** (OpenJDK). cotudy 의 LICENSE 는 이 파일에 적용되지 않는다.
+- 라이선스 전문은 사이트와 저장소에 함께 둔다: [`public/licenses/openjdk/LICENSE`](public/licenses/openjdk/LICENSE), [`ASSEMBLY_EXCEPTION`](public/licenses/openjdk/ASSEMBLY_EXCEPTION), [`THIRD_PARTY_README`](public/licenses/openjdk/THIRD_PARTY_README)
+- 소스 코드: https://github.com/adoptium/jdk8u (태그 `jdk8u512-b09`)
+- Java 와 OpenJDK 는 Oracle 및 그 계열사의 상표다.
 
 ## Vite
 

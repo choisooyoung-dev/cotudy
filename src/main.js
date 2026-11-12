@@ -5,12 +5,15 @@ import { store } from './store.js';
 import { STAGES } from './content/stages.js';
 import { NPCS } from './content/npcs.js';
 import { QUESTS as JAVA_QUESTS } from './content/java/quests.js';
+import { QUESTS as JS_QUESTS } from './content/javascript/quests.js';
+import { RUNTIMES } from './runner/index.js';
 import { openMission } from './ui/mission.js';
 import { warmUpJava, runJava } from './runner/java.js';
+import { runJs } from './runner/javascript.js';
 
 const LANGS = [
   { id: 'java', name: 'Java', desc: '백엔드 · 안드로이드', quests: JAVA_QUESTS },
-  { id: 'javascript', name: 'JavaScript', desc: '준비 중', quests: null },
+  { id: 'javascript', name: 'JavaScript', desc: '웹 · 프론트엔드 · Node.js', quests: JS_QUESTS },
   { id: 'python', name: 'Python', desc: '준비 중', quests: null },
 ];
 
@@ -25,7 +28,8 @@ app.innerHTML = `
   <div class="credit"><span class="java-state">☕ 자바 준비 중…</span> · <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a> · © 2026 choisooyoung-dev. All rights reserved.</div>`;
 
 const $ = (s) => app.querySelector(s);
-let quests = JAVA_QUESTS;
+const langInfo = () => LANGS.find((l) => l.id === (store.lang || 'java'));
+let quests = langInfo().quests || JAVA_QUESTS;
 let busy = false;
 
 // ---------- progress ----------
@@ -75,7 +79,7 @@ function refresh() {
   world.setArrowTarget(q ? q.npc : null);
 
   // HUD
-  const lang = LANGS.find((l) => l.id === (store.lang || 'java'));
+  const lang = langInfo();
   $('.hud-title').textContent = `${lang.name} · 1회차`;
   $('.hud-sub').textContent = stage ? `${stage.name} · ${stage.topic}` : '1회차 완료!';
   $('.cells').innerHTML = STAGES.map((s, i) => `<i class="${stageDone(s) ? 'on' : i === si ? 'now' : ''}" title="${s.name} · ${s.topic}"></i>`).join('');
@@ -184,7 +188,7 @@ async function startQuest(q) {
   world.setFrozen(true);
   const before = currentStageIndex();
   const wasNext = nextQuest();
-  const res = await openMission(app, q, NPCS[q.npc]);
+  const res = await openMission(app, q, NPCS[q.npc], RUNTIMES[store.lang || 'java']);
   busy = false;
   world.setFrozen(false);
   if (!res) return;
@@ -207,11 +211,17 @@ async function startQuest(q) {
 async function chooseLanguage() {
   const v = await dialog({
     who: '인사팀 한지원',
-    lines: ['김사원님, 물류팀 입사를 축하해요! 저는 인사팀 한지원이에요.', '우리 센터는 전산 일을 코드로 해요. 어떤 언어로 일하실 거예요?'],
-    buttons: LANGS.map((l) => ({ html: `${l.name}<small> · ${l.desc}</small>`, value: l.id, disabled: !l.quests, primary: l.id === 'java' })),
+    lines: store.lang
+      ? ['다른 언어로 일해 볼래요? 언어마다 진행 상황은 따로 저장돼요.']
+      : ['김사원님, 물류팀 입사를 축하해요! 저는 인사팀 한지원이에요.', '우리 센터는 전산 일을 코드로 해요. 어떤 언어로 일하실 거예요?'],
+    buttons: LANGS.map((l) => ({ html: `${l.name}<small> · ${l.desc}</small>${store.lang === l.id ? ' ✓' : ''}`, value: l.id, disabled: !l.quests, primary: l.id === (store.lang || 'java') })),
   });
+  const first = !store.lang;
+  if (!v && !first) return;
   store.setLang(v || 'java');
-  quests = LANGS.find((l) => l.id === store.lang).quests;
+  if (!first) { location.reload(); return; } // other language = other progress and position
+  quests = langInfo().quests;
+  if (store.lang !== 'java') $('.java-state').textContent = `⚡ ${langInfo().name}`;
   refresh();
   toast('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', 6000);
 }
@@ -233,12 +243,14 @@ $('.menu-btn').addEventListener('click', async () => {
     who: '설정',
     lines: ['진행 상황은 이 브라우저에만 저장돼요. 다른 컴퓨터에서 이어 하려면 저장 파일을 받아서 거기서 불러오세요.'],
     buttons: [
+      { label: '🌐 언어 바꾸기', value: 'lang' },
       { label: '💾 저장 파일 받기', value: 'export' },
       { label: '📂 저장 파일 불러오기', value: 'import' },
       { label: '진행 초기화', value: 'reset' },
       { label: '닫기', value: null, primary: true },
     ],
   });
+  if (v === 'lang') chooseLanguage();
   if (v === 'export') exportSave();
   if (v === 'import') importSave();
   if (v === 'reset' && confirm('모든 진행 상황을 지울까요? 되돌릴 수 없어요.\n(지우기 전에 저장 파일을 받아 두면 나중에 불러올 수 있어요)')) { store.reset(); location.reload(); }
@@ -278,10 +290,14 @@ function importSave() {
 
 // ---------- start ----------
 refresh();
-warmUpJava(); // start loading Java in the background right away
 if (!store.lang) setTimeout(chooseLanguage, 400);
 
 // debug helper for development
-const warm = warmUpJava();
-warm.then(() => { $('.java-state').textContent = '☕ 자바 준비 완료'; }, () => { $('.java-state').textContent = '⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)'; });
-window.cotudy = { store, refresh, world, runJava, warm, talkTo, startQuest };
+// Java needs a slow first load, so start it in the background right away (only when playing Java)
+const warm = (store.lang || 'java') === 'java' ? warmUpJava() : Promise.resolve();
+if ((store.lang || 'java') === 'java') {
+  warm.then(() => { $('.java-state').textContent = '☕ 자바 준비 완료'; }, () => { $('.java-state').textContent = '⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)'; });
+} else {
+  $('.java-state').textContent = `⚡ ${langInfo().name}`;
+}
+window.cotudy = { store, refresh, world, runJava, runJs, warm, talkTo, startQuest };

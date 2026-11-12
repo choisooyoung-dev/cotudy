@@ -1,11 +1,10 @@
 // The mission window: concept study → predict output → fill blanks → write code → done.
-import { runJava, explainError, warmUpJava } from '../runner/java.js';
 import { codeView, codeEditor } from './code.js';
 
 const STEP_NAMES = ['부탁', '개념 공부', '출력 예상', '빈칸', '직접 쓰기'];
 const norm = (s) => (s || '').replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
 
-let javaReady = false;
+const readyLangs = new Set();
 
 export function faceHTML(look = {}) {
   const hair = look.hair || '#3b2a20';
@@ -28,7 +27,8 @@ export function faceHTML(look = {}) {
 /**
  * Opens the mission window. Resolves with { stars } when finished, or null if closed early.
  */
-export function openMission(root, quest, npc) {
+export function openMission(root, quest, npc, rt) {
+  const look = { badge: rt.badge, badgeColor: rt.badgeColor, title: rt.file };
   return new Promise((resolve) => {
     const bg = document.createElement('div');
     bg.className = 'mission-bg';
@@ -48,8 +48,8 @@ export function openMission(root, quest, npc) {
 
     const st = { step: 'concept', ci: 0, seen: new Set([0]), hintsUsed: 0, solutionShown: false, wrong: { predict: 0, fill: 0, write: 0 }, shownHints: { fill: 0, write: 0 }, reviewFrom: null, passed: {} };
 
-    let javaStatus = javaReady ? 'ready' : 'loading';
-    warmUpJava().then(() => { javaReady = true; javaStatus = 'ready'; bg.querySelectorAll('.loading-java').forEach((e) => e.remove()); });
+    let javaStatus = readyLangs.has(rt.name) || !rt.loadingNote ? 'ready' : 'loading';
+    rt.warm().then(() => { readyLangs.add(rt.name); javaStatus = 'ready'; bg.querySelectorAll('.loading-java').forEach((e) => e.remove()); });
 
     const close = (result) => { bg.remove(); removeEventListener('keydown', onKey, true); resolve(result); };
     bg.querySelector('.back').addEventListener('click', () => {
@@ -80,7 +80,7 @@ export function openMission(root, quest, npc) {
     function npcBox(text) {
       return `<div class="npc">${faceHTML(npc.look)}<div class="bubble"><b>${npc.role} ${npc.name}</b>${text}</div></div>`;
     }
-    const javaNote = () => (javaStatus === 'ready' ? '' : '<span class="loading-java">☕ 자바 준비 중… 처음 한 번은 10~40초쯤 걸려요</span>');
+    const javaNote = () => (javaStatus === 'ready' ? '' : `<span class="loading-java">${rt.loadingNote}</span>`);
 
     function consoleBox(single) {
       const c = document.createElement('div');
@@ -102,7 +102,7 @@ export function openMission(root, quest, npc) {
         <div class="ctop"><span class="cnum">개념 ${st.ci + 1} / ${cs.length}</span><h2>${c.title}</h2></div>
         <p>${c.body}</p></div>`;
       const box = right.querySelector('.concept');
-      const view = codeView(c.code, { title: '예제 · Main.java' });
+      const view = codeView(c.code, { ...look, title: '예제 · ' + rt.file });
       box.appendChild(view.el);
       const bar = document.createElement('div');
       bar.className = 'runbar';
@@ -114,15 +114,14 @@ export function openMission(root, quest, npc) {
       bar.querySelector('.run').addEventListener('click', async (e) => {
         const b = e.currentTarget; b.disabled = true;
         bar.querySelector('.status').textContent = '실행 중…';
-        const r = await runJava(c.code);
+        const r = await rt.run(c.code);
         b.disabled = false;
         bar.querySelector('.status').textContent = r.phase === 'compile' && !r.ok ? '컴파일 에러' : `실행 ${(r.ms / 1000).toFixed(1)}초`;
         if (r.ok) out.innerHTML = `<div class="col"><h5>실행 결과</h5><span class="ok">${esc(r.output) || '<span class="muted">(출력 없음)</span>'}</span></div>`;
         else {
           out.classList.remove('single');
-          const line = +(r.error.match(/Main\.java:(\d+)/)?.[1] || 0);
-          view.markLine(line);
-          out.innerHTML = `<div class="col"><h5>에러</h5><span class="bad">${esc(r.error)}</span></div><div class="col plain"><h5>쉬운 말로</h5><b>${explainError(r.error)}</b></div>`;
+          view.markLine(r.line);
+          out.innerHTML = `<div class="col"><h5>에러</h5><span class="bad">${esc(r.error)}</span></div><div class="col plain"><h5>쉬운 말로</h5><b>${rt.explain(r.error, r.line)}</b></div>`;
         }
       });
       if (c.note) { const n = document.createElement('p'); n.className = 'note'; n.innerHTML = '👀 ' + c.note; box.appendChild(n); }
@@ -154,7 +153,7 @@ export function openMission(root, quest, npc) {
       bindReview();
       right.innerHTML = `<div class="concept"><div class="ctop"><span class="cnum">출력 예상</span><h2>${p.prompt}</h2></div></div>`;
       const box = right.querySelector('.concept');
-      box.appendChild(codeView(p.code).el);
+      box.appendChild(codeView(p.code, look).el);
       const ch = document.createElement('div');
       ch.className = 'choices';
       p.choices.forEach((c, i) => {
@@ -169,7 +168,7 @@ export function openMission(root, quest, npc) {
             nav.querySelector('.next').disabled = false;
           } else {
             b.classList.add('wrong'); st.wrong.predict++;
-            react(false, '아쉬워요', st.wrong.predict >= 2 ? p.explain : '음… 다시 한번 골라 볼래요? print 와 println, 변수 값을 천천히 따라가 봐요.');
+            react(false, '아쉬워요', st.wrong.predict >= 2 ? p.explain : '음… 다시 한번 골라 볼래요? 한 줄씩, 출력 순서와 변수 값을 천천히 따라가 봐요.');
           }
         });
         ch.appendChild(b);
@@ -217,12 +216,12 @@ export function openMission(root, quest, npc) {
           return false;
         }
       }
-      const r = await runJava(code);
+      const r = await rt.run(code);
       statusEl.textContent = r.phase === 'compile' && !r.ok ? '컴파일 실패' : `실행 ${(r.ms / 1000).toFixed(1)}초`;
       if (!r.ok) {
-        const line = +(r.error.match(/Main\.java:(\d+)/)?.[1] || 0);
+        const line = r.line;
         view.markLine(line);
-        const ex = explainError(r.error);
+        const ex = rt.explain(r.error, line);
         out.innerHTML = `<div class="col"><h5>내 출력</h5><span class="bad">${esc(r.error)}</span></div><div class="col plain"><h5>쉬운 말로</h5><b>${ex || '에러 메시지의 첫 줄을 확인해 주세요.'}</b></div>`;
         st.wrong[kind]++;
         react(false, '아직이에요', line ? `앗, 에러가 났네요. ${line}번째 줄을 한번 볼래요?` : '앗, 에러가 났네요. 메시지를 같이 볼까요?');
@@ -244,7 +243,7 @@ export function openMission(root, quest, npc) {
         + `<div class="card"><h4>빈칸 채우기</h4>${f.prompt}<div class="expect">${esc(f.expected)}</div></div>` + learnedCard();
       bindReview();
       right.innerHTML = '';
-      const view = codeView(f.code, { blanks: f.blanks });
+      const view = codeView(f.code, { ...look, blanks: f.blanks });
       view.el.classList.add('grow');
       right.appendChild(view.el);
       const bar = document.createElement('div');
@@ -283,7 +282,7 @@ export function openMission(root, quest, npc) {
         + `<div class="card"><h4>직접 쓰기</h4>${w.prompt}<div class="expect">${esc(w.expected)}</div></div>` + learnedCard();
       bindReview();
       right.innerHTML = '';
-      const ed = codeEditor(st.writeCode ?? w.starter, { onRun: () => run() });
+      const ed = codeEditor(st.writeCode ?? w.starter, { ...look, onRun: () => run() });
       right.appendChild(ed.el);
       const bar = document.createElement('div');
       bar.className = 'runbar';

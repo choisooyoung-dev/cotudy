@@ -1,14 +1,14 @@
 // Code display helpers: Java syntax highlight, read-only view (with blanks), and a small editor.
 
-const KEYWORDS = new Set('public private protected class static void new return if else for while do switch case break continue final this super extends implements interface abstract try catch finally throw throws import package true false null'.split(' '));
-const TYPES = new Set('int long double float boolean char byte short String System Math Integer Double Long Boolean Character Object ArrayList HashMap List Map Scanner'.split(' '));
+const KEYWORDS = new Set('public private protected class static void new return if else for while do switch case break continue final this super extends implements interface abstract try catch finally throw throws import package true false null let const var function typeof undefined of in async await'.split(' '));
+const TYPES = new Set('int long double float boolean char byte short String System Math Integer Double Long Boolean Character Object ArrayList HashMap List Map Scanner console Number Array JSON'.split(' '));
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** Returns highlighted HTML for one line of Java. */
 export function highlightLine(line) {
   let out = '';
-  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*"?)|('(?:[^'\\]|\\.)*'?)|(\b\d+(?:\.\d+)?[LlDdFf]?\b)|([A-Za-z_]\w*)|([\s\S])/g;
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*"?|`(?:[^`\\]|\\.)*`?)|('(?:[^'\\]|\\.)*'?)|(\b\d+(?:\.\d+)?[LlDdFf]?\b)|([A-Za-z_]\w*)|([\s\S])/g;
   let m;
   while ((m = re.exec(line))) {
     if (m[1]) out += `<span class="c">${esc(m[1])}</span>`;
@@ -31,10 +31,12 @@ export function highlight(code) {
 }
 
 /** Read-only code box. `blanks` turns {{i}} into inputs. Returns { el, values(), inputs }. */
-export function codeView(code, { title = 'Main.java', blanks = null } = {}) {
+const badgeHTML = (badge, color) => `<span class="java" style="background:${color || '#f89820'}">${badge || 'Java 8'}</span>`;
+
+export function codeView(code, { title = 'Main.java', blanks = null, badge, badgeColor } = {}) {
   const el = document.createElement('div');
   el.className = 'editor';
-  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><span class="java">Java 8</span></div>`;
+  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span>${badgeHTML(badge, badgeColor)}</div>`;
   const pre = document.createElement('pre');
   pre.className = 'codeview';
   const inputs = [];
@@ -79,10 +81,10 @@ export function codeView(code, { title = 'Main.java', blanks = null } = {}) {
 }
 
 /** Editable code box with highlight overlay, line numbers, Tab = 4 spaces. */
-export function codeEditor(initial, { title = 'Main.java', onRun } = {}) {
+export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor } = {}) {
   const el = document.createElement('div');
   el.className = 'editor grow';
-  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="처음 코드로">처음으로</button><span class="java">Java 8</span></div>
+  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="처음 코드로">처음으로</button>${badgeHTML(badge, badgeColor)}</div>
   <div class="ed-wrap"><div class="ed-gutter"></div><div class="ed-area"><pre></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div></div>`;
   const ta = el.querySelector('textarea');
   const pre = el.querySelector('pre');
