@@ -53,6 +53,7 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 /* ---------- dialog ---------- */
 .dlg { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: min(760px, calc(100vw - 32px)); background: var(--paper); border: 3px solid var(--line); border-radius: 18px; padding: 18px 20px 14px; box-shadow: 0 4px 0 var(--line); z-index: 10; }
 .dlg .who { position: absolute; top: -16px; left: 20px; background: var(--orange); border: 3px solid var(--line); border-radius: 10px; padding: 2px 12px; font-weight: 800; font-size: 14px; }
+.dlg .who.me { background: #8fc8ff; }
 .dlg p { margin: 6px 0 12px; font-size: 17px; line-height: 1.6; min-height: 1.6em; }
 .dlg .btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 .btn { font-weight: 800; border: 3px solid var(--line); border-radius: 12px; padding: 7px 14px; background: #fff; box-shadow: 0 3px 0 var(--line); }
@@ -86,6 +87,11 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .npc { display: flex; gap: 12px; align-items: flex-start; }
 .face { flex: none; width: 76px; height: 76px; border-radius: 16px; background: #d8ecff; border: 3px solid var(--line); position: relative; overflow: hidden; }
 .face i { position: absolute; display: block; }
+/* bust portrait standing on the talk box: no frame, outlined like a sticker */
+.face.bust { width: 76px; height: 98px; background: none; border: 0; border-radius: 0; overflow: visible;
+  filter: drop-shadow(3px 0 0 var(--line)) drop-shadow(-3px 0 0 var(--line)) drop-shadow(0 -3px 0 var(--line)); }
+/* the face stands right on top of the name badge */
+.dlg .portrait { position: absolute; left: 30px; bottom: calc(100% + 12px); transform: scale(1.1); transform-origin: bottom left; pointer-events: none; }
 .bubble { position: relative; background: #fff; border: 3px solid var(--line); border-radius: 16px; padding: 10px 12px; font-size: 15px; line-height: 1.5; flex: 1; }
 .bubble b { display: block; font-size: 12px; color: #a0661c; margin-bottom: 2px; }
 .bubble::before { content: ""; position: absolute; left: -14px; top: 18px; border: 10px solid transparent; border-left: 0; border-right: 11px solid var(--line); }

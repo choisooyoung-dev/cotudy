@@ -1,4 +1,5 @@
 // Progress lives in the browser's localStorage, separately for each language.
+import { tr } from './i18n.js';
 // Shape: { lang: 'java', byLang: { java: { done: { questId: stars }, pos: {x,z} } } }
 
 const KEY = 'cotudy.v1';
@@ -33,6 +34,9 @@ export const store = {
   },
   get pos() { return langState().pos; },
   savePos(x, z) { langState().pos = { x: +x.toFixed(2), z: +z.toFixed(2) }; write(state); },
+  /** True after the first-day tour (greeting the team) has been played once. */
+  get toured() { return !!state.toured; },
+  setToured() { state.toured = true; write(state); },
   reset() { state = { byLang: {} }; write(state); },
 
   /** The whole save as a JSON string (for the "저장 파일 받기" button). */
@@ -42,11 +46,11 @@ export const store = {
   /** Replaces the save with an exported file. Throws a Korean message if the file is not a cotudy save. */
   importText(text) {
     let obj;
-    try { obj = JSON.parse(text); } catch { throw new Error('JSON 파일이 아니에요.'); }
+    try { obj = JSON.parse(text); } catch { throw new Error(tr('JSON 파일이 아니에요.', 'This is not a JSON file.')); }
     const data = obj?.app === 'cotudy' ? obj.data : null;
-    if (!data || typeof data.byLang !== 'object') throw new Error('cotudy 저장 파일이 아니에요.');
+    if (!data || typeof data.byLang !== 'object') throw new Error(tr('cotudy 저장 파일이 아니에요.', 'This is not a cotudy save file.'));
     for (const l of Object.values(data.byLang)) {
-      if (typeof l?.done !== 'object') throw new Error('저장 파일 내용이 깨졌어요.');
+      if (typeof l?.done !== 'object') throw new Error(tr('저장 파일 내용이 깨졌어요.', 'The save file is damaged.'));
     }
     state = data;
     write(state);

@@ -1,4 +1,5 @@
 // The 3D center: renderer, camera that follows 김사원, walking, NPC wandering, name tags, quest marks.
+import { tr } from '../i18n.js';
 import * as THREE from 'three';
 import { makePerson, animatePerson } from './builders.js';
 import { buildCenter, buildTape, makeForklift, TAPE, ZONES } from './layout.js';
@@ -27,7 +28,9 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 400);
   const CAM_OFFSET = new THREE.Vector3(60, 62, 60);
 
-  const { colliders } = buildCenter(scene);
+  const { colliders, seats } = buildCenter(scene);
+  // yellow-black floor tape around the areas: drawn only, no collider (every area is walkable)
+  for (const lines of Object.values(TAPE)) buildTape(scene, lines);
 
   // ---- locked areas ----
   const locks = {}; // zone -> { tape, collider }
@@ -68,7 +71,7 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
     }
     holder.position.set(start.x, 0, start.z);
     scene.add(holder);
-    people.push({ id, def, p, holder, target: null, wait: Math.random() * 2, moving: false, speed: def.forklift ? 3 : 1.5 });
+    people.push({ id, def, p, holder, target: null, wait: Math.random() * 2, moving: false, speed: def.forklift ? 3 : 1.5, guide: null, seat: null, sitting: false });
   }
 
   // ---- quest mark (red 3D "!") ----
@@ -105,9 +108,9 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
   tagLayer.className = 'tags';
   container.appendChild(tagLayer);
   const makeTag = (html, cls = '') => { const d = document.createElement('div'); d.className = 'tag ' + cls; d.innerHTML = html; tagLayer.appendChild(d); return d; };
-  const meTag = makeTag('<b>물류팀</b>김사원', 'me');
+  const meTag = makeTag(tr('<b>물류팀</b>김사원', '<b>Logistics</b>Kim'), 'me');
   for (const n of people) n.tag = makeTag(`<b>${n.def.role}</b>${n.def.name}`);
-  const prompt = makeTag('<kbd>Space</kbd> 말 걸기', 'prompt');
+  const prompt = makeTag(tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
 
   // ---- input ----
   const keys = new Set();
@@ -215,12 +218,44 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
       const d = Math.hypot(pos.x - mp.x, pos.z - mp.z);
       const talking = d < 2.6 && !n.def.forklift;
       if (d < best && !frozen) { best = d; nearest = n; }
-      if (talking) {
+      if (n.guide && n.seat) { n.seat.taken = false; n.seat = null; n.sitting = false; } // stand up when the tour needs them
+      if (n.sitting) {
+        // sitting on a seat for a while; stays seated even while you talk to them
+        n.moving = false;
+        n.wait -= dt;
+        if (n.wait <= 0) { n.sitting = false; n.seat.taken = false; n.seat = null; n.wait = 0.5; }
+      } else if (n.guide) {
+        // scripted walk (tour): follow the path, ignoring walls; a leader waits when the player falls behind
+        const g = n.guide;
+        const wp = g.path[g.i];
+        const waitForPlayer = g.lead && d > 6;
+        if (wp && !waitForPlayer && !frozen) {
+          const dx = wp.x - pos.x, dz = wp.z - pos.z, dist = Math.hypot(dx, dz);
+          if (dist < 0.15) g.i++;
+          else {
+            const step = Math.min(dist, g.speed * dt);
+            pos.x += dx / dist * step; pos.z += dz / dist * step;
+            n.holder.rotation.y = Math.atan2(dx, dz);
+          }
+          n.moving = dist >= 0.15;
+        } else {
+          n.moving = false;
+          const f = !wp && g.face ? g.face : mp;
+          n.holder.rotation.y = Math.atan2(f.x - pos.x, f.z - pos.z);
+        }
+        if (!wp && g.onArrive && (!g.lead || d < 3.4)) { const done = g.onArrive; g.onArrive = null; done(); }
+      } else if (talking) {
         n.moving = false;
         n.holder.rotation.y = Math.atan2(mp.x - pos.x, mp.z - pos.z);
       } else if (n.wait > 0) {
         n.wait -= dt; n.moving = false;
       } else {
+        if (!n.target && !n.def.forklift && Math.random() < 0.35) {
+          // sometimes go sit down on a free seat inside their own area
+          const [ax0, az0, ax1, az1] = n.def.area;
+          const free = seats.filter((st) => !st.taken && st.x >= ax0 - 1 && st.x <= ax1 + 1 && st.z >= az0 - 1 && st.z <= az1 + 1);
+          if (free.length) { n.seat = free[Math.floor(Math.random() * free.length)]; n.seat.taken = true; n.target = { x: n.seat.x, z: n.seat.z, seat: true }; }
+        }
         if (!n.target) {
           const [ax0, az0, ax1, az1] = n.def.area;
           n.target = n.def.forklift
@@ -228,16 +263,21 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
             : { x: ax0 + Math.random() * (ax1 - ax0), z: az0 + Math.random() * (az1 - az0) };
         }
         const dx = n.target.x - pos.x, dz = n.target.z - pos.z, dist = Math.hypot(dx, dz);
-        if (dist < 0.2) { n.target = null; n.wait = n.def.forklift ? 1.5 : 1.5 + Math.random() * 3; n.moving = false; }
+        if (dist < 0.2 && n.target.seat) {
+          // arrived at the seat: sit for 8–20 s
+          pos.x = n.seat.x; pos.z = n.seat.z; n.holder.rotation.y = n.seat.rot;
+          n.target = null; n.sitting = true; n.wait = 8 + Math.random() * 12; n.moving = false;
+        } else if (dist < 0.2) { n.target = null; n.wait = n.def.forklift ? 1.5 : 1.5 + Math.random() * 3; n.moving = false; }
         else {
           const step = Math.min(dist, n.speed * dt);
           const sx = dx / dist * step, sz = dz / dist * step;
           const r = n.def.forklift ? 0.1 : 0.4;
-          if (blocked(pos.x + sx, pos.z + sz, r, true) && !n.def.forklift) { n.target = null; n.wait = 0.5; n.moving = false; }
+          // on the way to a seat they may brush past the desk it belongs to, so don't stop for furniture then
+          if (!n.target.seat && blocked(pos.x + sx, pos.z + sz, r, true) && !n.def.forklift) { n.target = null; n.wait = 0.5; n.moving = false; }
           else { pos.x += sx; pos.z += sz; n.moving = true; n.holder.rotation.y = n.def.forklift ? (sx > 0 ? 0 : Math.PI) : Math.atan2(sx, sz); }
         }
       }
-      animatePerson(n.p, t + n.id.length, n.moving && !n.def.forklift);
+      animatePerson(n.p, t + n.id.length, n.moving && !n.def.forklift, n.sitting);
       const mark = marks.get(n.id);
       if (mark) {
         mark.position.set(pos.x, 3.5 + Math.sin(t * 3) * 0.12, pos.z);
@@ -289,7 +329,23 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
     setArrowTarget(id) { arrowTarget = id; },
     get blockedZone() { return blockedZoneHit; },
     get playerPos() { return me.group.position; },
+    npcPos(id) { return people.find((q) => q.id === id)?.holder.position; },
     setPad(x, z) { pad.x = x; pad.z = z; },
+    /**
+     * Walks an NPC along `path` ([{x, z}, …]) and keeps it there until freeNpc().
+     * lead: it waits whenever the player is more than 6 m behind, and the promise resolves only
+     * once the player has caught up. face: {x, z} to look at after arriving (default: the player).
+     */
+    walkNpc(id, path, { lead = false, speed = 2.6, face = null } = {}) {
+      const n = people.find((q) => q.id === id);
+      if (!n) return Promise.resolve();
+      return new Promise((resolve) => { n.guide = { path, i: 0, lead, speed, face, onArrive: resolve }; });
+    },
+    /** Lets an NPC go back to wandering in its own area. */
+    freeNpc(id) {
+      const n = people.find((q) => q.id === id);
+      if (n) { n.guide = null; n.target = null; n.wait = 1; }
+    },
     /** Smoothly look at an NPC for a moment (used when a new quest opens). */
     async showNpc(id, ms = 1800) {
       const n = people.find((q) => q.id === id);

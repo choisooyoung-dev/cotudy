@@ -2,24 +2,27 @@
 // Coordinates: x = left→right, z = back→front, 1 unit ≈ 1 m. Back walls are at z = Z0 and x = X0.
 import * as THREE from 'three';
 import { box, cyl, textPlane, floorMaterial, carton, canvasTexture, drawText } from './builders.js';
+import { tr } from '../i18n.js';
 
 export const X0 = -32, X1 = 32, Z0 = -22, Z1 = 22;
 
 /** Areas. `rect` = [x0, z0, x1, z1]. Locked areas get tape + a collider over `lockRect`. */
 export const ZONES = {
-  office:    { name: '사무실',            rect: [X0, 9, -14, Z1] },
-  receiving: { name: '화장품 입고장',      rect: [X0, Z0, -12, -6], lockRect: [X0, Z0, -11.9, -5.6] },
-  printing:  { name: '주문 출력실',        rect: [X0, -4, -15, 5], lockRect: [X0, -4.3, -14.7, 5.3] },
-  picking:   { name: '피킹',              rect: [-10, Z0, 10, -6.2], lockRect: [-10.2, Z0, 10, -6] },
-  packing:   { name: '패킹',              rect: [12, -6, X1, 5.8], lockRect: [11.8, Z0, X1, 6] },
-  shipping:  { name: '출고장 · 택배 상차장', rect: [12, Z0, X1, -6], lockRect: [11.8, Z0, X1, 6] },
-  rest:      { name: '휴게실',            rect: [13, 9, X1, Z1] },
+  office:    { name: tr('사무실', 'Office'),            rect: [X0, 9, -14, Z1] },
+  receiving: { name: tr('화장품 입고장', 'Cosmetics receiving'),      rect: [X0, Z0, -12, -6], lockRect: [X0, Z0, -11.9, -5.6] },
+  printing:  { name: tr('주문 출력실', 'Order printing'),        rect: [X0, -4, -15, 5], lockRect: [X0, -4.3, -14.7, 5.3] },
+  picking:   { name: tr('피킹', 'Picking'),              rect: [-10, Z0, 10, -6.2], lockRect: [-10.2, Z0, 10, -6] },
+  packing:   { name: tr('패킹', 'Packing'),              rect: [12, -6, X1, 5.8], lockRect: [11.8, Z0, X1, 6] },
+  shipping:  { name: tr('출고장 · 택배 상차장', 'Shipping · Courier loading'), rect: [12, Z0, X1, -6], lockRect: [11.8, Z0, X1, 6] },
+  rest:      { name: tr('휴게실', 'Break room'),            rect: [13, 9, X1, Z1] },
 };
 
 export function buildCenter(scene) {
   const colliders = [];
   const solid = (x0, z0, x1, z1) => colliders.push({ x0: Math.min(x0, x1), z0: Math.min(z0, z1), x1: Math.max(x0, x1), z1: Math.max(z0, z1) });
   const S = scene;
+  // places where people can sit down for a while: { x, z, rot } (rot = which way they face)
+  const seats = [];
 
   // ---- shell ----
   const floor = (kind, x0, z0, x1, z1, y = 0) => {
@@ -46,7 +49,7 @@ export function buildCenter(scene) {
     if (open) {
       box(S, 5, 4.2, 0.1, '#2a2e36', x, 2.1, Z0 + 0.05, { cast: false });
       box(S, 4.4, 3.6, 0.4, '#f4f4f4', x, 2, Z0 + 0.3);
-      textPlane(S, '번개택배', 3.6, 0.8, '#f4f4f4', '#e2523f').position.set(x, 3, Z0 + 0.52);
+      textPlane(S, tr('번개택배', 'LIGHTNING'), 3.6, 0.8, '#f4f4f4', '#e2523f').position.set(x, 3, Z0 + 0.52);
     } else {
       box(S, 5, 4.2, 0.12, '#a3adb8', x, 2.1, Z0 + 0.06);
       for (let y = 0.3; y < 4.2; y += 0.3) box(S, 5, 0.04, 0.14, '#8b96a2', x, y, Z0 + 0.07, { cast: false });
@@ -62,12 +65,12 @@ export function buildCenter(scene) {
     if (onLeft) { p.position.set(X0 + 0.03, pos[1], pos[0]); p.rotation.y = Math.PI / 2; }
     else p.position.set(pos[0], pos[1], Z0 + 0.03);
   };
-  wallSign('안전제일', 3.2, 1.1, '#1f8a4c', '#fff', [-10, 4.4], false, { fs: 44, border: '#fff' });
-  wallSign('지게차 통행 주의', 4.4, 0.9, '#ffcc00', '#222', [-22.5, 5.2], false, { fs: 34, border: '#222' });
-  wallSign('입고 IN', 2.6, 0.8, '#2f6fd6', '#fff', [-26, 5.25], false, { fs: 36 });
-  wallSign('출고 OUT', 2.8, 0.8, '#e2523f', '#fff', [26, 5.25], false, { fs: 36 });
-  wallSign('적재 높이 1.5m 이하', 4.2, 0.8, '#fff', '#c0392b', [4, 4.6], false, { fs: 30, border: '#c0392b' });
-  wallSign('보행자 통로', 3, 0.8, '#2c3e50', '#fff', [7, 4.6], true, { fs: 32 });
+  wallSign(tr('안전제일', 'SAFETY FIRST'), 3.2, 1.1, '#1f8a4c', '#fff', [-10, 4.4], false, { fs: 44, border: '#fff' });
+  wallSign(tr('지게차 통행 주의', 'FORKLIFT CROSSING'), 4.4, 0.9, '#ffcc00', '#222', [-22.5, 5.2], false, { fs: 34, border: '#222' });
+  wallSign(tr('입고 IN', 'INBOUND'), 2.6, 0.8, '#2f6fd6', '#fff', [-26, 5.25], false, { fs: 36 });
+  wallSign(tr('출고 OUT', 'OUTBOUND'), 2.8, 0.8, '#e2523f', '#fff', [26, 5.25], false, { fs: 36 });
+  wallSign(tr('적재 높이 1.5m 이하', 'MAX STACK 1.5m'), 4.2, 0.8, '#fff', '#c0392b', [4, 4.6], false, { fs: 30, border: '#c0392b' });
+  wallSign(tr('보행자 통로', 'WALKWAY'), 3, 0.8, '#2c3e50', '#fff', [7, 4.6], true, { fs: 32 });
 
   // wall clock: real current time, redrawn every minute
   const clockCanvas = document.createElement('canvas');
@@ -101,11 +104,11 @@ export function buildCenter(scene) {
     const p = textPlane(S, text, w, 1, null, c, { fs: 40 });
     p.rotation.x = -Math.PI / 2; p.position.set(x, 0.06, z);
   };
-  floorLabel('① 화장품 입고장', -21, -7.2, 7);
-  floorLabel('③ 피킹', 0, -7.4, 5);
-  floorLabel('⑥ 출고장 · 택배 상차장', 21, -7.4, 9);
-  floorLabel('④ 패킹', 18, 4.8, 5);
-  floorLabel('⑦ 휴게실', 25, 10, 5, '#5b6472');
+  floorLabel(tr('① 화장품 입고장', '① Cosmetics receiving'), -21, -7.2, 7);
+  floorLabel(tr('③ 피킹', '③ Picking'), 0, -7.4, 5);
+  floorLabel(tr('⑥ 출고장 · 택배 상차장', '⑥ Shipping · Loading'), 21, -7.4, 9);
+  floorLabel(tr('④ 패킹', '④ Packing'), 18, 4.8, 5);
+  floorLabel(tr('⑦ 휴게실', '⑦ Break room'), 25, 10, 5, '#5b6472');
 
   // ---- 입고장 ----
   const pallet = (x, z, lv = 2) => {
@@ -153,6 +156,8 @@ export function buildCenter(scene) {
   packTable(16, 1); packTable(21, 1); packTable(16, -3.5); packTable(21, -3.5);
 
   // ---- glass rooms ----
+  // Glass walls are only for looks: they have no collider, so you can walk through them
+  // (they were hard to see and got in the way, 2026-11-12).
   const glassMat = new THREE.MeshLambertMaterial({ color: '#bfe3ff', transparent: true, opacity: 0.22 });
   /** wall from (a,b) to (c,d), axis aligned, with optional door gap [from, to] along the wall. */
   const glassWall = (a, b, c, d, door) => {
@@ -167,7 +172,6 @@ export function buildCenter(scene) {
       m.position.set(horiz ? mid : a, 1.3, horiz ? b : mid);
       S.add(m);
       box(S, horiz ? len : 0.12, 0.1, horiz ? 0.12 : len, '#7b8794', horiz ? mid : a, 2.6, horiz ? b : mid, { cast: false });
-      if (horiz) solid(s0, b - 0.15, s1, b + 0.15); else solid(a - 0.15, s0, a + 0.15, s1);
     }
   };
   // 주문 출력실
@@ -181,10 +185,11 @@ export function buildCenter(scene) {
     for (let i = 0; i < mon; i++) { box(S, 0.8, 0.5, 0.06, '#20242c', x + (i - (mon - 1) / 2) * 0.85, 1.4, z - 0.35); box(S, 0.08, 0.3, 0.08, '#555', x + (i - (mon - 1) / 2) * 0.85, 1.1, z - 0.35); }
     box(S, 0.7, 0.03, 0.25, '#ddd', x, 1.02, z + 0.1);
     box(S, 0.6, 0.08, 0.6, '#e17055', x, 0.55, z + 0.85); box(S, 0.6, 0.6, 0.08, '#e17055', x, 0.85, z + 1.15);
+    seats.push({ x, z: z + 0.85, rot: Math.PI });
     solid(x - 1.1, z - 0.55, x + 1.1, z + 0.55);
   };
   desk(-22, -1.5); desk(-22, 2.5);
-  const wb = textPlane(S, '오늘 출고 마감\n15:00', 2.4, 1.4, '#ffffff', '#2c3e50', { fs: 30, border: '#95a5a6' });
+  const wb = textPlane(S, tr('오늘 출고 마감\n15:00', 'Shipping cutoff\n15:00'), 2.4, 1.4, '#ffffff', '#2c3e50', { fs: 30, border: '#95a5a6' });
   wb.position.set(X0 + 0.05, 1.9, 1.5); wb.rotation.y = Math.PI / 2;
 
   // 사무실
@@ -198,16 +203,17 @@ export function buildCenter(scene) {
   };
   plant(-15.2, 10.2); plant(-31, 21); plant(-15.5, 21);
   box(S, 0.4, 1.4, 0.3, '#34495e', -16.5, 0.7, 10); solid(-16.7, 9.85, -16.3, 10.15);
-  textPlane(S, '출근 09:00', 0.36, 0.2, '#2ecc71', '#fff', { fs: 9 }).position.set(-16.5, 1.15, 10.16);
+  textPlane(S, tr('출근 09:00', 'IN 09:00'), 0.36, 0.2, '#2ecc71', '#fff', { fs: 9 }).position.set(-16.5, 1.15, 10.16);
 
-  // 휴게실 + 화장실
+  // 휴게실
   floor('tile', 13, 9, X1, Z1, 0.02);
-  box(S, 4, 0.6, 1.4, '#e7837a', 22, 0.3, 20); box(S, 4, 0.9, 0.4, '#e7837a', 22, 0.75, 20.9);
-  box(S, 0.4, 0.8, 1.4, '#e7837a', 20, 0.4, 20); box(S, 0.4, 0.8, 1.4, '#e7837a', 24, 0.4, 20);
-  solid(19.8, 19.3, 24.2, 21.2);
-  box(S, 1.6, 0.4, 0.9, '#c4966a', 22, 0.4, 17.8); solid(21.2, 17.35, 22.8, 18.25);
+  box(S, 4, 0.6, 1.4, '#e7837a', 26, 0.3, 20); box(S, 4, 0.9, 0.4, '#e7837a', 26, 0.75, 20.9);
+  box(S, 0.4, 0.8, 1.4, '#e7837a', 24, 0.4, 20); box(S, 0.4, 0.8, 1.4, '#e7837a', 28, 0.4, 20);
+  seats.push({ x: 25, z: 19.9, rot: Math.PI }, { x: 27, z: 19.9, rot: Math.PI });
+  solid(23.8, 19.3, 28.2, 21.2);
+  box(S, 1.6, 0.4, 0.9, '#c4966a', 26, 0.4, 17.8); solid(25.2, 17.35, 26.8, 18.25);
   box(S, 1.4, 2.4, 1, '#c0392b', X1 - 1, 1.2, 11);
-  textPlane(S, '믹스커피\n☕ 300원', 1.1, 0.9, '#fff3e0', '#8e2b20', { fs: 20 }).position.set(X1 - 1, 1.6, 11.52);
+  textPlane(S, tr('믹스커피\n☕ 300원', 'Coffee mix\n☕ 300 won'), 1.1, 0.9, '#fff3e0', '#8e2b20', { fs: 20 }).position.set(X1 - 1, 1.6, 11.52);
   solid(X1 - 1.7, 10.5, X1, 11.5);
   box(S, 0.7, 1.4, 0.7, '#ecf0f1', X1 - 1, 0.7, 13.5); cyl(S, 0.25, 0.25, 0.6, '#a9d6f0', X1 - 1, 1.7, 13.5); solid(X1 - 1.35, 13.15, X1, 13.85);
   box(S, 2.4, 0.1, 1.4, '#d9b98c', 18, 0.9, 13);
@@ -215,15 +221,33 @@ export function buildCenter(scene) {
   cyl(S, 0.2, 0.15, 0.25, '#e74c3c', 17.5, 1.07, 13); cyl(S, 0.2, 0.15, 0.25, '#f1c40f', 18.5, 1.07, 13.2);
   solid(16.8, 12.3, 19.2, 13.7);
   box(S, 3, 1.8, 0.1, '#cfd8dc', 16, 0.9, 9.05, { cast: false });
-  textPlane(S, '이번 주 식단표\n월 제육 · 화 돈까스\n수 비빔밥 · 목 짜장', 2.2, 1.4, '#fffef6', '#333', { fs: 17, border: '#b08455' }).position.set(16, 1.9, 9.12);
+  textPlane(S, tr('이번 주 식단표\n월 제육 · 화 돈까스\n수 비빔밥 · 목 짜장', 'Lunch this week\nMon pork · Tue cutlet\nWed bibimbap · Thu noodles'), 2.2, 1.4, '#fffef6', '#333', { fs: 17, border: '#b08455' }).position.set(16, 1.9, 9.12);
   solid(14.5, 8.9, 17.5, 9.2);
-  // toilet room
-  box(S, 4, 2.8, 0.2, '#dfe6e9', 15, 1.4, Z1 - 4); box(S, 0.2, 2.8, 4, '#dfe6e9', 13.1, 1.4, Z1 - 2);
-  box(S, 1, 2.1, 0.22, '#74b9ff', 15.6, 1.05, Z1 - 3.98);
-  textPlane(S, '화장실 🚻', 1.6, 0.5, '#0984e3', '#fff', { fs: 20 }).position.set(15, 2.5, Z1 - 3.88);
-  solid(13, Z1 - 4.15, 17, Z1); // you can't go inside; the door is a "rest stop"
 
-  return { colliders, solid };
+  // 센터장실 (director's office) in the break room corner: a glass room with a door toward the break room.
+  // The guest sofa is for later (HQ staff visits).
+  floor('wood', 13, 14.5, 21.5, Z1, 0.03);
+  glassWall(13, 14.5, 21.5, 14.5, [16.2, 18.4]); glassWall(21.5, 14.5, 21.5, Z1);
+  textPlane(S, tr('센터장실', 'DIRECTOR'), 2, 0.5, '#2c3e50', '#fff', { fs: 24 }).position.set(17.3, 2.35, 14.56);
+  box(S, 2.6, 0.1, 1.1, '#8d6e63', 17.6, 0.85, 19.6); // desk
+  [[-1.2, -0.45], [1.2, -0.45], [-1.2, 0.45], [1.2, 0.45]].forEach(([a, b]) => box(S, 0.08, 0.8, 0.08, '#5d4037', 17.6 + a, 0.4, 19.6 + b));
+  box(S, 0.9, 0.55, 0.06, '#222', 17.6, 1.25, 19.95); box(S, 0.12, 0.25, 0.12, '#444', 17.6, 0.98, 19.95); // monitor (faces the door)
+  textPlane(S, tr('센터장 문', 'Director Moon'), 0.8, 0.2, '#f5e6c8', '#4a2c1a', { fs: 10 }).position.set(17, 0.98, 19.04);
+  solid(16.3, 19.05, 18.9, 20.15);
+  box(S, 0.75, 0.12, 0.75, '#34495e', 17.6, 0.5, 20.75); box(S, 0.75, 0.8, 0.12, '#34495e', 17.6, 0.95, 21.15); // big chair
+  seats.push({ x: 17.6, z: 20.75, rot: Math.PI });
+  box(S, 0.5, 2, 2.6, '#6d4c41', 13.35, 1, 19.8); // bookcase
+  for (let i = 0; i < 4; i++) box(S, 0.42, 0.06, 2.5, '#4e342e', 13.38, 0.4 + i * 0.5, 19.8, { cast: false });
+  solid(13, 18.5, 13.6, 21.1);
+  // guest sofa + coffee table
+  box(S, 1, 0.5, 2.2, '#7f8fa6', 14, 0.25, 16.6); box(S, 0.3, 0.9, 2.2, '#7f8fa6', 13.6, 0.55, 16.6);
+  seats.push({ x: 14.2, z: 16, rot: Math.PI / 2 }, { x: 14.2, z: 17.2, rot: Math.PI / 2 });
+  solid(13.4, 15.5, 14.5, 17.7);
+  box(S, 1, 0.4, 1.4, '#c4966a', 15.6, 0.2, 16.6); cyl(S, 0.1, 0.08, 0.18, '#fff', 15.5, 0.49, 16.4);
+  solid(15.1, 15.9, 16.1, 17.3);
+  plant(20.8, 21.2);
+
+  return { colliders, solid, seats };
 }
 
 /** Yellow/black floor tape around a locked area. Returns the meshes so they can be removed. */

@@ -47,6 +47,9 @@ export function drawText(g, text, cw, ch, fg, fs) {
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   const lines = text.split('\n');
+  // shrink the font when a line is wider than the sign (English text is often longer)
+  const widest = Math.max(...lines.map((l) => g.measureText(l).width));
+  if (widest > cw * 0.9) { fs = Math.floor(fs * (cw * 0.9) / widest); g.font = `800 ${fs}px ${FONT}`; }
   lines.forEach((l, i) => g.fillText(l, cw / 2, ch / 2 + (i - (lines.length - 1) / 2) * fs * 1.15));
 }
 
@@ -160,9 +163,15 @@ export function makePerson(look = {}) {
   return { group: g, parts: { body, legL, legR, armL, armR, carry } };
 }
 
-/** Animates walking (t = time, moving = bool). */
-export function animatePerson(p, t, moving) {
+/** Animates walking (t = time, moving = bool). sitting: legs forward, hips on a chair seat. */
+export function animatePerson(p, t, moving, sitting = false) {
   const { body, legL, legR, armL, armR, carry } = p.parts;
+  if (sitting) {
+    legL.rotation.x = legR.rotation.x = -Math.PI / 2;
+    if (!carry) { armL.rotation.x = -0.7; armR.rotation.x = -0.7 + Math.sin(t * 1.5) * 0.08; }
+    body.position.y = 0.03 + Math.sin(t * 2) * 0.01;
+    return;
+  }
   const s = moving ? Math.sin(t * 11) : 0;
   legL.rotation.x = s * 0.6;
   legR.rotation.x = -s * 0.6;

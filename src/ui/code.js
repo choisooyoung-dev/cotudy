@@ -1,4 +1,5 @@
 // Code display helpers: Java syntax highlight, read-only view (with blanks), and a small editor.
+import { tr } from '../i18n.js';
 
 const KEYWORDS = new Set('public private protected class static void new return if else for while do switch case break continue final this super extends implements interface abstract try catch finally throw throws import package true false null let const var function typeof undefined of in async await def elif and or not None True False pass lambda from as with global'.split(' '));
 const TYPES = new Set('int long double float boolean char byte short String System Math Integer Double Long Boolean Character Object ArrayList HashMap List Map Scanner console Number Array JSON'.split(' '));
@@ -84,7 +85,7 @@ export function codeView(code, { title = 'Main.java', blanks = null, badge, badg
 export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor } = {}) {
   const el = document.createElement('div');
   el.className = 'editor grow';
-  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="처음 코드로">처음으로</button>${badgeHTML(badge, badgeColor)}</div>
+  el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="${tr('처음 코드로', 'Back to the starting code')}">${tr('처음으로', 'Reset')}</button>${badgeHTML(badge, badgeColor)}</div>
   <div class="ed-wrap"><div class="ed-gutter"></div><div class="ed-area"><pre></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div></div>`;
   const ta = el.querySelector('textarea');
   const pre = el.querySelector('pre');
@@ -133,8 +134,9 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
     set value(v) { ta.value = v; render(); },
     focus() {
       ta.focus();
-      let marker = ta.value.indexOf('// 여기에 코드를 쓰세요');
-      if (marker < 0) marker = ta.value.indexOf('# 여기에 코드를 쓰세요');
+      // put the cursor on the line after the "write your code here" comment
+      const marker = ['// 여기에 코드를 쓰세요', '# 여기에 코드를 쓰세요', '// Write your code here', '# Write your code here']
+        .map((m) => ta.value.indexOf(m)).find((i) => i >= 0) ?? -1;
       if (marker >= 0) {
         const end = ta.value.indexOf('\n', marker);
         const indent = ta.value.slice(ta.value.lastIndexOf('\n', marker) + 1, marker);
