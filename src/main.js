@@ -14,9 +14,9 @@ import { runJs } from './runner/javascript.js';
 import { runPython, warmUpPython } from './runner/python.js';
 
 const LANGS = [
-  { id: 'java', name: 'Java', desc: '백엔드 · 안드로이드', quests: JAVA_QUESTS },
-  { id: 'javascript', name: 'JavaScript', desc: '웹 · 프론트엔드 · Node.js', quests: JS_QUESTS },
-  { id: 'python', name: 'Python', desc: '데이터 · 자동화 · AI', quests: PY_QUESTS },
+  { id: 'java', name: 'Java', icon: '<span class="lang-ico java">☕</span>', quests: JAVA_QUESTS },
+  { id: 'javascript', name: 'JavaScript', icon: '<span class="lang-ico js">JS</span>', quests: JS_QUESTS },
+  { id: 'python', name: 'Python', icon: '<span class="lang-ico py">🐍</span>', quests: PY_QUESTS },
 ];
 
 const app = document.getElementById('app');
@@ -222,7 +222,7 @@ async function chooseLanguage() {
     buttons: LANGS.map((l) => {
       const p = l.quests ? percent(l.id) : 0;
       const progress = p > 0 ? `<span class="lang-pct">${p}%</span>` : '';
-      return { html: `${l.name}<small> · ${l.desc}</small>${progress}${store.lang === l.id ? ' ✓' : ''}`, value: l.id, disabled: !l.quests, primary: l.id === (store.lang || 'java') };
+      return { html: `${l.icon}${l.name}${progress}${store.lang === l.id ? ' ✓' : ''}`, value: l.id, disabled: !l.quests, primary: l.id === (store.lang || 'java') };
     }),
   });
   const first = !store.lang;
