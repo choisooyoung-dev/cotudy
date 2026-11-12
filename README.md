@@ -1,7 +1,7 @@
 # cotudy — 물류회사에서 일하며 배우는 코딩
 
 > 화장품 물류회사 물류팀에 갓 입사한 **김사원**이 되어 물류센터에서 일한다.
-> 입고·출력·피킹·패킹·출고를 돌며 동료들이 부탁하는 일을 **코드로** 해결하다 보면, 어느새 코딩 언어(Java · JavaScript)를 배우게 되는 3D 게임
+> 입고·출력·피킹·패킹·출고를 돌며 동료들이 부탁하는 일을 **코드로** 해결하다 보면, 어느새 코딩 언어(Java · JavaScript · Python)를 배우게 되는 3D 게임
 
 **▶ 바로 하기: https://choisooyoung-dev.github.io/cotudy/**
 
@@ -13,12 +13,12 @@
 
 ## 이런 걸 배워요
 
-**Java** 와 **JavaScript** 중 하나를 골라서 배운다. 처음 보는 사람도 할 수 있게, 출력 한 줄부터 시작한다. (Python 은 준비 중)
+**Java**, **JavaScript**, **Python** 중 하나를 골라서 배운다. 처음 보는 사람도 할 수 있게, 출력 한 줄부터 시작한다.
 
 | 공간 | 담당 | 배우는 것 | 상태 |
 |---|---|---|---|
 | 사무실 | 인사팀 한지원 | 화면에 출력하기, 에러 메시지 읽기, 주석 | ✅ |
-| 화장품 입고장 | 입고 담당 박주임 | 변수와 타입 (Java: `int` `long` `double` `boolean` `char` `String` 형변환 / JavaScript: `let` `const` number `toFixed` boolean string `Math.floor` `Number()`) | ✅ |
+| 화장품 입고장 | 입고 담당 박주임 | 변수와 타입 (Java: `int` `long` `double` `boolean` `char` `String` 형변환 / JavaScript: `let` `const` number `toFixed` boolean string `Math.floor` `Number()` / Python: 변수 f-문자열 `int` `float` `bool` `str` `//` `int()`) | ✅ |
 | 주문 출력실 | 출력 담당 이대리 | 연산자 | 🚧 준비 중 |
 | 피킹 | 피커 정사원 | 조건문 | 🚧 |
 | 패킹 | 패커 송사원 | 반복문 | 🚧 |
@@ -28,7 +28,7 @@
 
 ## 하는 법
 
-1. 처음 들어가면 인사팀 한지원이 **어떤 언어로 일할지** 물어본다. Java 또는 JavaScript 를 고른다. 나중에 ⚙︎ → **🌐 언어 바꾸기**로 바꿀 수 있고, 언어마다 진행은 따로 저장된다.
+1. 처음 들어가면 인사팀 한지원이 **어떤 언어로 일할지** 물어본다. Java, JavaScript, Python 중 하나를 고른다. 나중에 ⚙︎ → **🌐 언어 바꾸기**로 바꿀 수 있고, 언어마다 진행은 따로 저장된다.
 2. **방향키**(또는 `W` `A` `S` `D`)로 센터를 걸어 다닌다. 휴대폰에서는 화면 왼쪽 아래 버튼을 쓴다.
 3. 머리 위에 **빨간 느낌표(!)** 가 뜬 사람에게 가서 `Space` 를 누르면 부탁을 들을 수 있다. 주황 화살표가 그 사람 쪽을 가리킨다.
 4. **퀘스트 시작**을 누르면 미션 창이 열린다. 순서는 이렇다.
@@ -39,7 +39,7 @@
 5. 막히면 **힌트**를 하나씩 열 수 있다. **정답 보기**는 3번 틀리면 열린다. 힌트를 안 쓸수록 별(★)을 많이 받는다.
 6. 한 공간의 퀘스트를 다 끝내면 다음 공간의 노란 테이프가 걷힌다.
 
-> ☕ **Java 는 처음 실행이 조금 느려요.** 자바 실행기를 받느라 처음 한 번은 10~40초쯤 걸린다. 왼쪽 아래에 "☕ 자바 준비 완료"가 뜨면, 그다음부터는 1~2초면 실행된다. 인터넷 연결이 필요하다. JavaScript 는 기다림 없이 바로 실행된다.
+> ☕ **Java 는 처음 실행이 조금 느려요.** 자바 실행기를 받느라 처음 한 번은 10~40초쯤 걸린다. 왼쪽 아래에 "☕ 자바 준비 완료"가 뜨면, 그다음부터는 1~2초면 실행된다. 인터넷 연결이 필요하다. JavaScript 는 기다림 없이 바로 실행되고, Python 은 처음 한 번 몇 초 준비한 뒤 바로 실행된다.
 
 ## 진행 상황 저장
 
@@ -52,7 +52,7 @@
 ## 자주 묻는 것
 
 - **실행을 눌렀는데 한참 "실행 중…"이에요.** (Java) 처음 한 번은 자바 실행기를 받는 중이다. 조금만 기다리자. 계속 멈춰 있으면 새로고침한다.
-- **JavaScript 에서 "시간 초과"가 나요.** 3초 안에 끝나지 않는 코드(끝나지 않는 반복문 등)는 멈춘다.
+- **"시간 초과"가 나요.** JavaScript 는 3초, Python 은 5초 안에 끝나지 않는 코드(끝나지 않는 반복문 등)는 멈춘다.
 - **에러가 났어요.** 출력 칸 오른쪽에 "쉬운 말로" 풀이가 나온다. 빨갛게 칠해진 줄부터 보자.
 - **출력이 똑같아 보이는데 틀렸대요.** 띄어쓰기, 콜론(`:`), 단위(`개`, `kg`)까지 한 글자씩 비교해 보자.
 - **처음부터 다시 하고 싶어요.** ⚙︎ → 진행 초기화. (되돌릴 수 없으니 먼저 저장 파일을 받아 두자.)
@@ -69,7 +69,7 @@ cotudy 의 코드, 퀘스트·이야기·캐릭터·대사, 화면 디자인과 
 - ❌ 저작권자의 허락 없이 코드·퀘스트 내용·디자인을 **복사, 수정, 다시 배포, 다른 서비스에 사용, 상업적으로 이용**할 수 없다.
 - 쓰고 싶은 부분이 있으면 GitHub 이슈로 먼저 물어봐 주세요.
 
-자세한 내용은 [LICENSE](LICENSE). cotudy 가 함께 쓰는 외부 소프트웨어(CheerpJ, Three.js, OpenJDK javac)는 각자의 라이선스를 따른다 → [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+자세한 내용은 [LICENSE](LICENSE). cotudy 가 함께 쓰는 외부 소프트웨어(CheerpJ, Pyodide, Three.js, OpenJDK javac)는 각자의 라이선스를 따른다 → [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
@@ -102,6 +102,7 @@ src/store.js                진행 저장 (localStorage, 언어별), 저장 파�
 src/runner/index.js         언어별 실행기 목록 (실행, 에러 풀이, 코드 칸 이름)
 src/runner/java.js          CheerpJ 로 컴파일·실행, javac 에러를 쉬운 말로 풀이
 src/runner/javascript.js    Web Worker 에서 실행 (3초 제한), JS 에러를 쉬운 말로 풀이
+src/runner/python.js        Pyodide 를 Web Worker 에서 실행 (5초 제한), 파이썬 에러를 쉬운 말로 풀이
 src/world/layout.js         센터 바닥·벽·가구·표지판·충돌 상자, 공간(ZONES)과 잠금 테이프
 src/world/builders.js       로우폴리 도형, 캐릭터 만들기·걷기 애니메이션
 src/world/game.js           Three.js 장면, 카메라, 이동·충돌, NPC, 이름표, 느낌표
@@ -111,16 +112,17 @@ src/content/stages.js       1회차 공간 순서
 src/content/npcs.js         NPC 이름·직함·모습·돌아다니는 범위·잡담
 src/content/java/quests.js        Java 퀘스트 내용 (코드와 분리된 데이터)
 src/content/javascript/quests.js  JavaScript 퀘스트 내용 (같은 이야기, JS 코드)
+src/content/python/quests.js      Python 퀘스트 내용 (같은 이야기, 파이썬 코드)
 docs/mockups/               디자인 시안
 PLAN.md                     전체 설계
 ```
 
 ### 새 퀘스트·공간 추가
 
-1. `src/content/java/quests.js` (또는 `javascript/quests.js`) 의 `QUESTS` 에 퀘스트 객체를 하나 더 넣는다. 두 언어 모두 같은 `id`·`stage`·`npc` 로 만들면 이야기가 맞춰진다.
+1. `src/content/java/quests.js` (또는 `javascript/quests.js`, `python/quests.js`) 의 `QUESTS` 에 퀘스트 객체를 하나 더 넣는다. 세 언어 모두 같은 `id`·`stage`·`npc` 로 만들면 이야기가 맞춰진다. 설명은 그 언어만으로 쓴다 (다른 언어와 비교하지 않기).
    - `stage`: `src/content/stages.js` 의 공간 id (예: `'printing'` = 주문 출력실 · 연산자)
    - `npc`: `src/content/npcs.js` 의 id (예: `'lee'` = 이대리)
-   - `concepts`(개념 카드), `predict`(출력 예상), `fill`(빈칸 `{{0}}`), `write`(직접 쓰기)를 채운다. Java 코드는 `main('…')` 도우미로 `class Main` 뼈대를 씌운다. JavaScript 는 뼈대 없이 그대로 쓴다.
+   - `concepts`(개념 카드), `predict`(출력 예상), `fill`(빈칸 `{{0}}`), `write`(직접 쓰기)를 채운다. Java 코드는 `main('…')` 도우미로 `class Main` 뼈대를 씌운다. JavaScript·Python 은 뼈대 없이 그대로 쓴다.
    - `fill.solution`, `write.solution` 은 "정답 보기"에 쓰이고, 실행 결과가 `expected` 와 같아야 한다.
 2. 그 공간에 퀘스트가 생기면, 앞 공간을 끝냈을 때 자동으로 열린다.
 3. `npm run dev` 로 띄워서 직접 풀어 본다. 브라우저 콘솔의 `cotudy.startQuest(...)` 로 바로 열 수도 있다.

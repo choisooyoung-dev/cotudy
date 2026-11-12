@@ -1,6 +1,6 @@
 // Code display helpers: Java syntax highlight, read-only view (with blanks), and a small editor.
 
-const KEYWORDS = new Set('public private protected class static void new return if else for while do switch case break continue final this super extends implements interface abstract try catch finally throw throws import package true false null let const var function typeof undefined of in async await'.split(' '));
+const KEYWORDS = new Set('public private protected class static void new return if else for while do switch case break continue final this super extends implements interface abstract try catch finally throw throws import package true false null let const var function typeof undefined of in async await def elif and or not None True False pass lambda from as with global'.split(' '));
 const TYPES = new Set('int long double float boolean char byte short String System Math Integer Double Long Boolean Character Object ArrayList HashMap List Map Scanner console Number Array JSON'.split(' '));
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -8,7 +8,7 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
 /** Returns highlighted HTML for one line of Java. */
 export function highlightLine(line) {
   let out = '';
-  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*"?|`(?:[^`\\]|\\.)*`?)|('(?:[^'\\]|\\.)*'?)|(\b\d+(?:\.\d+)?[LlDdFf]?\b)|([A-Za-z_]\w*)|([\s\S])/g;
+  const re = /(\/\/.*$|#.*$)|("(?:[^"\\]|\\.)*"?|`(?:[^`\\]|\\.)*`?)|('(?:[^'\\]|\\.)*'?)|(\b\d+(?:\.\d+)?[LlDdFf]?\b)|([A-Za-z_]\w*)|([\s\S])/g;
   let m;
   while ((m = re.exec(line))) {
     if (m[1]) out += `<span class="c">${esc(m[1])}</span>`;
@@ -117,7 +117,7 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
       const s = ta.selectionStart;
       const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
       const indent = ta.value.slice(lineStart).match(/^ */)[0];
-      const extra = ta.value[s - 1] === '{' ? '    ' : '';
+      const extra = ta.value[s - 1] === '{' || ta.value[s - 1] === ':' ? '    ' : '';
       ta.setRangeText('\n' + indent + extra, s, ta.selectionEnd, 'end');
       render();
     } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -133,7 +133,8 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
     set value(v) { ta.value = v; render(); },
     focus() {
       ta.focus();
-      const marker = ta.value.indexOf('// 여기에 코드를 쓰세요');
+      let marker = ta.value.indexOf('// 여기에 코드를 쓰세요');
+      if (marker < 0) marker = ta.value.indexOf('# 여기에 코드를 쓰세요');
       if (marker >= 0) {
         const end = ta.value.indexOf('\n', marker);
         const indent = ta.value.slice(ta.value.lastIndexOf('\n', marker) + 1, marker);

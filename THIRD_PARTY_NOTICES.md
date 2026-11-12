@@ -8,6 +8,12 @@ cotudy 는 아래 외부 소프트웨어를 함께 쓴다. 이 부분은 cotudy 
 - CheerpJ Community 라이선스(개인·교육·취미 사용, 개인이 배포하는 소프트웨어)에 따라 무료로 쓰며, 화면 왼쪽 아래에 **"Built with CheerpJ"** 를 표시한다.
 - https://cheerpj.com/licensing/
 
+## Pyodide
+
+- 브라우저에서 파이썬을 실행하는 데 쓴다. 이 저장소에 들어 있지 않고, Python 을 고르면 jsDelivr CDN(`cdn.jsdelivr.net/pyodide/v0.29.0/`)에서 불러온다.
+- Mozilla Public License 2.0. https://github.com/pyodide/pyodide/blob/main/LICENSE
+- Python 은 Python Software Foundation 의 상표다.
+
 ## Three.js
 
 - 3D 화면을 그리는 데 쓴다. 빌드할 때 사이트에 함께 묶인다.

@@ -1,6 +1,7 @@
 // One entry per language: how to run code, explain errors, and label the code box.
 import { runJava, explainError, warmUpJava } from './java.js';
 import { runJs, explainJsError } from './javascript.js';
+import { runPython, explainPyError, warmUpPython } from './python.js';
 
 export const RUNTIMES = {
   java: {
@@ -16,5 +17,12 @@ export const RUNTIMES = {
     explain: (err, line) => explainJsError(err, line),
     warm: () => Promise.resolve(),
     loadingNote: '',
+  },
+  python: {
+    name: 'Python', file: 'main.py', badge: 'Python 3', badgeColor: '#3776ab',
+    run: runPython,
+    explain: (err, line) => explainPyError(err, line),
+    warm: warmUpPython,
+    loadingNote: '🐍 파이썬 준비 중… 처음 한 번은 몇 초 걸려요',
   },
 };

@@ -6,15 +6,17 @@ import { STAGES } from './content/stages.js';
 import { NPCS } from './content/npcs.js';
 import { QUESTS as JAVA_QUESTS } from './content/java/quests.js';
 import { QUESTS as JS_QUESTS } from './content/javascript/quests.js';
+import { QUESTS as PY_QUESTS } from './content/python/quests.js';
 import { RUNTIMES } from './runner/index.js';
 import { openMission } from './ui/mission.js';
 import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
+import { runPython, warmUpPython } from './runner/python.js';
 
 const LANGS = [
   { id: 'java', name: 'Java', desc: '백엔드 · 안드로이드', quests: JAVA_QUESTS },
   { id: 'javascript', name: 'JavaScript', desc: '웹 · 프론트엔드 · Node.js', quests: JS_QUESTS },
-  { id: 'python', name: 'Python', desc: '준비 중', quests: null },
+  { id: 'python', name: 'Python', desc: '데이터 · 자동화 · AI', quests: PY_QUESTS },
 ];
 
 const app = document.getElementById('app');
@@ -221,7 +223,8 @@ async function chooseLanguage() {
   store.setLang(v || 'java');
   if (!first) { location.reload(); return; } // other language = other progress and position
   quests = langInfo().quests;
-  if (store.lang !== 'java') $('.java-state').textContent = `⚡ ${langInfo().name}`;
+  if (store.lang === 'javascript') $('.java-state').textContent = '⚡ JavaScript';
+  if (store.lang === 'python') { $('.java-state').textContent = '🐍 파이썬 준비 중…'; warmUpPython().then(() => { $('.java-state').textContent = '🐍 파이썬 준비 완료'; }); }
   refresh();
   toast('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', 6000);
 }
@@ -297,7 +300,10 @@ if (!store.lang) setTimeout(chooseLanguage, 400);
 const warm = (store.lang || 'java') === 'java' ? warmUpJava() : Promise.resolve();
 if ((store.lang || 'java') === 'java') {
   warm.then(() => { $('.java-state').textContent = '☕ 자바 준비 완료'; }, () => { $('.java-state').textContent = '⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)'; });
+} else if (store.lang === 'python') {
+  $('.java-state').textContent = '🐍 파이썬 준비 중…';
+  warmUpPython().then(() => { $('.java-state').textContent = '🐍 파이썬 준비 완료'; }, () => { $('.java-state').textContent = '⚠️ 파이썬을 불러오지 못했어요 (인터넷 연결 확인)'; });
 } else {
   $('.java-state').textContent = `⚡ ${langInfo().name}`;
 }
-window.cotudy = { store, refresh, world, runJava, runJs, warm, talkTo, startQuest };
+window.cotudy = { store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest };
