@@ -2,6 +2,9 @@
   "name": "cotudy",
   "private": true,
   "version": "0.1.0",
+  "description": "물류센터에서 배우는 자바 — 3D 공부 게임",
+  "author": "choisooyoung-dev",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

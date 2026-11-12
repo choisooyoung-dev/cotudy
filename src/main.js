@@ -22,7 +22,7 @@ app.innerHTML = `
   <div class="toast hide"></div>
   <div class="pad"><button class="u">▲</button><button class="l">◀</button><button class="act">말 걸기</button><button class="r">▶</button><button class="d">▼</button></div>
   <button class="menu-btn" title="진행 초기화 등">⚙︎</button>
-  <div class="credit"><span class="java-state">☕ 자바 준비 중…</span> · 자바 실행: <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a></div>`;
+  <div class="credit"><span class="java-state">☕ 자바 준비 중…</span> · <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a> · © 2026 choisooyoung-dev. All rights reserved.</div>`;
 
 const $ = (s) => app.querySelector(s);
 let quests = JAVA_QUESTS;
@@ -229,9 +229,52 @@ $('.pad .act').addEventListener('click', () => dispatchEvent(new KeyboardEvent('
 // ---------- settings ----------
 $('.menu-btn').addEventListener('click', async () => {
   if (busy) return;
-  const v = await dialog({ who: 'cotudy', lines: ['설정'], buttons: [{ label: '진행 초기화', value: 'reset' }, { label: '닫기', value: null, primary: true }] });
-  if (v === 'reset' && confirm('모든 진행 상황을 지울까요? 되돌릴 수 없어요.')) { store.reset(); location.reload(); }
+  const v = await dialog({
+    who: '설정',
+    lines: ['진행 상황은 이 브라우저에만 저장돼요. 다른 컴퓨터에서 이어 하려면 저장 파일을 받아서 거기서 불러오세요.'],
+    buttons: [
+      { label: '💾 저장 파일 받기', value: 'export' },
+      { label: '📂 저장 파일 불러오기', value: 'import' },
+      { label: '진행 초기화', value: 'reset' },
+      { label: '닫기', value: null, primary: true },
+    ],
+  });
+  if (v === 'export') exportSave();
+  if (v === 'import') importSave();
+  if (v === 'reset' && confirm('모든 진행 상황을 지울까요? 되돌릴 수 없어요.\n(지우기 전에 저장 파일을 받아 두면 나중에 불러올 수 있어요)')) { store.reset(); location.reload(); }
 });
+
+function exportSave() {
+  const blob = new Blob([store.exportText()], { type: 'application/json' });
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href = URL.createObjectURL(blob);
+  a.download = `cotudy-save-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('💾 저장 파일을 받았어요. 다른 컴퓨터에서 ⚙︎ → 저장 파일 불러오기 로 이어 할 수 있어요', 5000);
+}
+
+function importSave() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (!confirm('지금 진행 상황을 이 저장 파일로 바꿀까요? 지금 진행은 사라져요.')) return;
+      store.importText(text);
+      location.reload();
+    } catch (e) {
+      toast(`⚠️ 불러오지 못했어요: ${e.message}`, 5000);
+    }
+  });
+  input.click();
+}
 
 // ---------- start ----------
 refresh();
