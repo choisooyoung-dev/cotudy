@@ -17,9 +17,11 @@ npm run dev
 - 자바 실행기는 인터넷(CheerpJ CDN)에서 받으므로 인터넷이 연결돼 있어야 한다.
 - 진행 상황은 브라우저 `localStorage` 에 저장된다. 오른쪽 아래 ⚙︎ 에서 초기화할 수 있다.
 
-## 배포 (GitHub Pages, 선택)
+## 배포 (GitHub Pages)
 
-`npm run build` 결과물(`dist/`)을 그대로 올리면 된다. `vite.config.js` 의 `base: './'` 덕분에 `/cotudy/` 같은 하위 경로에서도 동작한다.
+주소: https://choisooyoung-dev.github.io/cotudy/
+
+`main` 에 푸시하면 `.github/workflows/deploy.yml` 이 `npm run build` 를 해서 자동으로 배포한다 (1~2분). `vite.config.js` 의 `base: './'` 덕분에 `/cotudy/` 하위 경로에서도 동작한다.
 
 ## 폴더
 
