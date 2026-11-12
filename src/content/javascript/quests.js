@@ -17,7 +17,7 @@ export const QUESTS = [
         title: '화면에 찍기 <code>console.log</code>',
         body: '<code>console.log(…)</code> 는 괄호 안의 내용을 찍고 <b>줄을 바꿔요</b>.<br>글자(문자열)는 따옴표로 감싸요. 큰따옴표 <code>" "</code>, 작은따옴표 <code>\' \'</code> 둘 다 돼요.',
         code: 'console.log("안녕하세요");\nconsole.log(\'물류팀 김사원입니다\');',
-        note: '자바와 달리 <code>class</code> 나 <code>main</code> 같은 뼈대 없이, 쓴 줄이 위에서부터 바로 실행돼요.',
+        note: '코드는 <b>위에서부터 한 줄씩</b> 차례대로 실행돼요.',
       },
       {
         title: '여러 값을 한 번에 찍기',
@@ -118,7 +118,7 @@ export const QUESTS = [
     concepts: [
       {
         title: '변수 만들기 <code>let</code>',
-        body: '변수는 값을 담아 두는 <b>이름</b>이에요. <code>let 이름 = 값;</code> 으로 만들고, 그다음부터는 이름으로 값을 꺼내 써요.<br>자바처럼 <code>int</code> 같은 타입은 안 써요.',
+        body: '변수는 값을 담아 두는 <b>이름</b>이에요. <code>let 이름 = 값;</code> 으로 만들고, 그다음부터는 이름으로 값을 꺼내 써요.',
         code: 'let boxCount = 12;\nconsole.log(boxCount);',
         note: '변수 이름은 소문자로 시작하고, 단어가 바뀌면 대문자로 써요: <code>boxCount</code>',
       },
@@ -175,11 +175,11 @@ export const QUESTS = [
         title: '숫자는 <code>number</code> 하나',
         body: '자바스크립트는 정수와 소수를 구분하지 않아요. 바코드 같은 큰 정수도, 용량 같은 소수도 모두 <b>number</b> 예요.<br><code>typeof</code> 로 값의 타입을 볼 수 있어요.',
         code: 'let barcode = 8801234567890;\nlet volume = 50.5;\nconsole.log(barcode);\nconsole.log(volume / 2);\nconsole.log(typeof barcode, typeof volume);',
-        note: '자바의 <code>long</code> 처럼 <code>L</code> 을 붙일 필요가 없어요. (아주 큰 수, 약 9천조를 넘으면 정확하지 않게 돼요.)',
+        note: '아주 큰 수(약 9천조 이상)는 정확하지 않게 돼요. 바코드 정도는 괜찮아요.',
       },
       {
         title: '정수처럼 보이면 <code>.0</code> 이 안 붙어요',
-        body: '계산 결과가 딱 떨어지면 소수점 없이 찍혀요. 자바의 <code>double</code> 은 <code>1.0</code> 이라고 찍지만, 자바스크립트는 <code>1</code> 이에요.',
+        body: '계산 결과가 딱 떨어지면 소수점 없이 찍혀요. <code>0.25 * 4</code> 는 <code>1.0</code> 이 아니라 <code>1</code> 로 찍혀요.',
         code: 'console.log(0.25 * 4);\nconsole.log(30.0);',
       },
       {
@@ -214,7 +214,7 @@ export const QUESTS = [
       hints: ['weight * 4 는 1 이에요. 1.0 으로 찍으려면?', '(weight * 4).toFixed(1) 을 문자열에 붙여요: "박스 무게: " + (weight * 4).toFixed(1) + "kg"'],
       solution: 'let weight = 0.25;\nconsole.log("박스 무게: " + (weight * 4).toFixed(1) + "kg");',
     },
-    learned: ['정수·소수 모두 <code>number</code>', '딱 떨어지면 <code>1</code> (1.0 아님)', '<code>숫자.toFixed(1)</code> → 소수점 한 자리 문자열'],
+    learned: ['정수·소수 모두 <code>number</code>', '딱 떨어지면 <code>1</code> 로 찍혀요', '<code>숫자.toFixed(1)</code> → 소수점 한 자리 문자열'],
   },
   {
     id: 'recv-bool-char-string', stage: 'receiving', npc: 'park',
@@ -232,7 +232,7 @@ export const QUESTS = [
       },
       {
         title: '문자열 <code>string</code>',
-        body: '글자는 모두 문자열이에요. 자바의 <code>char</code> 처럼 "글자 하나" 타입이 따로 없고, <code>"A"</code> 도 <code>\'A\'</code> 도 문자열이에요.',
+        body: '글자는 한 글자든 여러 글자든 모두 문자열이에요. <code>"A"</code> 도 <code>\'A\'</code> 도 문자열이에요.',
         code: 'let grade = \'A\';\nlet name = "쿠션 팩트";\nconsole.log(grade, typeof grade);\nconsole.log(name + " 입고");',
       },
       {
@@ -267,7 +267,7 @@ export const QUESTS = [
       hints: ['빈칸 문제와 같은 모양이에요. 값만 "토너", "B", false 로 바꿔요.', 'let name = "토너"; let grade = "B"; let passed = false; 를 만들고 세 줄을 찍어요.'],
       solution: 'let name = "토너";\nlet grade = "B";\nlet passed = false;\nconsole.log("상품: " + name);\nconsole.log("등급: " + grade);\nconsole.log("통과: " + passed);',
     },
-    learned: ['<code>true</code> / <code>false</code> 는 따옴표 없이', '글자는 모두 문자열 (char 없음)', '<code>+</code> 는 왼쪽부터: 문자열이 나오면 이어 붙이기'],
+    learned: ['<code>true</code> / <code>false</code> 는 따옴표 없이', '글자는 모두 문자열', '<code>+</code> 는 왼쪽부터: 문자열이 나오면 이어 붙이기'],
   },
   {
     id: 'recv-cast', stage: 'receiving', npc: 'park',
@@ -280,7 +280,7 @@ export const QUESTS = [
     concepts: [
       {
         title: '나누기는 소수점까지 나와요',
-        body: '자바와 달리, 자바스크립트는 정수끼리 나눠도 <b>소수점까지</b> 나와요.',
+        body: '정수끼리 나눠도 결과는 <b>소수점까지</b> 나와요.',
         code: 'console.log(7 / 2);\nconsole.log(10 / 4);',
       },
       {
@@ -299,7 +299,7 @@ export const QUESTS = [
       code: 'let boxes = 7;\nconsole.log(boxes / 2);',
       choices: ['3.5', '3', '4', '3.0'],
       answer: 0,
-      explain: '자바스크립트는 나누기 결과를 소수점까지 보여 줘요. 7 / 2 = 3.5 (자바였다면 3)',
+      explain: '나누기 결과는 소수점까지 나와요. 7 / 2 = 3.5',
     },
     fill: {
       prompt: '빈칸을 채워서 무게를 정수로 정산하세요.',
