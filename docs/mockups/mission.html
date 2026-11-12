@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>cotudy 미션 창 시안</title>
+<style>
+:root{--ink:#3d2a17;--line:#5b3a1e;--paper:#fff8e7;--green:#6cbf4b;--dgreen:#3f8f2a;--red:#e2523f}
+*{box-sizing:border-box}
+html,body{margin:0;background:#1d2027;font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink)}
+#wrap{position:relative;width:1280px;height:800px;margin:0 auto;overflow:hidden;
+ background:linear-gradient(#0000,#0000),repeating-linear-gradient(45deg,#c9ced5 0 18px,#c2c7ce 18px 36px)}
+#wrap::before{content:"";position:absolute;inset:0;background:#1d2027b0}
+.win{position:absolute;inset:22px;background:var(--paper);border:4px solid var(--line);border-radius:22px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;overflow:hidden}
+.top{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:3px solid #e7d7b5;background:#fff3d6}
+.back{font-weight:800;border:3px solid var(--line);border-radius:12px;padding:5px 12px;background:#fff;font-size:14px}
+.title{font-weight:900;font-size:18px}
+.title small{display:block;font-weight:600;font-size:12px;opacity:.7}
+.steps{margin-left:auto;display:flex;gap:6px;align-items:center}
+.steps i{display:block;width:22px;height:22px;border-radius:6px;background:#e7d7b5;border:2px solid #cdb88f}
+.steps i.on{background:var(--green);border-color:var(--dgreen)}
+.steps i.now{background:#fff;border:2px dashed var(--dgreen)}
+.steps span{font-size:12px;font-weight:700;margin-right:6px;opacity:.7}
+.body{flex:1;display:grid;grid-template-columns:380px 1fr;min-height:0}
+.left{padding:18px;border-right:3px solid #e7d7b5;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.npc{display:flex;gap:12px;align-items:flex-start}
+.face{flex:none;width:86px;height:86px;border-radius:18px;background:#d8ecff;border:3px solid var(--line);position:relative;overflow:hidden}
+.face .head{position:absolute;left:15px;top:20px;width:56px;height:52px;background:#ffd9b8;border-radius:8px}
+.face .hair{position:absolute;left:12px;top:12px;width:62px;height:20px;background:#2b1d14;border-radius:6px 6px 2px 2px}
+.face .bang{position:absolute;left:14px;top:28px;width:28px;height:9px;background:#2b1d14;border-radius:2px}
+.face .e1,.face .e2{position:absolute;top:44px;width:6px;height:9px;background:#2d2d2d;border-radius:2px}.face .e1{left:30px}.face .e2{left:50px}
+.face .c1,.face .c2{position:absolute;top:56px;width:9px;height:5px;background:#ff9aa2;border-radius:3px}.face .c1{left:21px}.face .c2{left:56px}
+.face .vest{position:absolute;left:8px;top:74px;width:70px;height:20px;background:#c6f432;border-radius:6px 6px 0 0}
+.bubble{position:relative;background:#fff;border:3px solid var(--line);border-radius:16px;padding:10px 12px;font-size:15px;line-height:1.5}
+.bubble b{display:block;font-size:12px;color:#a0661c;margin-bottom:2px}
+.bubble::before{content:"";position:absolute;left:-11px;top:22px;border:8px solid transparent;border-right-color:var(--line)}
+.card{background:#fff;border:3px solid #e7d7b5;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.6}
+.card h4{margin:0 0 6px;font-size:13px;color:#a0661c}
+.card code{background:#f3ead6;border-radius:5px;padding:1px 5px;font-family:"JetBrains Mono",Menlo,monospace;font-size:13px}
+.expect{font-family:Menlo,monospace;background:#2b2f3a;color:#e9f5d9;border-radius:8px;padding:8px 10px;margin-top:6px;font-size:13px}
+.hint{display:flex;gap:8px;margin-top:auto}
+.hint button{flex:1;font:inherit;font-weight:800;font-size:13px;border:3px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.hint button.dim{opacity:.45}
+.right{display:flex;flex-direction:column;min-height:0;padding:16px 18px 16px 16px;gap:12px}
+.editor{flex:1;background:#232733;border-radius:14px;border:3px solid #2f3442;display:flex;flex-direction:column;overflow:hidden}
+.tabbar{display:flex;align-items:center;gap:8px;background:#1b1e27;padding:8px 12px;color:#cfd6e4;font-size:12px;font-family:Menlo,monospace}
+.tabbar .tab{background:#232733;padding:4px 10px;border-radius:7px 7px 0 0}
+.tabbar .java{margin-left:auto;background:#f89820;color:#fff;font-weight:800;border-radius:6px;padding:2px 8px;font-family:inherit}
+pre{margin:0;padding:12px 0;font-family:"JetBrains Mono",Menlo,monospace;font-size:16px;line-height:1.75;color:#e6e9ef;flex:1}
+.ln{display:flex}.ln .n{width:46px;text-align:right;padding-right:14px;color:#5d6577;user-select:none}
+.ln.cur{background:#2c3140}
+.k{color:#ff8fab}.t{color:#7fd1ff}.s{color:#b5e08c}.f{color:#ffd166}.c{color:#7d8597}
+.caret{display:inline-block;width:2px;height:20px;background:#ffd166;vertical-align:-4px;margin-left:1px}
+.err-line{background:#5a2a2a !important}
+.squig{text-decoration:underline wavy #ff6b6b 2px;text-underline-offset:4px}
+.runbar{display:flex;gap:10px;align-items:center}
+.runbar button{font:inherit;font-weight:900;font-size:16px;border:3px solid var(--line);border-radius:14px;padding:9px 18px;background:#fff;box-shadow:0 3px 0 var(--line)}
+.runbar .run{background:#ffd84d}
+.runbar .submit{background:var(--green);color:#fff}
+.runbar .status{margin-left:auto;font-size:13px;font-weight:700;opacity:.75}
+.console{height:178px;background:#1b1e27;border-radius:14px;border:3px solid #2f3442;color:#e6e9ef;font-family:Menlo,monospace;font-size:14px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.console .col{padding:10px 14px}
+.console .col+.col{border-left:2px solid #2f3442}
+.console h5{margin:0 0 8px;font-family:-apple-system,"Apple SD Gothic Neo",sans-serif;font-size:12px;color:#9aa3b5}
+.console .ok{color:#9be37a}.console .bad{color:#ff8a80}
+.toast{position:absolute;right:46px;bottom:240px;background:#fff;border:4px solid var(--dgreen);border-radius:18px;padding:14px 18px;box-shadow:0 5px 0 var(--dgreen);display:flex;gap:12px;align-items:center;max-width:420px}
+.toast .big{font-size:34px}
+.toast b{font-size:18px;color:var(--dgreen)}
+.toast p{margin:2px 0 0;font-size:14px}
+.toast.err{border-color:var(--red);box-shadow:0 5px 0 var(--red)}.toast.err b{color:var(--red)}
+.label{position:absolute;bottom:8px;right:30px;color:#fff;font-size:12px;opacity:.6}
+.err .only-ok{display:none}.ok .only-err{display:none}
+</style></head><body>
+<div id="wrap">
+<div class="win">
+ <div class="top">
+  <div class="back">← 센터로</div>
+  <div class="title">립스틱 박스 수 찍기<small>화장품 입고장 · 박주임 · 변수와 타입 퀘스트 1</small></div>
+  <div class="steps"><span>부탁 · 개념 공부 · 출력 예상 · 빈칸 · 직접 쓰기</span><i class="on" title="부탁"></i><i class="on" title="개념 공부"></i><i class="on" title="출력 예상"></i><i class="on" title="빈칸 채우기"></i><i class="now" title="직접 쓰기"></i></div>
+ </div>
+ <div class="body">
+  <div class="left">
+   <div class="npc"><div class="face"><div class="hair"></div><div class="head"></div><div class="hair"></div><div class="bang"></div><div class="e1"></div><div class="e2"></div><div class="c1"></div><div class="c2"></div><div class="vest"></div></div>
+    <div class="bubble"><b>입고 담당 박주임</b>김사원님, 이번엔 박스 수를 <code>boxCount</code> 변수에 넣고 화면에 찍어 줄래요?</div></div>
+   <div class="card"><h4>5단계 · 직접 쓰기</h4>
+    <code>int</code> 변수 <code>boxCount</code> 에 <code>12</code> 를 넣고, 아래처럼 출력되게 하세요.
+    <div class="expect">립스틱 박스: 12개</div></div>
+   <div class="card"><h4>개념 정리 <span style="float:right;font-weight:700;color:#5b3a1e;cursor:pointer">📖 개념 다시 보기</span></h4><code>int 이름 = 값;</code> 으로 정수를 담는다.<br>문자열과 숫자는 <code>+</code> 로 이어 붙여 출력할 수 있다.</div>
+   <div class="hint"><button>💡 힌트 1</button><button class="dim">힌트 2 🔒</button><button class="dim">정답 보기 🔒</button></div>
+  </div>
+  <div class="right">
+   <div class="editor">
+    <div class="tabbar"><span class="tab">Main.java</span><span class="java">Java 8</span></div>
+    <pre id="code"></pre>
+   </div>
+   <div class="runbar"><button class="run">▶ 실행</button><button class="submit">제출</button><span class="status only-ok">실행 1.2초 · 출력이 맞아요</span><span class="status only-err">컴파일 실패</span></div>
+   <div class="console">
+    <div class="col"><h5>내 출력</h5><div class="only-ok">립스틱 박스: 12개</div>
+     <div class="only-err bad">Main.java:3: error: ';' expected<br>&nbsp;&nbsp;&nbsp;&nbsp;int boxCount = 12<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^<br>1 error</div></div>
+    <div class="col"><h5 class="only-ok">기대 출력</h5><div class="only-ok ok">립스틱 박스: 12개 ✓</div>
+     <h5 class="only-err">쉬운 말로</h5><div class="only-err" style="font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;line-height:1.6"><b style="color:#ffd166">3번째 줄 끝에 <code style="background:#2f3442;color:#fff">;</code> 가 빠졌어요.</b><br>자바는 문장이 끝날 때마다 <code style="background:#2f3442;color:#fff">;</code> 를 붙여야 해요.</div></div>
+   </div>
+  </div>
+ </div>
+</div>
+<div class="toast only-ok"><div class="big">🎉</div><div><b>미션 성공! ★★★</b><p>박주임: "김사원님 최고! 벌써 끝났어요?"</p></div></div>
+<div class="toast err only-err"><div class="big">🧐</div><div><b>아직이에요</b><p>박주임: "앗, 에러가 났네요. 3번째 줄을 한번 볼래요?"</p></div></div>
+<div class="label">cotudy 미션 창 시안</div>
+</div>
+<script>
+const ERR=location.search.includes('err');document.getElementById('wrap').classList.add(ERR?'err':'ok');
+const L=[
+ '<span class="k">public class</span> <span class="t">Main</span> {',
+ '    <span class="k">public static void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {',
+ ERR?'        <span class="t">int</span> boxCount = 12<span class="squig">&nbsp;</span>':'        <span class="t">int</span> boxCount = 12;',
+ '        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"립스틱 박스: "</span> + boxCount + <span class="s">"개"</span>);<span class="caret"></span>',
+ '    }',
+ '}'];
+document.getElementById('code').innerHTML=L.map((l,i)=>`<div class="ln${ERR&&i==2?' err-line':(!ERR&&i==3?' cur':'')}"><span class="n">${i+1}</span><span>${l}</span></div>`).join('');
+</script></body></html>

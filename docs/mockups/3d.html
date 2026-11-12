@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>cotudy 3D mock</title>
+<style>
+html,body{margin:0;background:#2b2f3a;font-family:-apple-system,"Apple SD Gothic Neo",sans-serif;overflow:hidden}
+#wrap{position:relative;width:960px;height:600px;margin:0 auto}
+.hud{position:absolute;top:14px;left:14px;background:#fff8e7;border:3px solid #5b3a1e;border-radius:12px;padding:8px 14px;color:#5b3a1e;font-weight:700;box-shadow:0 3px 0 #5b3a1e}
+.hud small{display:block;font-weight:500;font-size:12px;opacity:.75}
+.bar{height:8px;background:#e7d7b5;border-radius:4px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;width:33%;background:#6cbf4b}
+.tip{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#fff8e7;border:3px solid #5b3a1e;border-radius:20px;padding:8px 18px;color:#5b3a1e;font-weight:700}
+.tip kbd{background:#5b3a1e;color:#fff8e7;border-radius:6px;padding:1px 7px;margin-right:6px}
+.label{position:absolute;top:14px;right:14px;background:#00000080;color:#fff;padding:6px 10px;border-radius:8px;font-size:13px}
+.tag{position:absolute;transform:translate(-50%,-100%);background:#fff8e7;border:2px solid #5b3a1e;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;color:#5b3a1e;white-space:nowrap}
+.tag.lock{opacity:.6}
+</style></head><body>
+<div id="wrap">
+<div class="hud">지역 1 · 입고센터 <small>1. 변수와 타입 · 2/6</small><div class="bar"><i></i></div></div>
+<div class="label">3D 로우폴리 시안</div>
+<div class="tip"><kbd>Space</kbd>3. 계량실 들어가기 (double)</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const W=960,H=600,wrap=document.getElementById('wrap');
+const R=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});R.setSize(W,H);R.setPixelRatio(2);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+wrap.prepend(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color('#bfe6ff');S.fog=new THREE.Fog('#bfe6ff',60,110);
+const cam=new THREE.PerspectiveCamera(35,W/H,0.1,200);cam.position.set(12,46,50);cam.lookAt(6,0,0);
+S.add(new THREE.HemisphereLight('#ffffff','#7fb069',0.75));
+const sun=new THREE.DirectionalLight('#fff3dd',0.85);sun.position.set(20,35,15);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-40,right:40,top:40,bottom:-40});S.add(sun);
+const M=c=>new THREE.MeshLambertMaterial({color:c,flatShading:true});
+function add(geo,col,x,y,z,o={}){const m=new THREE.Mesh(geo,M(col));m.position.set(x,y,z);m.castShadow=o.cast!==false;m.receiveShadow=true;if(o.ry)m.rotation.y=o.ry;if(o.opacity!=null){m.material.transparent=true;m.material.opacity=o.opacity}S.add(m);return m}
+// ground
+add(new THREE.BoxGeometry(80,1,60),'#8fd16a',0,-0.5,0,{cast:false});
+add(new THREE.BoxGeometry(80,0.1,10),'#a9adb3',0,0.05,-24,{cast:false});
+for(let x=-36;x<40;x+=6)add(new THREE.BoxGeometry(3,0.12,0.3),'#f2f2f2',x,0.08,-24,{cast:false});
+// path segments
+const P=[[-20,18],[-12,12],[-2,12],[-2,-4],[10,-4],[10,10],[22,10],[22,-8],[32,-12]];
+for(let i=0;i<P.length-1;i++){const[a,b]=P[i],[c,d]=P[i+1];const len=Math.hypot(c-a,d-b)+3;const m=add(new THREE.BoxGeometry(len,0.12,3),'#d4d7db',(a+c)/2,0.06,(b+d)/2,{cast:false});m.rotation.y=-Math.atan2(d-b,c-a)}
+// building
+const tags=[];
+function bld(x,z,state,num,name,title,col){
+ const op=state==='locked'?0.45:1;
+ add(new THREE.BoxGeometry(6,3.4,4.4),'#e9edf1',x,1.7,z,{opacity:op});
+ add(new THREE.BoxGeometry(6.4,0.5,4.8),col,x,3.6,z,{opacity:op});
+ add(new THREE.BoxGeometry(3,2.4,0.1),'#b9c2cb',x-1.1,1.2,z+2.25,{opacity:op});
+ add(new THREE.BoxGeometry(1,1.8,0.1),'#8a5a32',x+1.8,0.9,z+2.25,{opacity:op});
+ add(new THREE.BoxGeometry(1.2,0.8,0.1),'#9fd7f2',x+1.8,2.4,z+2.25,{opacity:op});
+ if(state==='done'){add(new THREE.CylinderGeometry(0.08,0.08,3),'#6b4a2b',x+3.4,5,z);add(new THREE.BoxGeometry(1.2,0.7,0.05),'#6cbf4b',x+4,6,z)}
+ if(state==='open'){const g=add(new THREE.CylinderGeometry(1.4,1.4,0.05,24),'#fff3a0',x+1.8,0.1,z+3.4,{cast:false,opacity:0.7});
+  add(new THREE.ConeGeometry(0.5,1,4),'#ff6b6b',x,5.6,z,{ry:0.7});add(new THREE.SphereGeometry(0.25,6,6),'#ff6b6b',x,4.7,z)}
+ if(state==='locked')add(new THREE.BoxGeometry(0.6,0.5,0.2),'#c9a227',x+1.8,1,z+2.35);
+ tags.push({p:new THREE.Vector3(x,4.4,z),t:num+'. '+name+' · '+title,lock:state==='locked'});
+}
+bld(-12,6,'done',1,'int','검수대','#e07a5f');
+bld(-6,-10,'done',2,'long','송장실','#5b8fd9');
+bld(10,-10,'open',3,'double','계량실','#f2b134');
+bld(15,16,'locked',4,'boolean','품질검사','#9b7fd1');
+bld(28,4,'locked',5,'String','라벨실','#4fb39a');
+bld(30,-18,'locked',6,'형변환','입고정산','#e0607e');
+// trees
+function tree(x,z,s=1){add(new THREE.CylinderGeometry(0.25*s,0.3*s,1.4*s,6),'#7a4a24',x,0.7*s,z);add(new THREE.IcosahedronGeometry(1.3*s,0),'#55a84a',x,2.2*s,z);}
+[[-30,0],[-28,12],[-25,-12],[-16,22],[0,22],[5,4],[18,-2],[36,14],[-34,-16],[38,-4],[4,-16]].forEach(([x,z],i)=>tree(x,z,0.9+((i*37)%5)/10));
+// pallets & boxes
+function pallet(x,z){add(new THREE.BoxGeometry(2.2,0.3,2.2),'#b08455',x,0.15,z);[[-0.5,-0.5],[0.5,-0.5],[-0.5,0.5],[0.5,0.5]].forEach(([a,b])=>add(new THREE.BoxGeometry(0.9,0.8,0.9),'#c99a62',x+a,0.7,z+b));add(new THREE.BoxGeometry(0.9,0.8,0.9),'#d9ad72',x,1.5,z)}
+pallet(-8,2);pallet(4,-2);pallet(25,-4);
+// conveyor
+add(new THREE.BoxGeometry(12,0.6,1.4),'#555',4,0.6,20);for(let i=0;i<4;i++)add(new THREE.BoxGeometry(0.9,0.7,0.9),'#c99a62',-0.5+i*3,1.25,20);
+// trucks
+function truck(x,z,col){add(new THREE.BoxGeometry(7,3,2.6),'#f4f4f4',x,2,z);add(new THREE.BoxGeometry(2.2,2.4,2.6),col,x+4.6,1.7,z);add(new THREE.BoxGeometry(0.1,1,2),'#9fd7f2',x+5.7,2.2,z);
+ [[-2,1.3],[2,1.3],[4.6,1.3],[-2,-1.3],[2,-1.3],[4.6,-1.3]].forEach(([a,b])=>{const w=add(new THREE.CylinderGeometry(0.55,0.55,0.4,12),'#333',x+a,0.55,z+b);w.rotation.x=Math.PI/2})}
+truck(-18,-25,'#e07a5f');truck(8,-23,'#5b8fd9');
+// forklift
+add(new THREE.BoxGeometry(1.6,1,1.2),'#f2b134',17,0.7,-14);add(new THREE.BoxGeometry(0.1,2.2,1),'#666',17.9,1.2,-14);
+// gate
+add(new THREE.BoxGeometry(0.5,4,0.5),'#888',35,2,-15);add(new THREE.BoxGeometry(0.5,4,0.5),'#888',35,2,-9);add(new THREE.BoxGeometry(0.8,0.8,7),'#e0607e',35,4.2,-12);
+tags.push({p:new THREE.Vector3(35,5.4,-12),t:'보관창고 →',lock:false});
+// player
+const pl=new THREE.Group();S.add(pl);pl.position.set(11.8,0,-4.5);
+const pm=(g,c,y)=>{const m=new THREE.Mesh(g,M(c));m.position.y=y;m.castShadow=true;pl.add(m);return m};
+pm(new THREE.CylinderGeometry(0.45,0.5,1,8),'#3d5a80',0.5);pm(new THREE.CylinderGeometry(0.55,0.55,1,8),'#ff9f43',1.4);
+pm(new THREE.SphereGeometry(0.55,10,8),'#ffd8b1',2.35);const hat=pm(new THREE.SphereGeometry(0.6,10,6,0,Math.PI*2,0,Math.PI/2),'#f2d024',2.45);
+// npc
+const npc=new THREE.Group();S.add(npc);npc.position.set(-18,0,15);
+[[new THREE.CylinderGeometry(0.45,0.5,1.8,8),'#3d5a80',0.9],[new THREE.SphereGeometry(0.55,10,8),'#ffd8b1',2.2]].forEach(([g,c,y])=>{const m=new THREE.Mesh(g,M(c));m.position.y=y;m.castShadow=true;npc.add(m)});
+tags.push({p:new THREE.Vector3(-18,3.4,15),t:'첫 출근 환영해요!',lock:false});
+R.render(S,cam);
+tags.forEach(o=>{const v=o.p.clone().project(cam);const d=document.createElement('div');d.className='tag'+(o.lock?' lock':'');d.textContent=o.t;d.style.left=((v.x+1)/2*W)+'px';d.style.top=((1-v.y)/2*H)+'px';wrap.appendChild(d)});
+</script></body></html>

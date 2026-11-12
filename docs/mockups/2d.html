@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>cotudy 2D mock</title>
+<style>
+html,body{margin:0;background:#2b2f3a;font-family:-apple-system,"Apple SD Gothic Neo",sans-serif}
+#wrap{position:relative;width:960px;height:600px;margin:0 auto}
+canvas{display:block;image-rendering:pixelated}
+.hud{position:absolute;top:14px;left:14px;background:#fff8e7;border:3px solid #5b3a1e;border-radius:12px;padding:8px 14px;color:#5b3a1e;font-weight:700;box-shadow:0 3px 0 #5b3a1e}
+.hud small{display:block;font-weight:500;font-size:12px;opacity:.75}
+.bar{height:8px;background:#e7d7b5;border-radius:4px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;width:33%;background:#6cbf4b}
+.tip{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#fff8e7;border:3px solid #5b3a1e;border-radius:20px;padding:8px 18px;color:#5b3a1e;font-weight:700}
+.tip kbd{background:#5b3a1e;color:#fff8e7;border-radius:6px;padding:1px 7px;margin-right:6px}
+.label{position:absolute;top:14px;right:14px;background:#00000080;color:#fff;padding:6px 10px;border-radius:8px;font-size:13px}
+</style></head><body>
+<div id="wrap"><canvas id="c" width="960" height="600"></canvas>
+<div class="hud">지역 1 · 입고센터 <small>1. 변수와 타입 · 2/6</small><div class="bar"><i></i></div></div>
+<div class="label">2D 탑다운 시안</div>
+<div class="tip"><kbd>Space</kbd>3. 계량실 들어가기 (double)</div></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');const T=24;
+function r(a,b,w,h,col){x.fillStyle=col;x.fillRect(a,b,w,h)}
+// grass with checker
+for(let i=0;i<40;i++)for(let j=0;j<25;j++){r(i*T,j*T,T,T,(i+j)%2?'#8fd16a':'#86c962');if((i*7+j*13)%11==0){r(i*T+6,j*T+8,2,4,'#5fa843');r(i*T+10,j*T+6,2,6,'#5fa843')}}
+// path winding
+x.strokeStyle='#c9cdd2';x.lineWidth=40;x.lineCap='round';x.lineJoin='round';
+x.beginPath();x.moveTo(60,560);x.lineTo(160,470);x.lineTo(330,470);x.lineTo(330,280);x.lineTo(590,280);x.lineTo(590,460);x.lineTo(820,460);x.lineTo(820,250);x.lineTo(935,200);x.stroke();
+x.strokeStyle='#f2f2f2';x.lineWidth=4;x.setLineDash([2,10]);x.stroke();x.setLineDash([]);
+// asphalt yard + loading lane
+r(0,0,960,120,'#a9adb3');for(let k=0;k<960;k+=60)r(k+10,58,30,4,'#f2f2f2');
+// truck at dock
+function truck(a,b,col){r(a,b,70,30,'#f4f4f4');r(a,b,70,4,'#ddd');r(a+70,b+6,22,24,col);r(a+76,b+10,12,9,'#9fd7f2');x.fillStyle='#333';[a+12,a+52,a+80].forEach(q=>{x.beginPath();x.arc(q,b+32,6,0,7);x.fill()});x.fillStyle=col;x.font='bold 10px sans-serif';x.fillText('COTUDY 물류',a+6,b+19)}
+truck(120,30,'#e07a5f');truck(600,40,'#5b8fd9');
+function tree(a,b){r(a-4,b+10,8,14,'#7a4a24');x.fillStyle='#3f8f3a';x.beginPath();x.arc(a,b,18,0,7);x.fill();x.fillStyle='#55a84a';x.beginPath();x.arc(a-5,b-5,11,0,7);x.fill()}
+[[40,160],[40,330],[700,560],[880,560],[460,560],[900,300],[690,300],[260,560]].forEach(p=>tree(...p));
+function flower(a,b,col){x.fillStyle=col;for(const[dx,dy]of[[-3,0],[3,0],[0,-3],[0,3]])x.fillRect(a+dx-2,b+dy-2,4,4);r(a-1,b-1,3,3,'#ffe066')}
+for(let k=0;k<22;k++){const fx=(k*137)%940+10,fy=(k*251)%440+140;flower(fx,fy,['#ff8fab','#fff','#c59bff'][k%3])}
+// pallets and boxes
+function box(a,b){r(a,b,14,12,'#c99a62');r(a,b+5,14,2,'#a87a45');r(a+6,b,2,12,'#e7c58f')}
+function pallet(a,b){r(a,b+14,34,5,'#b08455');box(a+2,b+2);box(a+18,b+2);box(a+10,b-9)}
+pallet(250,330);pallet(450,330);pallet(820,250);
+// conveyor
+r(400,520,220,16,'#555');for(let k=0;k<22;k++)r(402+k*10,522,6,12,'#777');box(430,508);box(500,508);box(570,508);
+// forklift
+const fx=700,fy=200;r(fx,fy,26,18,'#f2b134');r(fx+4,fy-12,14,12,'#333');r(fx+6,fy-10,10,8,'#9fd7f2');r(fx+26,fy-16,3,34,'#666');r(fx+29,fy+12,14,3,'#666');x.fillStyle='#222';[fx+6,fx+20].forEach(q=>{x.beginPath();x.arc(q,fy+20,5,0,7);x.fill()});
+// buildings: state done/open/locked
+function house(a,b,state,num,name,roof,title){
+ const dim=state==='locked';x.globalAlpha=dim?.5:1;
+ r(a-42,b+32,84,6,'#00000025');
+ r(a-38,b-14,76,46,'#e9edf1');r(a-38,b-14,76,4,'#cfd6dd');
+ r(a-42,b-24,84,12,roof);r(a-42,b-14,84,3,'#00000030');
+ for(let k=0;k<7;k++)r(a-26+k*0,b+0+k*4,32,2,'#b9c2cb');
+ r(a-26,b-2,32,34,'#c3ccd5');for(let k=0;k<8;k++)r(a-26,b+k*4,32,1,'#9aa5b1');
+ r(a+12,b-4,18,14,'#9fd7f2');r(a+12,b+16,18,16,'#8a5a32');r(a+26,b+24,2,2,'#ffd34d');
+ x.fillStyle='#fff';x.font='bold 9px sans-serif';x.fillText(title,a-36,b-15);
+ x.globalAlpha=1;
+ if(state==='locked'){r(a+14,b+19,12,10,'#c9a227');x.strokeStyle='#c9a227';x.lineWidth=3;x.beginPath();x.arc(a+20,b+19,4,Math.PI,0);x.stroke()}
+ if(state==='done'){r(a+38,b-56,3,40,'#6b4a2b');x.fillStyle='#6cbf4b';x.beginPath();x.moveTo(a+41,b-56);x.lineTo(a+60,b-50);x.lineTo(a+41,b-44);x.fill();x.fillStyle='#fff';x.font='bold 10px sans-serif';x.fillText('✓',a+44,b-47)}
+ if(state==='open'){x.fillStyle='#fff3a0';x.globalAlpha=.65;x.beginPath();x.ellipse(a+21,b+40,20,7,0,0,7);x.fill();x.globalAlpha=1;
+  x.fillStyle='#ffe066';[[-30,26],[40,30],[-20,-34],[44,0]].forEach(([dx,dy])=>{x.fillRect(a+dx,b+dy,3,3)});
+  r(a-4,b-48,8,16,'#ff6b6b');r(a-6,b-50,12,4,'#ff6b6b');x.fillStyle='#fff';x.font='bold 10px sans-serif';x.fillText('!',a-2,b-37)}
+ r(a-60,b+22,3,16,'#7a4a24');r(a-80,b+10,40,14,'#c99a62');x.fillStyle='#4a2c12';x.font='bold 10px sans-serif';x.fillText(num+'. '+name,a-78,b+20);
+}
+house(200,420,'done',1,'int','#e07a5f','검수대');
+house(360,220,'done',2,'long','#5b8fd9','송장실');
+house(570,220,'open',3,'double','#f2b134','계량실');
+house(620,410,'locked',4,'boolean','#9b7fd1','품질검사');
+house(800,400,'locked',5,'String','#4fb39a','라벨실');
+house(860,190,'locked',6,'형변환','#e0607e','입고정산');
+// gate to next zone
+r(918,140,8,60,'#888');r(948,140,8,60,'#888');r(912,134,50,10,'#e0607e');x.fillStyle='#fff';x.font='bold 9px sans-serif';x.fillText('보관창고 →',914,142);
+// player
+const px=591,py=290;r(px-10,py+14,20,5,'#00000030');
+r(px-7,py-2,14,14,'#ff9f43');r(px-7,py-2,14,3,'#ffd34d');r(px-7,py+10,5,6,'#3d5a80');r(px+2,py+10,5,6,'#3d5a80');
+r(px-8,py-16,16,14,'#ffd8b1');r(px-9,py-21,18,7,'#f2d024');r(px-4,py-10,2,3,'#222');r(px+3,py-10,2,3,'#222');
+r(px+4,py+2,4,6,'#fff');
+// npc
+const nx=100,ny=480;r(nx-6,ny-2,12,12,'#3d5a80');r(nx-7,ny-14,14,12,'#ffd8b1');r(nx-8,ny-19,16,6,'#f2d024');
+r(nx-30,ny-50,96,22,'#fff');x.fillStyle='#333';x.font='11px sans-serif';x.fillText('첫 출근 환영해요!',nx-25,ny-35);
+</script></body></html>
