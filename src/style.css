@@ -100,6 +100,11 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .card h4 { margin: 0 0 6px; font-size: 13px; color: #a0661c; display: flex; justify-content: space-between; gap: 8px; }
 .card code, .concept code, .prompt-text code { background: #f3ead6; border-radius: 5px; padding: 1px 5px; font-size: 13px; }
 .card ul { margin: 0; padding-left: 18px; }
+/* the task card (fill / write): the first thing your eye should land on */
+.card.task { background: #fffaf0; border: 4px solid var(--orange); box-shadow: 0 4px 0 #d39424; padding: 14px 16px; animation: pop .35s; }
+.task-tag { display: inline-block; background: var(--orange); border: 3px solid var(--line); border-radius: 10px; padding: 2px 10px; font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+.task-text { font-size: 16px; font-weight: 600; line-height: 1.65; }
+.expect-label { margin-top: 10px; font-size: 13px; font-weight: 800; color: var(--dgreen); }
 .expect { font-family: var(--mono); background: #2b2f3a; color: #e9f5d9; border-radius: 8px; padding: 8px 10px; margin-top: 6px; font-size: 13px; white-space: pre; overflow-x: auto; }
 .linkish { background: none; border: 0; padding: 0; color: var(--line); font-weight: 700; text-decoration: underline; font-size: 12px; }
 .hint-row { display: flex; gap: 8px; margin-top: auto; }

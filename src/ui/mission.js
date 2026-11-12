@@ -156,6 +156,11 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       nav.querySelector('.back2')?.addEventListener('click', () => { st.step = st.reviewFrom; st.reviewFrom = null; render(); });
     }
 
+    /** The problem to solve: made to stand out so you see right away what to do. */
+    function taskCard(title, prompt, expected) {
+      return `<div class="card task"><span class="task-tag">${title}</span><div class="task-text">${prompt}</div>`
+        + `<div class="expect-label">${tr('✅ 이렇게 나오면 성공', '✅ Make it print this')}</div><div class="expect">${esc(expected)}</div></div>`;
+    }
     function learnedCard() {
       return `<div class="card"><h4>${tr('개념 정리', 'Summary')} <button class="linkish review">${tr('📖 개념 다시 보기', '📖 Review concepts')}</button></h4><ul>${quest.learned.map((l) => `<li>${l}</li>`).join('')}</ul></div>`;
     }
@@ -257,7 +262,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     function renderFill() {
       const f = quest.fill;
       left.innerHTML = npcBox(tr('빈칸만 채우면 돼요! 채우고 ▶ 실행을 눌러 주세요.', 'Just fill in the blanks! Then press ▶ Run.'))
-        + `<div class="card"><h4>${tr('빈칸 채우기', 'Fill in the blanks')}</h4>${f.prompt}<div class="expect">${esc(f.expected)}</div></div>` + learnedCard();
+        + taskCard(tr('📝 문제 · 빈칸 채우기', '📝 Task · Fill in the blanks'), f.prompt, f.expected) + learnedCard();
       bindReview();
       right.innerHTML = '';
       const view = codeView(f.code, { ...look, blanks: f.blanks });
@@ -296,7 +301,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     function renderWrite() {
       const w = quest.write;
       left.innerHTML = npcBox(tr('이번엔 직접 써 볼래요? 다 쓰면 ▶ 실행!', 'This time, write it yourself! Press ▶ Run when you\'re done.'))
-        + `<div class="card"><h4>${tr('직접 쓰기', 'Write it yourself')}</h4>${w.prompt}<div class="expect">${esc(w.expected)}</div></div>` + learnedCard();
+        + taskCard(tr('📝 문제 · 직접 쓰기', '📝 Task · Write it yourself'), w.prompt, w.expected) + learnedCard();
       bindReview();
       right.innerHTML = '';
       const ed = codeEditor(st.writeCode ?? w.starter, { ...look, onRun: () => run() });
