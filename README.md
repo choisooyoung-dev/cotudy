@@ -114,7 +114,6 @@ src/content/java/quests.js        Java 퀘스트 내용 (코드와 분리된 데
 src/content/javascript/quests.js  JavaScript 퀘스트 내용 (같은 이야기, JS 코드)
 src/content/python/quests.js      Python 퀘스트 내용 (같은 이야기, 파이썬 코드)
 docs/mockups/               디자인 시안
-PLAN.md                     전체 설계
 ```
 
 ### 새 퀘스트·공간 추가
