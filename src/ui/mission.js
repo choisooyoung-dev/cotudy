@@ -88,7 +88,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       reactEl?.remove();
       reactEl = document.createElement('div');
       reactEl.className = 'react' + (ok ? '' : ' err');
-      reactEl.innerHTML = `<div class="big">${ok ? '🎉' : '🧐'}</div><div><b>${title}</b><p>${npc.name}: "${text}"</p></div>`;
+      reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div>`;
       win.appendChild(reactEl);
       if (!ok) setTimeout(() => reactEl?.classList.contains('err') && reactEl.remove(), 6000);
     }
@@ -168,7 +168,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       const p = quest.predict;
       left.innerHTML = npcBox(tr('이 코드, 실행하면 어떻게 나올 것 같아요?', 'What do you think this code prints?')) + learnedCard();
       bindReview();
-      right.innerHTML = `<div class="concept"><div class="ctop"><span class="cnum">${tr('출력 예상', 'Predict')}</span><h2>${p.prompt}</h2></div></div>`;
+      right.innerHTML = `<div class="concept"><div class="ctop"><span class="cnum">${tr('출력 맞히기', 'Predict the output')}</span><h2>${p.prompt}</h2></div></div>`;
       const box = right.querySelector('.concept');
       box.appendChild(codeView(p.code, look).el);
       const ch = document.createElement('div');
