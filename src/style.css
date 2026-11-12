@@ -6,7 +6,7 @@
   --mono: "JetBrains Mono", "D2Coding", Menlo, Consolas, monospace;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #1d2027; font-family: var(--font); color: var(--ink); overflow: hidden; }
+html, body { margin: 0; height: 100%; background: #1d2027; font-family: var(--font); color: var(--ink); overflow: hidden; word-break: keep-all; overflow-wrap: break-word; }
 #app { position: fixed; inset: 0; }
 #world { position: absolute; inset: 0; }
 #world canvas { display: block; }
@@ -88,7 +88,8 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .face i { position: absolute; display: block; }
 .bubble { position: relative; background: #fff; border: 3px solid var(--line); border-radius: 16px; padding: 10px 12px; font-size: 15px; line-height: 1.5; flex: 1; }
 .bubble b { display: block; font-size: 12px; color: #a0661c; margin-bottom: 2px; }
-.bubble::before { content: ""; position: absolute; left: -11px; top: 20px; border: 8px solid transparent; border-right-color: var(--line); }
+.bubble::before { content: ""; position: absolute; left: -14px; top: 18px; border: 10px solid transparent; border-left: 0; border-right: 11px solid var(--line); }
+.bubble::after { content: ""; position: absolute; left: -10px; top: 21px; border: 7px solid transparent; border-left: 0; border-right: 10px solid #fff; }
 .card { background: #fff; border: 3px solid var(--sand); border-radius: 14px; padding: 12px 14px; font-size: 14px; line-height: 1.6; }
 .card h4 { margin: 0 0 6px; font-size: 13px; color: #a0661c; display: flex; justify-content: space-between; gap: 8px; }
 .card code, .concept code, .prompt-text code { background: #f3ead6; border-radius: 5px; padding: 1px 5px; font-size: 13px; }

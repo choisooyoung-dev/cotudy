@@ -71,9 +71,85 @@ export function runJava(source) {
   return job;
 }
 
+// ---- fast path ----
+// Starting javac with cheerpjRunMain for every run is slow (javac + a second JVM main each time).
+// Instead we compile this small helper once, load it with cheerpjRunLibrary, and then each run is one
+// Java method call: compile with javac's API, then call Main.main through a fresh class loader.
+const RUNNER_SRC = `package cotudy;
+import java.io.*; import java.net.*; import java.lang.reflect.*;
+public class Runner {
+  public static String run(String code) throws Exception {
+    File dir = new File("/files/run/");
+    dir.mkdirs();
+    new File("/files/src/").mkdirs();
+    String src = "/files/src/Main.java";
+    Writer w = new OutputStreamWriter(new FileOutputStream(src), "UTF-8");
+    w.write(code);
+    w.close();
+    StringWriter log = new StringWriter();
+    PrintWriter pw = new PrintWriter(log);
+    int rc = com.sun.tools.javac.Main.compile(new String[] { src, "-d", "/files/run/", "-encoding", "UTF-8" }, pw);
+    pw.flush();
+    if (rc != 0) return "C" + log;
+    PrintStream oldOut = System.out, oldErr = System.err;
+    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(buf, true, "UTF-8");
+    System.setOut(ps); System.setErr(ps);
+    String status = "R";
+    try {
+      URLClassLoader cl = new URLClassLoader(new URL[] { dir.toURI().toURL() }, null);
+      Method m = cl.loadClass("Main").getMethod("main", String[].class);
+      m.invoke(null, (Object) new String[0]);
+    } catch (InvocationTargetException e) {
+      status = "X";
+      ps.print("Exception in thread \\"main\\" ");
+      e.getCause().printStackTrace(ps);
+    } catch (Throwable t) {
+      status = "X";
+      t.printStackTrace(ps);
+    } finally {
+      ps.flush();
+      System.setOut(oldOut); System.setErr(oldErr);
+    }
+    return status + buf.toString("UTF-8");
+  }
+}`;
+
+let fastRunner = null; // Promise<Runner class | null>
+function loadFastRunner() {
+  fastRunner ||= (async () => {
+    const out = consoleEl();
+    window.cheerpOSAddStringFile('/str/Runner.java', new TextEncoder().encode(RUNNER_SRC));
+    out.textContent = '';
+    const code = await window.cheerpjRunMain('com.sun.tools.javac.Main', toolsJarPath(), '/str/Runner.java', '-d', '/files/', '-encoding', 'UTF-8');
+    if (code !== 0) throw new Error('runner compile failed: ' + out.textContent);
+    const lib = await window.cheerpjRunLibrary(`${toolsJarPath()}:/files/`);
+    return await lib.cotudy.Runner;
+  })().catch((e) => { console.warn('[cotudy] fast Java runner unavailable, using the slow path', e); return null; });
+  return fastRunner;
+}
+
 async function doRun(source) {
   await initJava();
   window.__cotudyJavaReady = true;
+  const Runner = await loadFastRunner();
+  if (!Runner) return doRunSlow(source);
+  const t0 = performance.now();
+  const res = String(await Runner.run(source));
+  const ms = performance.now() - t0;
+  const kind = res[0];
+  const text = res.slice(1).replaceAll('/files/src/', '');
+  if (kind === 'C') {
+    return { ok: false, phase: 'compile', output: '', error: text.trim(), line: +(text.match(/Main\.java:(\d+)/)?.[1] || 0), ms };
+  }
+  // drop the reflection frames our helper adds under the user's own stack trace
+  const output = kind === 'X'
+    ? text.split('\n').filter((l) => !/^\s+at (sun\.reflect|java\.lang\.reflect|jdk\.internal|cotudy\.Runner|com\.leaningtech)/.test(l)).join('\n')
+    : text;
+  return { ok: kind === 'R', phase: 'run', output, error: kind === 'X' ? output.trim() : '', line: +(output.match(/Main\.java:(\d+)\)/)?.[1] || 0), ms };
+}
+
+async function doRunSlow(source) {
   const t0 = performance.now();
   const out = consoleEl();
   ++runCount;

@@ -13,6 +13,11 @@ import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
 import { runPython, warmUpPython } from './runner/python.js';
 
+// Start loading the language runtime first, before the 3D center is built, so it is ready sooner.
+// (The first Java load takes 10+ seconds on a new browser; after that the browser cache makes it ~2s.)
+const warm = (store.lang || 'java') === 'java' ? warmUpJava() : Promise.resolve();
+if (store.lang === 'python') warmUpPython();
+
 const LANGS = [
   { id: 'java', name: 'Java', icon: '<img class="lang-ico" src="./icons/java-original.svg" alt="">', quests: JAVA_QUESTS },
   { id: 'javascript', name: 'JavaScript', icon: '<img class="lang-ico" src="./icons/javascript-original.svg" alt="">', quests: JS_QUESTS },
@@ -302,9 +307,6 @@ function importSave() {
 refresh();
 if (!store.lang) setTimeout(chooseLanguage, 400);
 
-// debug helper for development
-// Java needs a slow first load, so start it in the background right away (only when playing Java)
-const warm = (store.lang || 'java') === 'java' ? warmUpJava() : Promise.resolve();
 if ((store.lang || 'java') === 'java') {
   warm.then(() => { $('.java-state').textContent = '☕ 자바 준비 완료'; }, () => { $('.java-state').textContent = '⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)'; });
 } else if (store.lang === 'python') {
@@ -313,4 +315,5 @@ if ((store.lang || 'java') === 'java') {
 } else {
   $('.java-state').textContent = `⚡ ${langInfo().name}`;
 }
-window.cotudy = { store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest };
+// debug helper for development
+window.cotudy = { store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS } };
