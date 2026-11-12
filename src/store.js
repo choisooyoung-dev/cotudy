@@ -23,6 +23,8 @@ export const store = {
   get lang() { return state.lang || null; },
   setLang(l) { state.lang = l; langState(); write(state); },
   isDone(qid) { return qid in langState().done; },
+  /** Finished quests of any language (for showing progress on the language picker). */
+  doneOf(lang) { return state.byLang[lang]?.done || {}; },
   stars(qid) { return langState().done[qid] || 0; },
   complete(qid, stars) {
     const d = langState().done;

@@ -26,7 +26,7 @@ app.innerHTML = `
   <div class="goal"></div>
   <div class="toast hide"></div>
   <div class="pad"><button class="u">▲</button><button class="l">◀</button><button class="act">말 걸기</button><button class="r">▶</button><button class="d">▼</button></div>
-  <button class="menu-btn" title="진행 초기화 등">⚙︎</button>
+  <button class="menu-btn" title="언어 바꾸기 · 저장 파일 · 초기화"><span class="ico">⚙️</span>설정</button>
   <div class="credit"><span class="java-state">☕ 자바 준비 중…</span> · <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a> · © 2026 choisooyoung-dev. All rights reserved.</div>`;
 
 const $ = (s) => app.querySelector(s);
@@ -47,11 +47,14 @@ function nextQuest() {
   if (!stage) return null;
   return questsOf(stage.id).find((q) => !store.isDone(q.id)) || null;
 }
-function percent() {
+/** Progress of a language in % (default: the current one). Each 1회차 stage counts the same. */
+function percent(langId = store.lang || 'java') {
+  const lang = LANGS.find((l) => l.id === langId);
+  const done = store.doneOf(langId);
   let sum = 0;
   for (const s of STAGES) {
-    const qs = questsOf(s.id);
-    if (qs.length) sum += qs.filter((q) => store.isDone(q.id)).length / qs.length;
+    const qs = (lang?.quests || []).filter((q) => q.stage === s.id);
+    if (qs.length) sum += qs.filter((q) => q.id in done).length / qs.length;
   }
   return Math.round((sum / STAGES.length) * 100);
 }
@@ -216,10 +219,14 @@ async function chooseLanguage() {
     lines: store.lang
       ? ['다른 언어로 일해 볼래요? 언어마다 진행 상황은 따로 저장돼요.']
       : ['김사원님, 물류팀 입사를 축하해요! 저는 인사팀 한지원이에요.', '우리 센터는 전산 일을 코드로 해요. 어떤 언어로 일하실 거예요?'],
-    buttons: LANGS.map((l) => ({ html: `${l.name}<small> · ${l.desc}</small>${store.lang === l.id ? ' ✓' : ''}`, value: l.id, disabled: !l.quests, primary: l.id === (store.lang || 'java') })),
+    buttons: LANGS.map((l) => {
+      const p = l.quests ? percent(l.id) : 0;
+      const progress = p > 0 ? `<span class="lang-pct">${p}%</span>` : '';
+      return { html: `${l.name}<small> · ${l.desc}</small>${progress}${store.lang === l.id ? ' ✓' : ''}`, value: l.id, disabled: !l.quests, primary: l.id === (store.lang || 'java') };
+    }),
   });
   const first = !store.lang;
-  if (!v && !first) return;
+  if (!first && (!v || v === store.lang)) return; // closed, or picked the same language
   store.setLang(v || 'java');
   if (!first) { location.reload(); return; } // other language = other progress and position
   quests = langInfo().quests;
@@ -269,7 +276,7 @@ function exportSave() {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast('💾 저장 파일을 받았어요. 다른 컴퓨터에서 ⚙︎ → 저장 파일 불러오기 로 이어 할 수 있어요', 5000);
+  toast('💾 저장 파일을 받았어요. 다른 컴퓨터에서 ⚙️ 설정 → 저장 파일 불러오기로 이어 할 수 있어요', 5000);
 }
 
 function importSave() {
