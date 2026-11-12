@@ -61,10 +61,7 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .btn.run { background: var(--yellow); }
 .btn[disabled] { opacity: .45; cursor: default; }
 .btn kbd { margin-left: 6px; }
-.lang-ico { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-right: 8px; border-radius: 7px; font-size: 16px; vertical-align: -6px; }
-.lang-ico.java { background: #fdebd3; }
-.lang-ico.js { background: #f7df1e; color: #222; font-family: var(--mono); font-size: 12px; font-weight: 900; }
-.lang-ico.py { background: #dbe9f7; }
+.lang-ico { width: 26px; height: 26px; margin-right: 8px; vertical-align: -7px; background: #fff; border-radius: 7px; padding: 2px; box-sizing: border-box; }
 .lang-pct { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #3f8f2a; color: #fff; font-size: 12px; font-weight: 800; vertical-align: 2px; }
 .btn.go .lang-pct { background: #fff; color: #3f8f2a; }
 .lang-list { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 6px; }

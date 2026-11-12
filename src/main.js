@@ -14,9 +14,9 @@ import { runJs } from './runner/javascript.js';
 import { runPython, warmUpPython } from './runner/python.js';
 
 const LANGS = [
-  { id: 'java', name: 'Java', icon: '<span class="lang-ico java">☕</span>', quests: JAVA_QUESTS },
-  { id: 'javascript', name: 'JavaScript', icon: '<span class="lang-ico js">JS</span>', quests: JS_QUESTS },
-  { id: 'python', name: 'Python', icon: '<span class="lang-ico py">🐍</span>', quests: PY_QUESTS },
+  { id: 'java', name: 'Java', icon: '<img class="lang-ico" src="./icons/java-original.svg" alt="">', quests: JAVA_QUESTS },
+  { id: 'javascript', name: 'JavaScript', icon: '<img class="lang-ico" src="./icons/javascript-original.svg" alt="">', quests: JS_QUESTS },
+  { id: 'python', name: 'Python', icon: '<img class="lang-ico" src="./icons/python-original.svg" alt="">', quests: PY_QUESTS },
 ];
 
 const app = document.getElementById('app');

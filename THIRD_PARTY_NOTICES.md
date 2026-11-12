@@ -51,6 +51,12 @@ THE SOFTWARE.
 - 소스 코드: https://github.com/adoptium/jdk8u (태그 `jdk8u512-b09`)
 - Java 와 OpenJDK 는 Oracle 및 그 계열사의 상표다.
 
+## 언어 로고 (`public/icons/`)
+
+- Java, JavaScript, Python 로고 SVG 는 [Devicon](https://github.com/devicons/devicon) v2.16.0 에서 가져왔다 (아이콘 모음은 MIT License, Copyright (c) 2015 konpa).
+- 로고 자체는 각 소유자의 상표다: Java 는 Oracle 및 그 계열사, Python 은 Python Software Foundation 의 상표다. JavaScript 로고는 커뮤니티에서 만든 로고다.
+- cotudy 는 어떤 언어를 고르는지 알려 주는 용도로만 쓰며, 이 회사·단체와 관계가 없고 후원·보증을 받지 않는다.
+
 ## Vite
 
 - 개발·빌드 도구로만 쓰고, 사이트에는 포함되지 않는다. MIT License.
