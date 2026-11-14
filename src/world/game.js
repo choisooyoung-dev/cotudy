@@ -8,7 +8,7 @@ const PLAYER_R = 0.42;
 const SPEED = 5.5;
 const VIEW = 22; // ortho frustum height (bigger = farther)
 
-export function createWorld(container, { npcs, playerStart, onInteract, onMove }) {
+export function createWorld(container, { npcs, playerStart, onInteract, onMove, spots = [] }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
@@ -71,7 +71,8 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
     }
     holder.position.set(start.x, 0, start.z);
     scene.add(holder);
-    people.push({ id, def, p, holder, target: null, wait: Math.random() * 2, moving: false, speed: def.forklift ? 3 : 1.5, guide: null, seat: null, sitting: false });
+    holder.visible = !def.hidden;
+    people.push({ id, def, p, holder, target: null, wait: Math.random() * 2, moving: false, speed: def.forklift ? 3 : 1.5, guide: null, seat: null, sitting: false, hidden: !!def.hidden, follow: false });
   }
 
   // ---- quest mark (red 3D "!") ----
@@ -111,6 +112,13 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
   const meTag = makeTag(tr('<b>물류팀</b>김사원', '<b>Logistics</b>Kim'), 'me');
   for (const n of people) n.tag = makeTag(`<b>${n.def.role}</b>${n.def.name}`);
   const prompt = makeTag(tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
+  // interactive spots (e.g. the retry board): { id, x, z, label }. Space near one calls onInteract('spot:' + id)
+  const spotList = spots.map((sp) => {
+    const holder = new THREE.Object3D();
+    holder.position.set(sp.x, 0, sp.z);
+    scene.add(holder);
+    return { id: 'spot:' + sp.id, holder, tag: makeTag(sp.label, 'spot'), def: {} };
+  });
 
   // ---- input ----
   const keys = new Set();
@@ -214,10 +222,27 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
     let best = 2.3;
     const mp = me.group.position;
     for (const n of people) {
+      if (n.hidden) { n.tag.style.display = 'none'; continue; }
       const pos = n.holder.position;
       const d = Math.hypot(pos.x - mp.x, pos.z - mp.z);
       const talking = d < 2.6 && !n.def.forklift;
       if (d < best && !frozen) { best = d; nearest = n; }
+      if (n.follow && !n.guide && !frozen) {
+        // following Kim around, a few steps behind (walks straight, ignoring furniture)
+        if (n.seat) { n.seat.taken = false; n.seat = null; n.sitting = false; }
+        if (d > 3.2) {
+          const dx = mp.x - pos.x, dz = mp.z - pos.z;
+          const step = Math.min(d - 3, (d > 8 ? 6 : 4.2) * dt);
+          pos.x += dx / d * step; pos.z += dz / d * step;
+          n.holder.rotation.y = Math.atan2(dx, dz);
+          n.moving = true;
+        } else { n.moving = false; n.holder.rotation.y = Math.atan2(mp.x - pos.x, mp.z - pos.z); }
+        animatePerson(n.p, t + n.id.length, n.moving, false);
+        const fm = marks.get(n.id);
+        if (fm) { fm.position.set(pos.x, 3.5 + Math.sin(t * 3) * 0.12, pos.z); fm.rotation.y = Math.PI / 4; }
+        placeTag(n.tag, n.holder, fm ? 4.85 : 2.95);
+        continue;
+      }
       if (n.guide && n.seat) { n.seat.taken = false; n.seat = null; n.sitting = false; } // stand up when the tour needs them
       if (n.sitting) {
         // sitting on a seat for a while; stays seated even while you talk to them
@@ -289,6 +314,11 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
     if (ringOwner) { const n = people.find((q) => q.id === ringOwner); ring.position.set(n.holder.position.x, 0.06, n.holder.position.z); ring.visible = true; }
     else ring.visible = false;
 
+    for (const sp of spotList) {
+      const d = Math.hypot(sp.holder.position.x - mp.x, sp.holder.position.z - mp.z);
+      if (d < 2 && d < best && !frozen) { best = d; nearest = sp; }
+      placeTag(sp.tag, sp.holder, 2.4);
+    }
     placeTag(meTag, me.group, 2.95);
     if (nearest) { prompt.style.display = ''; placeTag(prompt, nearest.holder, -0.2); } else prompt.style.display = 'none';
     prompt.classList.toggle('hidden', !nearest);
@@ -340,6 +370,47 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove }
       const n = people.find((q) => q.id === id);
       if (!n) return Promise.resolve();
       return new Promise((resolve) => { n.guide = { path, i: 0, lead, speed, face, onArrive: resolve }; });
+    },
+    /** Shows or hides an NPC (the HQ staff only appears on visits). at: {x, z} to place it when shown. */
+    setNpcHidden(id, hidden, at) {
+      const n = people.find((q) => q.id === id);
+      if (!n) return;
+      n.hidden = hidden; n.holder.visible = !hidden;
+      if (at) n.holder.position.set(at.x, 0, at.z);
+      if (hidden) { n.follow = false; n.guide = null; }
+    },
+    /** Makes an NPC follow the player (true) or stop (false). */
+    followNpc(id, on) {
+      const n = people.find((q) => q.id === id);
+      if (n) n.follow = on;
+    },
+    /** Moves the player right next to an NPC in one go (the "go there" button). */
+    teleportTo(id) {
+      const n = people.find((q) => q.id === id);
+      if (!n) return;
+      const { x, z } = n.holder.position;
+      // first free spot around them, so you don't land inside a desk
+      for (let r = 1.6; r <= 3.2; r += 0.8) {
+        for (let k = 0; k < 8; k++) {
+          const a = Math.PI / 4 + (k * Math.PI) / 4;
+          const px = x + Math.cos(a) * r, pz = z + Math.sin(a) * r;
+          if (!blocked(px, pz, PLAYER_R)) {
+            me.group.position.set(px, 0, pz);
+            me.group.rotation.y = Math.atan2(x - px, z - pz);
+            onMove?.(px, pz);
+            return;
+          }
+        }
+      }
+    },
+    /** Puts a guided NPC at the end of its walk right away. */
+    skipWalk(id) {
+      const n = people.find((q) => q.id === id);
+      const g = n?.guide;
+      if (!g || !g.path.length) return;
+      const last = g.path[g.path.length - 1];
+      n.holder.position.set(last.x, 0, last.z);
+      g.i = g.path.length;
     },
     /** Lets an NPC go back to wandering in its own area. */
     freeNpc(id) {

@@ -223,6 +223,13 @@ export function buildCenter(scene) {
   box(S, 3, 1.8, 0.1, '#cfd8dc', 16, 0.9, 9.05, { cast: false });
   textPlane(S, tr('이번 주 식단표\n월 제육 · 화 돈까스\n수 비빔밥 · 목 짜장', 'Lunch this week\nMon pork · Tue cutlet\nWed bibimbap · Thu noodles'), 2.2, 1.4, '#fffef6', '#333', { fs: 17, border: '#b08455' }).position.set(16, 1.9, 9.12);
   solid(14.5, 8.9, 17.5, 9.2);
+  // 재도전 게시판 (retry board): HQ coding tests you didn't pass get pinned here (spot at RETRY_SPOT)
+  box(S, 2.6, 1.7, 0.12, '#8d5a2b', 22, 1.25, 9.05, { cast: false });
+  box(S, 2.4, 1.5, 0.04, '#d9a066', 22, 1.25, 9.13, { cast: false });
+  [[-0.8, 1.45, '#fff8b0'], [-0.1, 1.15, '#ffffff'], [0.65, 1.5, '#ffd1dc'], [0.5, 0.9, '#d6f5ff']].forEach(([dx, y, c]) => box(S, 0.45, 0.4, 0.02, c, 22 + dx, y, 9.16, { cast: false }));
+  textPlane(S, tr('재도전 게시판', 'Retry board'), 2.2, 0.36, '#5d3a1a', '#fff', { fs: 20 }).position.set(22, 2.25, 9.13);
+  box(S, 0.08, 0.6, 0.08, '#5d3a1a', 21, 0.3, 9.1); box(S, 0.08, 0.6, 0.08, '#5d3a1a', 23, 0.3, 9.1);
+  solid(20.7, 8.9, 23.3, 9.25);
 
   // 센터장실 (director's office) in the break room corner: a glass room with a door toward the break room.
   // The guest sofa is for later (HQ staff visits).
@@ -264,6 +271,9 @@ export function buildTape(scene, segments) {
   scene.add(group);
   return group;
 }
+
+/** Where you stand to use the retry board. */
+export const RETRY_SPOT = { x: 22, z: 10.2 };
 
 export const TAPE = {
   receiving: [[X0, -5.6, -11.9, -5.6], [-11.9, Z0 + 1.5, -11.9, -5.6]],

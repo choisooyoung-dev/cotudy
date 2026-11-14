@@ -59,6 +59,27 @@ const ALL = {
     talk: ['오늘 물량 다 실으면 바로 출발해요!', '번개처럼 배송합니다~'],
     en: { name: "Mr. Yoon", role: "Lightning Express", talk: ["Once today's load is on, I'm off!", "Fast as lightning!"] },
   },
+  // HQ staff: three people who take turns visiting once a week (see src/main.js). Not in the center
+  // normally (hidden); on a visit they follow Kim around. Each one gives tests of one difficulty level,
+  // and starts visiting once the `unlock` stage is done.
+  hq1: {
+    name: '서다은', role: '본사', area: [-20, 6.5, -14, 8.5], hidden: true, level: 1, unlock: 'receiving',
+    look: { hair: '#2b2b2b', vest: false, shirt: '#ffffff', jacket: '#24345c', tie: '#2f6fd6', badge: '#4a90e2', pants: '#24345c', glasses: true, prop: 'tablet' },
+    talk: ['센터는 늘 바쁘네요.', '다음에 또 올게요.'],
+    en: { name: 'Seo', role: 'HQ', talk: ['The center is always busy.', 'See you next time.'] },
+  },
+  hq2: {
+    name: '백승호', role: '본사', area: [-20, 6.5, -14, 8.5], hidden: true, level: 2, unlock: 'packing',
+    look: { hair: '#5a3a22', vest: false, shirt: '#ffffff', jacket: '#5d6670', tie: '#c0392b', badge: '#4a90e2', pants: '#4b525a', prop: 'papers' },
+    talk: ['서류가 산더미네요…', '김사원님, 요즘 실력 늘었다던데요?'],
+    en: { name: 'Baek', role: 'HQ', talk: ['So much paperwork…', 'Kim, I hear you\'ve been improving.'] },
+  },
+  hq3: {
+    name: '차미경', role: '본사', area: [-20, 6.5, -14, 8.5], hidden: true, level: 3, unlock: 'forklift',
+    look: { hair: '#1a1a1a', style: 'long', vest: false, shirt: '#ffffff', jacket: '#1e1e24', tie: '#8e44ad', badge: '#f1c40f', pants: '#1e1e24', glasses: true, prop: 'coffee' },
+    talk: ['기본이 탄탄해야 해요.', '대충 하는 건 안 돼요.'],
+    en: { name: 'Cha', role: 'HQ', talk: ['Solid basics come first.', 'No cutting corners.'] },
+  },
   moon: {
     name: '문센터장', role: '센터장', area: [14.8, 15.2, 21, 21.4], // stays in 센터장실 (director's office)
     look: { hair: '#9e9e9e', vest: false, shirt: '#2c3e50', prop: 'coffee' },

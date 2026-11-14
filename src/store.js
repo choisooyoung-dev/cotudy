@@ -34,6 +34,9 @@ export const store = {
   },
   get pos() { return langState().pos; },
   savePos(x, z) { langState().pos = { x: +x.toFixed(2), z: +z.toFixed(2) }; write(state); },
+  /** HQ staff visits for the current language: { week, at, done, failed: [ids], passed: [ids] }. */
+  get hq() { const l = langState(); l.hq ||= { week: '', at: 0, done: false, failed: [], passed: [] }; return l.hq; },
+  saveHq() { write(state); },
   /** True after the first-day tour (greeting the team) has been played once. */
   get toured() { return !!state.toured; },
   setToured() { state.toured = true; write(state); },

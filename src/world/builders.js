@@ -128,7 +128,13 @@ export function makePerson(look = {}) {
   }
   const armL = limb(-0.45, 1.22, 0.18, 0.55, 0.22, shirt);
   const armR = limb(0.45, 1.22, 0.18, 0.55, 0.22, shirt);
-  box(body, 0.16, 0.2, 0.02, '#ffffff', 0.12, 1.0, 0.26); // badge
+  if (look.jacket) {
+    // suit jacket over a white shirt and a tie (HQ staff)
+    box(body, 0.74, 0.66, 0.49, look.jacket, 0, 0.92, 0);
+    box(body, 0.22, 0.6, 0.02, '#ffffff', 0, 0.95, 0.25);
+    box(body, 0.07, 0.42, 0.02, look.tie || '#2f6fd6', 0, 0.98, 0.265);
+  }
+  box(body, 0.16, 0.2, 0.02, look.badge || '#ffffff', look.jacket ? 0.24 : 0.12, 1.0, 0.27); // badge
   const hs = 1.05;
   const fz = hs * 0.45 + 0.01;
   box(body, hs, hs * 0.92, hs * 0.9, look.skin || '#ffd9b8', 0, 1.75, 0);
@@ -144,6 +150,16 @@ export function makePerson(look = {}) {
   box(body, 0.14, 0.55, hs * 0.9 + 0.04, hc, hs / 2 + 0.03, 1.95, -0.02);
   box(body, hs * 0.55, 0.16, 0.12, hc, -0.12, 2.08, hs * 0.45 + 0.02);
   if (look.style === 'bun') box(body, 0.4, 0.35, 0.4, hc, 0, 2.55, -0.15);
+  if (look.glasses) {
+    // a frame around each eye (4 thin bars) and a bridge, so the eyes still show
+    for (const gx of [-0.2, 0.2]) {
+      box(body, 0.28, 0.04, 0.02, '#222', gx, 1.86, fz + 0.01);
+      box(body, 0.28, 0.04, 0.02, '#222', gx, 1.65, fz + 0.01);
+      box(body, 0.04, 0.25, 0.02, '#222', gx - 0.12, 1.755, fz + 0.01);
+      box(body, 0.04, 0.25, 0.02, '#222', gx + 0.12, 1.755, fz + 0.01);
+    }
+    box(body, 0.12, 0.04, 0.02, '#222', 0, 1.8, fz + 0.01);
+  }
   if (look.style === 'long') box(body, hs + 0.06, 0.8, 0.25, hc, 0, 1.45, -hs * 0.45 - 0.05);
   if (look.cap) { box(body, hs + 0.14, 0.22, hs * 0.9 + 0.14, look.cap, 0, 2.36, 0); box(body, 0.7, 0.06, 0.4, look.cap, 0, 2.27, 0.6); }
   if (look.helmet) box(body, hs + 0.14, 0.3, hs * 0.9 + 0.14, look.helmet, 0, 2.38, 0);
@@ -151,6 +167,7 @@ export function makePerson(look = {}) {
   if (look.prop === 'box') carton(body, 0, 0.95, 0.5, 0.7);
   if (look.prop === 'scanner') { box(body, 0.12, 0.3, 0.12, '#333', 0.5, 1.0, 0.25); box(body, 0.16, 0.12, 0.3, '#f2b134', 0.5, 1.18, 0.35); }
   if (look.prop === 'papers') box(body, 0.5, 0.12, 0.4, '#ffffff', 0, 1.1, 0.4);
+  if (look.prop === 'tablet') { box(body, 0.5, 0.36, 0.05, '#2d3436', 0, 1.12, 0.42); box(body, 0.42, 0.28, 0.02, '#74b9ff', 0, 1.12, 0.45); }
   if (look.prop === 'coffee') cyl(body, 0.1, 0.08, 0.2, '#ffffff', 0.5, 1.2, 0.2);
   if (look.prop === 'tape') cyl(body, 0.16, 0.16, 0.1, '#c8a46a', 0.5, 1.15, 0.25);
   if (look.prop === 'bubble') cyl(body, 0.3, 0.3, 0.9, '#dff3ff', 0, 1.1, 0.45, { rz: Math.PI / 2 });

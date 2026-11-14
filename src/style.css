@@ -20,6 +20,7 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .tag b { color: #ffd84d; font-weight: 700; margin-right: 4px; }
 .tag.me { background: #ff9f43; }
 .tag.me b { color: #5b2a00; }
+.tag.spot { background: #8e5a2bee; }
 .tag.prompt { background: #fff8e7; color: var(--ink); border: 2px solid var(--line); font-weight: 700; transform-origin: center; }
 .tag.prompt.hidden { display: none; }
 
@@ -34,6 +35,10 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .hud .tip span { font-weight: 500; opacity: .75; }
 .hud .tip::before { content: ""; position: absolute; top: -6px; left: 50%; margin-left: -6px; border: 6px solid transparent; border-top: 0; border-bottom-color: #2b2f3a; }
 .hud:hover .tip { display: block; }
+/* "go there" button under the goal: big enough to tap on a phone */
+.goto-btn { position: absolute; top: 62px; right: 16px; z-index: 5; background: var(--green); color: #fff; border: 3px solid var(--line); border-radius: 12px; padding: 8px 14px; font-weight: 800; font-size: 14px; box-shadow: 0 3px 0 var(--line); cursor: pointer; min-height: 44px; }
+.goto-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
+.goto-btn.hide { display: none; }
 .goal { position: absolute; top: 16px; right: 16px; background: var(--paper); border: 3px solid var(--line); border-radius: 14px; padding: 8px 14px; font-weight: 700; font-size: 14px; z-index: 5; max-width: 46vw; }
 .menu-btn { position: absolute; bottom: 16px; right: 16px; z-index: 5; display: flex; align-items: center; gap: 6px; background: var(--paper); border: 3px solid var(--line); border-radius: 14px; padding: 8px 14px; font-weight: 800; font-size: 16px; box-shadow: 0 3px 0 var(--line); }
 .menu-btn .ico { font-size: 22px; line-height: 1; }
@@ -182,6 +187,12 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 
 .loading-java { font-size: 13px; font-weight: 700; color: #a0661c; }
 
+@media (max-width: 700px) {
+  /* phones: the goal can wrap to several lines, so the go-there button moves down near your thumb */
+  .goto-btn { top: auto; bottom: 84px; right: 16px; font-size: 15px; padding: 10px 16px; }
+  /* the goal goes under the progress box instead of on top of it */
+  .goal { top: 128px; left: 16px; right: auto; max-width: calc(100vw - 32px); font-size: 13px; }
+}
 @media (max-width: 860px) {
   .win .body { grid-template-columns: 1fr; }
   .win .left { border-right: 0; border-bottom: 3px solid var(--sand); max-height: 38vh; }

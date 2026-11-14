@@ -17,7 +17,12 @@ export function faceHTML(look = {}, { bust = false } = {}) {
   const vest = look.vest === false ? (look.shirt || '#ddd') : (look.vest || '#c6f432');
   const shirt = look.shirt || '#f4f4f4';
   const cap = look.cap || look.helmet;
-  const body = bust
+  const body = bust && look.jacket
+    ? `<i style="left:2px;top:62px;width:72px;height:36px;background:${look.jacket};border-radius:16px 16px 0 0"></i>
+    <i style="left:28px;top:62px;width:20px;height:36px;background:#fff"></i>
+    <i style="left:35px;top:66px;width:6px;height:32px;background:${look.tie || '#2f6fd6'}"></i>
+    <i style="left:52px;top:72px;width:12px;height:14px;background:${look.badge || '#fff'};border-radius:2px"></i>`
+    : bust
     ? `<i style="left:2px;top:62px;width:72px;height:36px;background:${shirt};border-radius:16px 16px 0 0"></i>
     ${look.vest === false ? '' : `<i style="left:2px;top:62px;width:24px;height:36px;background:${vest};border-radius:16px 0 0 0"></i><i style="left:50px;top:62px;width:24px;height:36px;background:${vest};border-radius:0 16px 0 0"></i>`}
     <i style="left:30px;top:62px;width:16px;height:8px;background:${look.skin || '#ffd9b8'};border-radius:0 0 8px 8px"></i>`
@@ -28,6 +33,7 @@ export function faceHTML(look = {}, { bust = false } = {}) {
     <i style="left:13px;top:18px;width:50px;height:46px;background:${look.skin || '#ffd9b8'};border-radius:8px"></i>
     <i style="left:12px;top:${cap ? 14 : 10}px;width:52px;height:${cap ? 10 : 18}px;background:${cap || hair};border-radius:6px 6px 2px 2px"></i>
     <i style="left:14px;top:26px;width:24px;height:8px;background:${hair};border-radius:2px"></i>
+    ${look.glasses ? `<i style="left:21px;top:36px;width:17px;height:14px;border:3px solid #222;border-radius:4px;box-sizing:border-box"></i><i style="left:39px;top:36px;width:17px;height:14px;border:3px solid #222;border-radius:4px;box-sizing:border-box"></i><i style="left:36px;top:40px;width:5px;height:3px;background:#222"></i>` : ''}
     ${look.style === 'bun' ? `<i style="left:28px;top:${cap ? 4 : 0}px;width:20px;height:14px;background:${hair};border-radius:7px 7px 3px 3px"></i>` : ''}
     ${look.style === 'long' ? `<i style="left:8px;top:22px;width:8px;height:44px;background:${hair};border-radius:3px"></i><i style="left:60px;top:22px;width:8px;height:44px;background:${hair};border-radius:3px"></i>` : ''}
     <i style="left:27px;top:39px;width:6px;height:9px;background:#2d2d2d;border-radius:2px"></i>
@@ -41,7 +47,9 @@ export function faceHTML(look = {}, { bust = false } = {}) {
 /**
  * Opens the mission window. Resolves with { stars } when finished, or null if closed early.
  */
-export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}`) {
+export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}`, opts = {}) {
+  // opts.test: HQ coding test. Only the "write it yourself" step, no concepts or summary card.
+  const test = !!opts.test;
   const look = { badge: rt.badge, badgeColor: rt.badgeColor, title: rt.file };
   return new Promise((resolve) => {
     const bg = document.createElement('div');
@@ -49,7 +57,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     bg.innerHTML = `<div class="win">
       <div class="top">
         <button class="btn back">${tr('← 센터로', '← Center')}</button>
-        <div class="title">${quest.title}<small>${tr(`${who}의 퀘스트`, `Quest from ${who}`)}</small></div>
+        <div class="title">${quest.title}<small>${test ? tr(`${who}의 코딩테스트`, `Coding test from ${who}`) : tr(`${who}의 퀘스트`, `Quest from ${who}`)}</small></div>
         <div class="steps"><span class="step-now"></span>${STEP_NAMES.map(() => '<i></i>').join('')}</div>
       </div>
       <div class="body"><div class="left"></div><div class="right"></div></div>
@@ -60,7 +68,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     const win = bg.querySelector('.win');
     const stepEls = [...bg.querySelectorAll('.steps i')];
 
-    const st = { step: 'concept', ci: 0, seen: new Set([0]), hintsUsed: 0, solutionShown: false, wrong: { predict: 0, fill: 0, write: 0 }, shownHints: { fill: 0, write: 0 }, reviewFrom: null, passed: {} };
+    const st = { step: test ? 'write' : 'concept', ci: 0, seen: new Set([0]), hintsUsed: 0, solutionShown: false, wrong: { predict: 0, fill: 0, write: 0 }, shownHints: { fill: 0, write: 0 }, reviewFrom: null, passed: {} };
 
     let javaStatus = readyLangs.has(rt.name) || !rt.loadingNote ? 'ready' : 'loading';
     rt.warm().then(() => { readyLangs.add(rt.name); javaStatus = 'ready'; bg.querySelectorAll('.loading-java').forEach((e) => e.remove()); });
@@ -68,7 +76,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     const close = (result) => { bg.remove(); removeEventListener('keydown', onKey, true); resolve(result); };
     bg.querySelector('.back').addEventListener('click', () => {
       if (st.step === 'done') return close({ stars: starCount() });
-      if (confirm(tr('센터로 돌아갈까요? 이 퀘스트는 처음부터 다시 해야 해요.', 'Go back to the center? You\'ll have to start this quest over.'))) close(null);
+      if (confirm(test ? tr('테스트를 그만둘까요? 휴게실 재도전 게시판에서 다시 풀 수 있어요.', 'Stop the test? You can retry it later from the break room retry board.') : tr('센터로 돌아갈까요? 이 퀘스트는 처음부터 다시 해야 해요.', 'Go back to the center? You\'ll have to start this quest over.'))) close(null);
     });
     const onKey = (e) => { if (e.key === 'Escape' && st.step === 'done') close({ stars: starCount() }); };
     addEventListener('keydown', onKey, true);
@@ -76,6 +84,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     const starCount = () => Math.max(1, 3 - (st.hintsUsed > 0 ? 1 : 0) - (st.solutionShown ? 1 : 0));
 
     function setSteps() {
+      if (test) { bg.querySelector('.steps').style.display = 'none'; return; }
       const idx = { concept: 1, predict: 2, fill: 3, write: 4, done: 5 }[st.reviewFrom || st.step];
       stepEls.forEach((el, i) => { el.className = i < idx ? 'on' : i === idx ? 'now' : ''; el.title = STEP_NAMES[i]; });
       bg.querySelector('.step-now').textContent = idx < STEP_NAMES.length
@@ -162,6 +171,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         + `<div class="expect-label">${tr('✅ 이렇게 나오면 성공', '✅ Make it print this')}</div><div class="expect">${esc(expected)}</div></div>`;
     }
     function learnedCard() {
+      if (test) return '';
       return `<div class="card"><h4>${tr('개념 정리', 'Summary')} <button class="linkish review">${tr('📖 개념 다시 보기', '📖 Review concepts')}</button></h4><ul>${quest.learned.map((l) => `<li>${l}</li>`).join('')}</ul></div>`;
     }
     function bindReview() {
@@ -300,8 +310,8 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     // ---------- write ----------
     function renderWrite() {
       const w = quest.write;
-      left.innerHTML = npcBox(tr('이번엔 직접 써 볼래요? 다 쓰면 ▶ 실행!', 'This time, write it yourself! Press ▶ Run when you\'re done.'))
-        + taskCard(tr('📝 문제 · 직접 쓰기', '📝 Task · Write it yourself'), w.prompt, w.expected) + learnedCard();
+      left.innerHTML = npcBox(test ? tr('제한 시간은 없어요. 지금까지 배운 걸로 풀 수 있어요!', 'There\'s no time limit. You can solve it with what you\'ve learned!') : tr('이번엔 직접 써 볼래요? 다 쓰면 ▶ 실행!', 'This time, write it yourself! Press ▶ Run when you\'re done.'))
+        + taskCard(test ? tr('🏢 본사 코딩테스트', '🏢 HQ coding test') : tr('📝 문제 · 직접 쓰기', '📝 Task · Write it yourself'), w.prompt, w.expected) + learnedCard();
       bindReview();
       right.innerHTML = '';
       const ed = codeEditor(st.writeCode ?? w.starter, { ...look, onRun: () => run() });
@@ -315,7 +325,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       right.appendChild(out);
       const nav = document.createElement('div');
       nav.className = 'nav';
-      nav.innerHTML = `<span></span><button class="btn go next" disabled>${tr('퀘스트 완료 →', 'Finish quest →')}</button>`;
+      nav.innerHTML = `<span></span><button class="btn go next" disabled>${test ? tr('제출하기 →', 'Submit →') : tr('퀘스트 완료 →', 'Finish quest →')}</button>`;
       right.appendChild(nav);
       setTimeout(() => ed.focus(), 50);
       ed.el.querySelector('textarea').addEventListener('input', () => { st.writeCode = ed.value; });
@@ -326,7 +336,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         st.writeCode = ed.value;
         const ok = await grade('write', ed.value, ed, out, status, w);
         b.disabled = false;
-        if (ok) { st.passed.write = true; nav.querySelector('.next').disabled = false; react(true, `${tr('미션 성공!', 'Mission complete!')} ${'★'.repeat(starCount())}`, quest.thanks); }
+        if (ok) { st.passed.write = true; nav.querySelector('.next').disabled = false; react(true, test ? tr('정답이에요!', 'Correct!') : `${tr('미션 성공!', 'Mission complete!')} ${'★'.repeat(starCount())}`, quest.thanks); }
         else bindHints('write', w, solveWrite);
       };
       bar.querySelector('.run').addEventListener('click', run);
@@ -342,7 +352,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       const stars = starCount();
       right.innerHTML = `<div class="done-screen">
         <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
-        <h2>${tr('퀘스트 완료!', 'Quest complete!')} ${quest.title}</h2>
+        <h2>${test ? tr('코딩테스트 통과!', 'Coding test passed!') : tr('퀘스트 완료!', 'Quest complete!')} ${quest.title}</h2>
         <p style="margin:0;opacity:.8">${stars === 3 ? tr('힌트 없이 해냈어요!', 'You did it without hints!') : stars === 2 ? tr('힌트를 보고 해냈어요. 다음엔 힌트 없이 도전!', 'You did it with hints. Try it without hints next time!') : tr('정답을 보고 끝냈어요. 나중에 안 보고 다시 써 봐요.', 'You finished after seeing the answer. Try writing it again later without looking.')}</p>
         <button class="btn go" style="font-size:17px;padding:10px 22px">${tr('센터로 돌아가기', 'Back to the center')}</button></div>`;
       right.querySelector('.btn.go').addEventListener('click', () => close({ stars }));
