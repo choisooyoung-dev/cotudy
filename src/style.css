@@ -201,3 +201,30 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
   .console { grid-template-columns: 1fr; }
   .console .col + .col { border-left: 0; border-top: 2px solid var(--code-line); }
 }
+
+/* phones: the mission window fills the screen and scrolls as one page, so the code box never gets squeezed */
+@media (max-width: 700px) {
+  .mission-bg { padding: 0; }
+  .win { width: 100%; height: 100%; border-radius: 0; border-width: 0; box-shadow: none; }
+  .win .top { padding: 8px 10px; gap: 8px; flex-wrap: wrap; }
+  .win .top .back { padding: 6px 10px; font-size: 14px; }
+  .win .title { font-size: 15px; flex: 1; min-width: 0; }
+  .win .title small { font-size: 11px; }
+  .steps { width: 100%; justify-content: flex-end; }
+  .steps i { width: 16px; height: 16px; border-radius: 4px; }
+  .win .body { display: block; overflow: auto; -webkit-overflow-scrolling: touch; }
+  .win .left { max-height: none; overflow: visible; padding: 12px; gap: 10px; }
+  .win .right { overflow: visible; padding: 12px; }
+  .side-card { display: none; }
+  .npc .face { transform: scale(.74); transform-origin: top left; margin: 0 -20px -20px 0; }
+  .concept, .editor.grow { flex: none; }
+  .editor { min-height: 200px; }
+  .codeview { font-size: 13px; }
+  .concept h2 { font-size: 18px; }
+  .concept p { font-size: 15px; }
+  .react { left: 10px; right: 10px; top: auto; bottom: 12px; max-width: none; }
+  .nav { position: sticky; bottom: 0; background: var(--paper); padding: 8px 0; }
+  .hint-row { margin-top: 0; }
+  .editor:not(:has(textarea)) { min-height: 0; }
+  .runbar .status[style] { display: none; }
+}

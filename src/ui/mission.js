@@ -120,8 +120,8 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       const c = cs[st.ci];
       const reviewing = !!st.reviewFrom;
       left.innerHTML = npcBox(reviewing ? tr('개념 다시 보고 문제로 돌아가요!', 'Review the concepts, then head back to the problem!') : st.ci === 0 ? quest.request[quest.request.length - 1] + tr('<br>먼저 이것부터 같이 봐요!', '<br>Let\'s look at this together first!') : tr('천천히 봐도 괜찮아요~', 'Take your time!'))
-        + `<div class="card"><h4>${tr('이번 퀘스트에 필요한 개념', 'Concepts for this quest')}</h4><div class="clist">${cs.map((x, i) => `<div class="ci ${i === st.ci ? 'cur' : st.seen.has(i) ? 'done' : ''}" data-i="${i}">${st.seen.has(i) && i !== st.ci ? '✓ ' : i === st.ci ? '▶ ' : ''}${i + 1}. ${x.title}</div>`).join('')}</div></div>`
-        + `<div class="card" style="font-size:13px">${tr('각 예제는 <b>▶ 실행해 보기</b>로 진짜 실행 결과를 볼 수 있어요. 개념을 다 보면 <b>문제 풀기</b>로 넘어가요.', 'Press <b>▶ Try it</b> on each example to see the real output. When you\'ve seen all the concepts, go on to <b>Solve</b>.')}</div>`;
+        + `<div class="card side-card"><h4>${tr('이번 퀘스트에 필요한 개념', 'Concepts for this quest')}</h4><div class="clist">${cs.map((x, i) => `<div class="ci ${i === st.ci ? 'cur' : st.seen.has(i) ? 'done' : ''}" data-i="${i}">${st.seen.has(i) && i !== st.ci ? '✓ ' : i === st.ci ? '▶ ' : ''}${i + 1}. ${x.title}</div>`).join('')}</div></div>`
+        + `<div class="card side-card" style="font-size:13px">${tr('각 예제는 <b>▶ 실행해 보기</b>로 진짜 실행 결과를 볼 수 있어요. 개념을 다 보면 <b>문제 풀기</b>로 넘어가요.', 'Press <b>▶ Try it</b> on each example to see the real output. When you\'ve seen all the concepts, go on to <b>Solve</b>.')}</div>`;
       left.querySelectorAll('.ci').forEach((el) => el.addEventListener('click', () => { st.ci = +el.dataset.i; st.seen.add(st.ci); render(); }));
 
       right.innerHTML = `<div class="concept">
@@ -172,7 +172,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
     }
     function learnedCard() {
       if (test) return '';
-      return `<div class="card"><h4>${tr('개념 정리', 'Summary')} <button class="linkish review">${tr('📖 개념 다시 보기', '📖 Review concepts')}</button></h4><ul>${quest.learned.map((l) => `<li>${l}</li>`).join('')}</ul></div>`;
+      return `<div class="card side-card"><h4>${tr('개념 정리', 'Summary')} <button class="linkish review">${tr('📖 개념 다시 보기', '📖 Review concepts')}</button></h4><ul>${quest.learned.map((l) => `<li>${l}</li>`).join('')}</ul></div>`;
     }
     function bindReview() {
       left.querySelector('.review')?.addEventListener('click', () => { st.reviewFrom = st.step; st.step = 'concept'; render(); });
