@@ -145,9 +145,10 @@ export function makePerson(look = {}) {
   box(body, 0.12, 0.04, 0.02, '#b5651d', 0, 1.58, fz);
   const hc = look.hair || '#3b2a20';
   box(body, hs + 0.08, 0.28, hs * 0.9 + 0.08, hc, 0, 2.27, 0);
-  box(body, hs + 0.08, 0.7, 0.2, hc, 0, 1.95, -hs * 0.45 - 0.04);
-  box(body, 0.14, 0.55, hs * 0.9 + 0.04, hc, -hs / 2 - 0.03, 1.95, -0.02);
-  box(body, 0.14, 0.55, hs * 0.9 + 0.04, hc, hs / 2 + 0.03, 1.95, -0.02);
+  // hair pieces are sized so no two faces (or a face and the skin) lie in the same plane: that flickers
+  box(body, hs + 0.07, 0.7, 0.2, hc, 0, 1.95, -hs * 0.45 - 0.04);
+  box(body, 0.14, 0.55, hs * 0.9 + 0.04, hc, -hs / 2 - 0.03, 1.95, -0.01);
+  box(body, 0.14, 0.55, hs * 0.9 + 0.04, hc, hs / 2 + 0.03, 1.95, -0.01);
   box(body, hs * 0.55, 0.16, 0.12, hc, -0.12, 2.08, hs * 0.45 + 0.02);
   if (look.style === 'bun') box(body, 0.4, 0.35, 0.4, hc, 0, 2.55, -0.15);
   if (look.glasses) {

@@ -232,7 +232,11 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   let nearest = null;
   let arrowTarget = null;
   let blockedZoneHit = null;
-  const clock = new THREE.Clock();
+  const SUN_OFFSET = new THREE.Vector3(25, 45, 30);
+  const TEXEL = (sun.shadow.camera.right - sun.shadow.camera.left) / sun.shadow.mapSize.x;
+  const lightRot = new THREE.Matrix4().lookAt(SUN_OFFSET, new THREE.Vector3(), new THREE.Vector3(0, 1, 0)).invert();
+  const lightRotInv = lightRot.clone().invert();
+  const sunPos = new THREE.Vector3();
   let saveTimer = 0;
 
   function resize() {
@@ -256,9 +260,13 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
     el.style.transform = `translate(${(tmp.x + 1) / 2 * container.clientWidth}px, ${(1 - tmp.y) / 2 * container.clientHeight}px) translate(-50%, -100%)`;
   }
 
-  function loop() {
-    const dt = Math.min(clock.getDelta(), 0.05);
-    const t = clock.elapsedTime;
+  // frame time from the browser's own frame clock (steadier than measuring inside the frame), lightly smoothed
+  let lastNow = null, t = 0, dt = 1 / 60;
+  function loop(now) {
+    const raw = lastNow == null ? 1 / 60 : Math.min((now - lastNow) / 1000, 0.05);
+    lastNow = now;
+    dt += (raw - dt) * (Math.abs(raw - dt) > 0.02 ? 1 : 0.25);
+    t += dt;
 
     // player movement (screen-relative: up = away from camera)
     let ix = 0, iz = 0;
@@ -299,10 +307,25 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
     }
     animatePerson(me, t, moving, !!mySeat);
 
+    // camera follows (not too close). Done before the name tags are placed, so tags use this frame's camera.
+    const mp = me.group.position;
+    tmp.copy(cam.userData.override || mp);
+    const target = cam.userData.target || (cam.userData.target = tmp.clone());
+    target.lerp(tmp, cam.userData.snap ? 1 : 1 - Math.pow(cam.userData.override ? 0.05 : 0.002, dt));
+    cam.userData.snap = false;
+    cam.position.copy(target).add(CAM_OFFSET);
+    cam.lookAt(target);
+    cam.updateMatrixWorld();
+    // the sun moves with the camera in whole shadow-map texels, so shadow edges don't shimmer
+    sunPos.copy(target).applyMatrix4(lightRot);
+    sunPos.x = Math.round(sunPos.x / TEXEL) * TEXEL; sunPos.y = Math.round(sunPos.y / TEXEL) * TEXEL;
+    sunPos.applyMatrix4(lightRotInv);
+    sun.target.position.copy(sunPos);
+    sun.position.copy(sunPos).add(SUN_OFFSET);
+
     // NPCs
     nearest = null;
     let best = 2.3;
-    const mp = me.group.position;
     for (const n of people) {
       if (n.hidden) { n.tag.style.display = 'none'; continue; }
       const pos = n.holder.position;
@@ -423,16 +446,6 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       arrowHolder.visible = !!n && d > 5;
       if (n) { arrowHolder.position.set(mp.x, 0.15, mp.z); arrowHolder.rotation.y = Math.atan2(n.holder.position.x - mp.x, n.holder.position.z - mp.z); }
     } else arrowHolder.visible = false;
-
-    // camera follows (not too close)
-    tmp.copy(cam.userData.override || mp);
-    const target = cam.userData.target || (cam.userData.target = tmp.clone());
-    target.lerp(tmp, cam.userData.snap ? 1 : 1 - Math.pow(cam.userData.override ? 0.05 : 0.002, dt));
-    cam.userData.snap = false;
-    cam.position.copy(target).add(CAM_OFFSET);
-    cam.lookAt(target);
-    sun.position.copy(target).add(new THREE.Vector3(25, 45, 30));
-    sun.target.position.copy(target);
 
     renderer.render(scene, cam);
     requestAnimationFrame(loop);

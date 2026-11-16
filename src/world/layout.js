@@ -26,6 +26,9 @@ export function buildCenter(scene) {
 
   // ---- shell ----
   const floor = (kind, x0, z0, x1, z1, y = 0) => {
+    // a raised floor sits a hair inside its edges, so its sides never share a plane with the floor under it
+    const e = y * 0.5;
+    x0 += e; z0 += e; x1 -= e; z1 -= e;
     const w = x1 - x0, d = z1 - z0;
     box(S, w, 0.2, d, null, (x0 + x1) / 2, -0.1 + y, (z0 + z1) / 2, { mat: floorMaterial(kind, w, d), cast: false });
   };
