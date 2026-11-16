@@ -6,9 +6,10 @@ import { buildCenter, buildTape, makeForklift, TAPE, ZONES } from './layout.js';
 
 const PLAYER_R = 0.42;
 const SPEED = 5.5;
+const COARSE = matchMedia('(pointer: coarse)').matches; // phone/tablet: tap instead of Space
 const VIEW = 22; // ortho frustum height (bigger = farther)
 
-export function createWorld(container, { npcs, playerStart, onInteract, onMove, spots = [] }) {
+export function createWorld(container, { npcs, playerStart, onInteract, onMove, onPrompt, spots = [] }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
@@ -112,13 +113,35 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   const meTag = makeTag(tr('<b>물류팀</b>김사원', '<b>Logistics</b>Kim'), 'me');
   for (const n of people) n.tag = makeTag(`<b>${n.def.role}</b>${n.def.name}`);
   const prompt = makeTag(tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
-  // interactive spots (e.g. the retry board): { id, x, z, label }. Space near one calls onInteract('spot:' + id)
+  const talkHTML = prompt.innerHTML;
+  let promptFor;
+  // interactive spots: { id, x, z, label?, action?, r? }. label = a name tag that is always shown (the retry board),
+  // action = what the Space prompt says, r = how close you must be. Space near one calls onInteract('spot:' + id).
   const spotList = spots.map((sp) => {
     const holder = new THREE.Object3D();
     holder.position.set(sp.x, 0, sp.z);
     scene.add(holder);
-    return { id: 'spot:' + sp.id, holder, tag: makeTag(sp.label, 'spot'), def: {} };
+    return { id: 'spot:' + sp.id, holder, tag: sp.label ? makeTag(sp.label, 'spot') : null, action: sp.action, r: sp.r || 2, def: {} };
   });
+  // every seat is a spot too: Space sits Kim down, moving (or Space again) stands back up
+  for (const [i, st] of seats.entries()) {
+    const holder = new THREE.Object3D();
+    holder.position.set(st.x, 0, st.z);
+    scene.add(holder);
+    spotList.push({ id: 'seat:' + i, seat: st, holder, tag: null, action: tr('앉기', 'Sit'), r: 1.3, def: {} });
+  }
+  let mySeat = null, standPos = null;
+  const sitDown = (st) => {
+    standPos = me.group.position.clone();
+    mySeat = st; st.taken = true;
+    me.group.position.set(st.x, 0, st.z);
+    me.group.rotation.y = st.rot;
+  };
+  const standUp = () => {
+    if (!mySeat) return;
+    mySeat.taken = false; mySeat = null;
+    me.group.position.copy(standPos); // seats sit inside furniture colliders: step back out first
+  };
 
   // ---- input ----
   const keys = new Set();
@@ -129,13 +152,59 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       if (down) keys.add(k); else keys.delete(k);
       if (!frozen) e.preventDefault();
     }
-    if (down && (k === ' ' || k === 'enter') && !frozen && nearest) { e.preventDefault(); onInteract(nearest.id); }
+    if (down && (k === ' ' || k === 'enter') && !frozen && nearest) {
+      e.preventDefault();
+      interact();
+    }
+  };
+  const interact = () => {
+    if (nearest.seat) { if (mySeat) standUp(); else sitDown(nearest.seat); }
+    else { standUp(); onInteract(nearest.id); }
   };
   addEventListener('keydown', (e) => onKey(e, true));
   addEventListener('keyup', (e) => onKey(e, false));
   addEventListener('blur', () => keys.clear());
   // touch / mouse d-pad
   const pad = { x: 0, z: 0 };
+  // touch to walk: hold a finger (or pen) on the floor and Kim walks toward it, following as it slides.
+  // Letting go keeps walking to the last point, so a tap means "go there". A tap on whoever/whatever
+  // is already in reach uses it (same as Space).
+  let walkTo = null, stuck = 0;
+  const ray = new THREE.Raycaster(), ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
+  const floorAt = (e) => {
+    const r = renderer.domElement.getBoundingClientRect();
+    ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), cam);
+    return ray.ray.intersectPlane(ground, hitP) ? { x: hitP.x, z: hitP.z } : null;
+  };
+  let touch = null; // { id, t, x, y }
+  const cv = renderer.domElement;
+  cv.style.touchAction = 'none';
+  cv.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' || frozen) return;
+    touch = { id: e.pointerId, t: performance.now(), x: e.clientX, y: e.clientY };
+    cv.setPointerCapture(e.pointerId);
+    // tapped right on the person/thing in reach (anywhere from feet to head on screen): use it instead of walking
+    if (nearest) {
+      const r = cv.getBoundingClientRect(), hp = nearest.holder.position;
+      const onScreen = (y) => { const v = new THREE.Vector3(hp.x, y, hp.z).project(cam); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; };
+      const a = onScreen(0), b = onScreen(2.6); // feet to just above the head
+      const px = Math.max(Math.min(a.x, b.x), Math.min(Math.max(a.x, b.x), e.clientX)), py = Math.max(Math.min(a.y, b.y), Math.min(Math.max(a.y, b.y), e.clientY));
+      if (Math.hypot(e.clientX - px, e.clientY - py) < 36) { touch.use = true; return; }
+    }
+    walkTo = floorAt(e); stuck = 0;
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!touch || e.pointerId !== touch.id || frozen) return;
+    if (Math.hypot(e.clientX - touch.x, e.clientY - touch.y) > 12) touch.use = false; // it's a drag, not a tap
+    if (!touch.use) { walkTo = floorAt(e); stuck = 0; }
+  });
+  const endTouch = (e) => {
+    if (!touch || e.pointerId !== touch.id) return;
+    if (touch.use && performance.now() - touch.t < 400 && nearest && !frozen) interact();
+    touch = null;
+  };
+  cv.addEventListener('pointerup', endTouch);
+  cv.addEventListener('pointercancel', endTouch);
 
   // ---- helpers ----
   function blocked(x, z, r, ignoreLocks) {
@@ -200,22 +269,35 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       if (keys.has('arrowright') || keys.has('d')) ix += 1;
       ix += pad.x; iz += pad.z;
     }
-    const moving = ix !== 0 || iz !== 0;
-    blockedZoneHit = null;
+    let moving = ix !== 0 || iz !== 0;
+    let wx = 0, wz = 0;
     if (moving) {
+      walkTo = null; // keys win over a touch target
       const len = Math.hypot(ix, iz);
       // screen axes → world: right = (1,0,-1)/√2, down = (1,0,1)/√2
-      const wx = (ix + iz) / Math.SQRT2 / len, wz = (iz - ix) / Math.SQRT2 / len;
+      wx = (ix + iz) / Math.SQRT2 / len; wz = (iz - ix) / Math.SQRT2 / len;
+    } else if (walkTo && !frozen) {
+      const p = me.group.position, dx = walkTo.x - p.x, dz = walkTo.z - p.z, dist = Math.hypot(dx, dz);
+      if (dist < 0.25) walkTo = null;
+      else { wx = dx / dist; wz = dz / dist; moving = true; }
+    }
+    if (frozen) walkTo = null;
+    if (moving && mySeat) { standUp(); moving = false; walkTo = touch ? walkTo : null; } // first move just gets up
+    blockedZoneHit = null;
+    if (moving) {
       const p = me.group.position;
+      const bx = p.x, bz = p.z;
       const nx = p.x + wx * SPEED * dt, nz = p.z + wz * SPEED * dt;
       const hit = blocked(nx, nz, PLAYER_R);
       if (hit?.lock) blockedZoneHit = hit.lock;
       moveWithCollision(me.group, wx * SPEED * dt, wz * SPEED * dt, PLAYER_R);
       me.group.rotation.y = Math.atan2(wx, wz);
+      // walking into furniture toward a touch target: give up after a moment instead of running in place
+      if (walkTo && !touch) { stuck = Math.hypot(p.x - bx, p.z - bz) < SPEED * dt * 0.2 ? stuck + dt : 0; if (stuck > 0.35) walkTo = null; }
       saveTimer += dt;
       if (saveTimer > 1) { saveTimer = 0; onMove?.(p.x, p.z); }
     }
-    animatePerson(me, t, moving);
+    animatePerson(me, t, moving, !!mySeat);
 
     // NPCs
     nearest = null;
@@ -315,9 +397,20 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
     else ring.visible = false;
 
     for (const sp of spotList) {
+      if (sp.tag) placeTag(sp.tag, sp.holder, 2.4);
+      if (frozen) continue;
+      if (sp.seat) {
+        if (mySeat) { if (sp.seat === mySeat) { best = -1; nearest = sp; } continue; }
+        if (sp.seat.taken) continue;
+      }
       const d = Math.hypot(sp.holder.position.x - mp.x, sp.holder.position.z - mp.z);
-      if (d < 2 && d < best && !frozen) { best = d; nearest = sp; }
-      placeTag(sp.tag, sp.holder, 2.4);
+      if (d < sp.r && d < best) { best = d; nearest = sp; }
+    }
+    const act = !nearest ? null : nearest.seat && mySeat ? tr('일어나기', 'Stand up') : nearest.action || tr('말 걸기', 'Talk');
+    if (act !== promptFor) {
+      promptFor = act;
+      prompt.innerHTML = act ? `${COARSE ? '👆' : '<kbd>Space</kbd>'} ${act}` : talkHTML;
+      onPrompt?.(act); // the phone's action button shows the same words
     }
     placeTag(meTag, me.group, 2.95);
     if (nearest) { prompt.style.display = ''; placeTag(prompt, nearest.holder, -0.2); } else prompt.style.display = 'none';
@@ -413,10 +506,12 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       g.i = g.path.length;
     },
     /** Gives the player ('me') or an NPC a coffee cup to hold (on) or takes it away. */
-    holdCup(id, on) {
+    holdCup(id, on, drink) {
       const p = id === 'me' ? me : people.find((q) => q.id === id)?.p;
-      if (p) holdCup(p, on);
+      if (p) holdCup(p, on, drink);
     },
+    /** Gets Kim up if sitting. */
+    standUp() { standUp(); },
     /** Lets an NPC go back to wandering in its own area. */
     freeNpc(id) {
       const n = people.find((q) => q.id === id);

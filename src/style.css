@@ -53,7 +53,13 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .pad { position: absolute; left: 16px; bottom: 30px; z-index: 5; display: none; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); gap: 4px; }
 .pad button { background: #fff8e7cc; border: 3px solid var(--line); border-radius: 12px; font-size: 18px; font-weight: 900; touch-action: none; }
 .pad .u { grid-area: 1 / 2; } .pad .l { grid-area: 2 / 1; } .pad .r { grid-area: 2 / 3; } .pad .d { grid-area: 3 / 2; } .pad .act { grid-area: 2 / 2; font-size: 12px; }
-@media (pointer: coarse) { .pad { display: grid; } }
+/* phones walk by touching the floor (see game.js), so only the action button is left; it shows what a tap would do */
+@media (pointer: coarse) {
+  .pad { display: block; left: 16px; bottom: 84px; } /* same row as the go-there button, left of it */
+  .pad .u, .pad .l, .pad .r, .pad .d { display: none; }
+  .pad .act { min-width: 96px; height: 52px; padding: 0 16px; font-size: 15px; background: #fff8e7; box-shadow: 0 3px 0 var(--line); }
+  .pad .act.off { display: none; }
+}
 
 /* ---------- dialog ---------- */
 .dlg { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: min(760px, calc(100vw - 32px)); background: var(--paper); border: 3px solid var(--line); border-radius: 18px; padding: 18px 20px 14px; box-shadow: 0 4px 0 var(--line); z-index: 10; }
@@ -227,4 +233,9 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
   .hint-row { margin-top: 0; }
   .editor:not(:has(textarea)) { min-height: 0; }
   .runbar .status[style] { display: none; }
+}
+
+/* phones: the credit line wraps to the left of the settings button instead of running under it */
+@media (max-width: 700px) {
+  .credit { right: 150px; line-height: 1.4; }
 }

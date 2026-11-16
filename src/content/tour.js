@@ -9,7 +9,9 @@ import { tr } from '../i18n.js';
 
 export const TOUR_START = [
   { who: 'han', text: tr('김사원님, 첫 출근이니까 센터 사람들한테 인사 한번 하고 와요! 제가 같이 갈게요.', 'Kim, it\'s your first day, so let\'s go say hello to everyone at the center! I\'ll come with you.') },
-  { who: 'han', text: tr('저 따라오세요~ 방향키나 W A S D 로 걸을 수 있어요.', 'Follow me! You can walk with the arrow keys or W A S D.') },
+  { who: 'han', text: matchMedia('(pointer: coarse)').matches
+    ? tr('저 따라오세요~ 바닥을 손가락으로 누른 채 끌면 그쪽으로 걸어요.', 'Follow me! Hold your finger on the floor and drag, and you\'ll walk that way.')
+    : tr('저 따라오세요~ 방향키나 W A S D 로 걸을 수 있어요.', 'Follow me! You can walk with the arrow keys or W A S D.') },
 ];
 
 export const TOUR_STOPS = [

@@ -181,13 +181,13 @@ export function makePerson(look = {}) {
 }
 
 /** Animates walking (t = time, moving = bool). sitting: legs forward, hips on a chair seat. */
-/** Puts a coffee cup in a person's right hand (on) or takes it away. */
-export function holdCup(p, on) {
-  if (!on) { if (p.parts.cup) { p.parts.cup.parent.remove(p.parts.cup); p.parts.cup = null; } return; }
-  if (p.parts.cup) return;
+/** Puts a paper cup in a person's right hand (on) or takes it away. drink = color of what's inside. */
+export function holdCup(p, on, drink = '#6f4e37') {
+  if (p.parts.cup) { p.parts.cup.parent.remove(p.parts.cup); p.parts.cup = null; }
+  if (!on) return;
   const cup = new THREE.Group();
   cyl(cup, 0.1, 0.08, 0.2, '#ffffff', 0, 0, 0);
-  cyl(cup, 0.09, 0.09, 0.02, '#6f4e37', 0, 0.105, 0, { cast: false });
+  cyl(cup, 0.09, 0.09, 0.02, drink, 0, 0.105, 0, { cast: false });
   cup.position.set(0, -0.58, 0.1); // at the hand
   cup.rotation.x = 1.1; // upright while the arm is bent; tips toward the mouth on a sip
   p.parts.armR.add(cup); // rides along with the arm, so a sip lifts the cup too

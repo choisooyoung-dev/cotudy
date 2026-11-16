@@ -84,6 +84,7 @@ const ALL = {
     name: '문센터장', role: '센터장', area: [14.8, 15.2, 21, 21.4], // stays in 센터장실 (director's office)
     look: { hair: '#9e9e9e', vest: false, shirt: '#2c3e50', prop: 'coffee' },
     talk: ['첫날 힘들죠? 커피 한잔해요.', '천천히 해도 괜찮아요. 하나씩!'],
+    coffeeLine: 0, // after talk[0] he actually brings you a coffee (see serveCoffee in main.js)
     en: { name: "Director Moon", role: "Center director", talk: ["Tough first day? Have a coffee.", "Take it slow. One thing at a time!"] },
   },
 };

@@ -297,3 +297,23 @@ export function makeForklift() {
 }
 
 export { canvasTexture };
+
+/**
+ * Things you can use or look at with Space: { id, kind, x, z, r }. x/z is the object itself, r how close
+ * Kim must stand. What each kind does lives in main.js (useObject). Seats are separate (every seat is sittable).
+ */
+export const OBJECT_SPOTS = [
+  { id: 'water', kind: 'water', x: X1 - 1, z: 13.5, r: 1.6 },
+  { id: 'coffee', kind: 'coffee', x: X1 - 1, z: 11, r: 1.9 },
+  ...[[-27, -16.5], [-24, -16.5], [-27, -12.5], [-20.5, -12.5], [-16, -17]].map(([x, z], i) => ({ id: 'pallet' + i, kind: 'pallet', x, z, r: 2.1 })),
+  { id: 'scanner', kind: 'scanner', x: -17, z: -10, r: 1.4 },
+  ...[-30, -28.4, -26.8].map((x, i) => ({ id: 'printer' + i, kind: 'printer', x, z: -2.8, r: 1.3 })),
+  { id: 'cutoff', kind: 'cutoff', x: X0 + 0.3, z: 1.5, r: 1.8 },
+  ...[-18.5, -14.5, -10.5].flatMap((z, i) => [-2.5, 2.5].map((x, j) => ({ id: `rack${i}${j}`, kind: 'rack', x, z, r: 1.7 }))),
+  ...[[16, -16], [18, -16], [16, -12], [21, -12]].map(([x, z], i) => ({ id: 'cage' + i, kind: 'cage', x, z, r: 1.4 })),
+  ...[-5, 2].map((z, i) => ({ id: 'belt' + i, kind: 'belt', x: 28, z, r: 1.6 })),
+  ...[[16, 1], [21, 1], [16, -3.5], [21, -3.5]].map(([x, z], i) => ({ id: 'pack' + i, kind: 'pack', x, z, r: 1.8 })),
+  { id: 'clockin', kind: 'clockin', x: -16.5, z: 10, r: 1.3 },
+  { id: 'menu', kind: 'menu', x: 16, z: 9.1, r: 1.6 },
+  { id: 'books', kind: 'books', x: 13.35, z: 19.8, r: 1.8 },
+];

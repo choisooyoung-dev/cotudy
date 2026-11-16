@@ -22,7 +22,7 @@ import { TOUR_START, TOUR_STOPS, TOUR_END } from './content/tour.js';
 import { HQ_TESTS as JAVA_HQ } from './content/java/hq.js';
 import { HQ_TESTS as JS_HQ } from './content/javascript/hq.js';
 import { HQ_TESTS as PY_HQ } from './content/python/hq.js';
-import { RETRY_SPOT } from './world/layout.js';
+import { RETRY_SPOT, OBJECT_SPOTS } from './world/layout.js';
 
 // Start loading the language runtime first, before the 3D center is built, so it is ready sooner.
 // (The first Java load takes 10+ seconds on a new browser; after that the browser cache makes it ~2s.)
@@ -42,7 +42,7 @@ app.innerHTML = `
   <div class="goal"></div>
   <button class="goto-btn hide">${tr('▶ 바로 가기', '▶ Go there')}</button>
   <div class="toast hide"></div>
-  <div class="pad"><button class="u">▲</button><button class="l">◀</button><button class="act">${tr('말 걸기', 'Talk')}</button><button class="r">▶</button><button class="d">▼</button></div>
+  <div class="pad"><button class="u">▲</button><button class="l">◀</button><button class="act off"></button><button class="r">▶</button><button class="d">▼</button></div>
   <button class="menu-btn" title="${tr('언어 · 저장 파일 · 초기화', 'Language · save file · reset')}"><span class="ico">⚙️</span>${tr('설정', 'Settings')}</button>
   <div class="credit"><span class="java-state">${tr('☕ 자바 준비 중…', '☕ Getting Java ready…')}</span> · <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a> · © 2026 choisooyoung-dev. All rights reserved.</div>`;
 
@@ -80,6 +80,78 @@ function percent(langId = store.lang || 'java') {
   return Math.round((sum / STAGES.length) * 100);
 }
 
+/** Phone or tablet: you walk by touching the floor instead of arrow keys. */
+const TOUCH = matchMedia('(pointer: coarse)').matches;
+
+// ---------- things around the center ----------
+// What Space does next to an object (spots from OBJECT_SPOTS in world/layout.js). Looking at something is a
+// short thought from Kim; the water cooler and the coffee machine put a cup in Kim's hand.
+const OBJECT_ACTIONS = {
+  water: () => tr('물 마시기', 'Drink water'),
+  coffee: () => tr('커피 뽑기', 'Get a coffee'),
+  clockin: () => tr('출근 찍기', 'Clock in'),
+  menu: () => tr('식단표 보기', 'Read the menu'),
+};
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const LOOKS = {
+  pallet: [
+    ['박스에 "수분 크림 24개입"이라고 적혀 있다. 생각보다 묵직하다.', 'The box says "Moisturizing cream ×24". Heavier than it looks.'],
+    ['쿠션 팩트 박스가 차곡차곡 쌓여 있다. 몇 개인지 세려면… 코드가 필요하겠다.', 'Cushion compact boxes, stacked neatly. Counting them all would take… some code.'],
+    ['송장에 "취급주의 · 유리병"이라고 붙어 있다. 살살 다뤄야지.', 'The label says "Fragile · Glass". Gently does it.'],
+  ],
+  scanner: [['바코드 스캐너다. 삑! 박스 번호가 화면에 떴다.', 'A barcode scanner. Beep! A box number pops up on the screen.']],
+  printer: [
+    ['송장이 계속 나오고 있다. 주문번호, 받는 사람, 상품명… 같은 게 한 장도 없다.', 'Shipping labels keep coming out. Order number, name, item… no two are the same.'],
+    ['프린터에 "용지 부족" 불이 깜빡인다. 이대리님께 말씀드려야겠다.', 'The "paper low" light is blinking. I should tell Lee.'],
+  ],
+  cutoff: [['오늘 출고 마감은 15시. 그 전에 다 싣고 나가야 한다!', 'Shipping cutoff is 15:00 today. Everything has to be loaded before then!']],
+  rack: [
+    ['선반마다 "A-03-2" 같은 번호가 붙어 있다. 구역, 줄, 층 번호인가 보다.', 'Every shelf has a code like "A-03-2". Zone, row and level, I guess.'],
+    ['립스틱, 마스카라, 선크림… 작은 상자들이 줄지어 있다.', 'Lipstick, mascara, sunscreen… rows and rows of little boxes.'],
+  ],
+  cage: [['택배사별로 박스를 모아 두는 바퀴 달린 철망 카트다. 꽤 꽉 찼다.', 'A wire cart on wheels that collects boxes for each courier. Pretty full already.']],
+  belt: [['컨베이어 위로 박스가 천천히 흘러간다. 계속 보고 있으니 졸리다…', 'Boxes drift slowly along the conveyor. Watching it makes me sleepy…']],
+  pack: [
+    ['에어캡이 놓여 있다. 하나만 톡… 아무도 못 봤겠지?', 'Some bubble wrap. Just one pop… nobody saw that, right?'],
+    ['포장 상자가 S, M, L 크기별로 쌓여 있다.', 'Packing boxes stacked by size: S, M and L.'],
+  ],
+  books: [['물류 관리, 재고 관리, 안전 수칙… 맨 끝에 "처음 배우는 코딩"도 꽂혀 있다.', 'Logistics, inventory, safety rules… and at the very end, "Coding for Beginners".']],
+};
+let cupTimer;
+function giveCup(drink, ms) {
+  world.holdCup('me', true, drink);
+  clearTimeout(cupTimer);
+  cupTimer = setTimeout(() => world.holdCup('me', false), ms);
+}
+async function useObject(o) {
+  if (!o) return;
+  const think = (ko, en) => speak([{ who: 'me', text: tr(ko, en) }]);
+  switch (o.kind) {
+    case 'water':
+      giveCup('#bfe6ff', 5000);
+      return toast(tr('💧 시원한 물 한 잔 마셨어요', '💧 You drank a cup of cold water'), 2500);
+    case 'coffee':
+      giveCup('#6f4e37', 40000);
+      return toast(tr('☕ 300원 넣고 믹스커피 한 잔 뽑았어요', '☕ 300 won in, one cup of coffee out'), 2500);
+    case 'clockin': {
+      const now = new Date();
+      return toast(tr(`🪪 삑! ${now.getHours()}시 ${now.getMinutes()}분, 출근 찍혔어요`, `🪪 Beep! Clocked in at ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`), 2500);
+    }
+    case 'menu': {
+      const day = new Date().getDay(); // 0 = Sunday
+      const menu = [null, ['제육볶음', 'spicy pork'], ['돈까스', 'pork cutlet'], ['비빔밥', 'bibimbap'], ['짜장면', 'black bean noodles']][day];
+      return think(
+        `이번 주 식단표다. 월 제육, 화 돈까스, 수 비빔밥, 목 짜장. ${menu ? `오늘은 ${menu[0]}!` : '오늘 메뉴는 안 적혀 있네…'}`,
+        `This week's lunch: Mon spicy pork, Tue cutlet, Wed bibimbap, Thu noodles. ${menu ? `Today it's ${menu[1]}!` : 'Today isn\'t on the list…'}`,
+      );
+    }
+    default: {
+      const l = LOOKS[o.kind];
+      if (l) return think(...pick(l));
+    }
+  }
+}
+
 // ---------- world ----------
 const savedPos = store.pos;
 const world = createWorld($('#world'), {
@@ -87,7 +159,11 @@ const world = createWorld($('#world'), {
   playerStart: savedPos || { x: -19.8, z: 11.3 },
   onInteract: (id) => talkTo(id),
   onMove: (x, z) => store.savePos(x, z),
-  spots: [{ id: 'retry', ...RETRY_SPOT, label: tr('📋 재도전 게시판', '📋 Retry board') }],
+  onPrompt: (act) => { const b = $('.pad .act'); if (!b) return; b.textContent = act || ''; b.classList.toggle('off', !act); },
+  spots: [
+    { id: 'retry', ...RETRY_SPOT, label: tr('📋 재도전 게시판', '📋 Retry board'), action: tr('게시판 보기', 'Check the board') },
+    ...OBJECT_SPOTS.map((o) => ({ ...o, action: OBJECT_ACTIONS[o.kind]?.() || tr('살펴보기', 'Look') })),
+  ],
 });
 
 function refresh() {
@@ -166,6 +242,7 @@ function dialog({ who, lines, buttons, look }) {
 async function talkTo(id) {
   if (busy || touring) return;
   if (id === 'spot:retry') return retryBoard();
+  if (id.startsWith('spot:')) return useObject(OBJECT_SPOTS.find((o) => 'spot:' + o.id === id));
   if (id.startsWith('hq')) return hqTalk(id);
   const npc = NPCS[id];
   const who = whoOf(npc);
@@ -174,7 +251,8 @@ async function talkTo(id) {
   if (q && q.npc === id) return offerQuest(q);
   // replay: talking to a quest giver whose quests are done
   const doneHere = quests.filter((x) => x.npc === id && store.isDone(x.id));
-  const line = npc.talk[Math.floor(Math.random() * npc.talk.length)];
+  const li = Math.floor(Math.random() * npc.talk.length);
+  const line = npc.talk[li];
   if (doneHere.length) {
     const v = await dialog({
       who, look, lines: [line],
@@ -187,11 +265,35 @@ async function talkTo(id) {
       });
       const rq = quests.find((x) => x.id === pick);
       if (rq) await startQuest(rq);
-    }
+    } else if (li === npc.coffeeLine) await serveCoffee(id);
     return;
   }
   // no quest from this person yet (or ever): just everyday small talk
   await dialog({ who, look, lines: [line] });
+  if (li === npc.coffeeLine) await serveCoffee(id);
+}
+
+// "Have a coffee" means a coffee: the director gets a cup from the coffee table in his office,
+// brings it back and hands it over. Kim holds it (and sips) for a while.
+const COFFEE_TABLE = { x: 16.7, z: 16.6 }, COFFEE_LOOK = { x: 15.6, z: 16.6 };
+async function serveCoffee(id) {
+  const from = world.npcPos(id);
+  if (!from) return;
+  const back = { x: from.x, z: from.z };
+  // from behind his desk, walk around its right end instead of through it
+  const aroundDesk = back.z > 19 ? [{ x: 19.4, z: back.z }, { x: 19.4, z: 18.4 }] : [];
+  busy = true;
+  await world.walkNpc(id, [...aroundDesk, COFFEE_TABLE], { speed: 2.2, face: COFFEE_LOOK });
+  await wait(900); // stirring the coffee mix
+  await world.walkNpc(id, [...aroundDesk.reverse(), back], { speed: 2.2 });
+  giveCup('#6f4e37', 40000);
+  toast(tr('☕ 믹스커피를 받았어요', '☕ You got a cup of coffee'), 2500);
+  busy = false;
+  await speak([
+    { who: id, text: tr('자, 믹스커피예요. 뜨거우니까 조심하고요.', 'Here, instant coffee. Careful, it\'s hot.') },
+    { who: 'me', text: tr('감사합니다! 잘 마실게요.', 'Thank you! I\'ll enjoy it.') },
+  ]);
+  world.freeNpc(id);
 }
 
 /** The quest giver asks for `q`. `lead` lines come first (e.g. "thanks, and one more thing…"). */
@@ -269,7 +371,9 @@ async function chooseLanguage() {
   if (store.lang === 'python') { $('.java-state').textContent = tr('🐍 파이썬 준비 중…', '🐍 Getting Python ready…'); warmUpPython().then(() => { $('.java-state').textContent = tr('🐍 파이썬 준비 완료', '🐍 Python ready'); }); }
   refresh();
   if (!store.toured) { runTour(); return; }
-  toast(tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Space</kbd> next to someone to talk'), 6000);
+  toast(TOUCH
+    ? tr('👆 바닥을 누른 채 끌면 따라 걸어요. 사람 옆에서 오른쪽 아래 버튼(또는 그 사람)을 누르면 말을 걸어요', '👆 Hold and drag on the floor to walk. Next to someone, tap the button at the bottom right (or them) to talk')
+    : tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Space</kbd> next to someone to talk'), 6000);
 }
 
 // ---------- "go there" button ----------
@@ -327,7 +431,9 @@ async function runTour() {
   $('.goal').textContent = goal;
   updateGoto();
   await speak(TOUR_START);
-  toast(tr('⌨️ 방향키(또는 W A S D)로 한지원을 따라가세요', '⌨️ Follow Jiwon with the arrow keys (or W A S D)'), 5000);
+  toast(TOUCH
+    ? tr('👆 바닥을 누른 채 끌면 따라 걸어요. 한지원을 따라가세요', '👆 Hold and drag on the floor to walk. Follow Jiwon')
+    : tr('⌨️ 방향키(또는 W A S D)로 한지원을 따라가세요', '⌨️ Follow Jiwon with the arrow keys (or W A S D)'), 5000);
   for (const stop of TOUR_STOPS) {
     world.walkNpc(stop.npc, [stop.meet], { speed: 2.2, face: stop.path[stop.path.length - 1] });
     await world.walkNpc('han', stop.path, { lead: true });
