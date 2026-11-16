@@ -59,6 +59,15 @@ export const TOUR_STOPS = [
       { who: 'me', text: tr('안녕하세요! 열심히 하겠습니다!', 'Hello! I\'ll do my best!') },
       { who: 'moon', text: tr('하나씩 천천히 하면 돼요. 커피 한잔하고 가요. ☕', 'Just take it one step at a time. Have a coffee before you go. ☕') },
     ],
+    // after "have a coffee": the director fetches cups from the sofa table and hands them out
+    coffee: {
+      table: { x: 16.7, z: 16.6 }, // stands here, next to the coffee table
+      look: { x: 15.6, z: 16.6 },
+      lines: [
+        { who: 'moon', text: tr('자, 믹스커피예요. 뜨거우니까 조심하고요.', 'Here, instant coffee. Careful, it\'s hot.') },
+        { who: 'me', text: tr('감사합니다! 잘 마실게요.', 'Thank you! I\'ll enjoy it.') },
+      ],
+    },
     // more coffee chat, shown one group at a time only while the runtime is still loading
     extra: [
       [

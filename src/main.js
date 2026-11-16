@@ -301,6 +301,22 @@ function runtimeReady() {
 const ME = () => tr('물류팀 김사원', 'Kim · Logistics');
 const speak = (lines) => dialog({ who: '', lines: lines.map((l) => ({ text: l.text, me: l.who === 'me', who: l.who === 'me' ? ME() : whoOf(NPCS[l.who]), look: l.who === 'me' ? PLAYER_LOOK : NPCS[l.who].look })) });
 
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+/** The director walks to the coffee table, comes back and hands Kim and Jiwon a cup. */
+async function coffeeBreak(stop) {
+  const c = stop.coffee;
+  busy = true; // no talking to others mid-scene (freezing would stop the director too)
+  await world.walkNpc(stop.npc, [c.table], { speed: 2, face: c.look });
+  await wait(900); // stirring the coffee mix
+  await world.walkNpc(stop.npc, [stop.meet], { speed: 2 });
+  world.holdCup('me', true);
+  world.holdCup('han', true);
+  toast(tr('☕ 믹스커피를 받았어요', '☕ You got a cup of coffee'), 2500);
+  await wait(500);
+  busy = false;
+  await speak(c.lines);
+}
+
 async function runTour() {
   touring = true;
   // the tour is the first day at work, not a loading screen: hide the "getting Java ready" status
@@ -316,6 +332,7 @@ async function runTour() {
     world.walkNpc(stop.npc, [stop.meet], { speed: 2.2, face: stop.path[stop.path.length - 1] });
     await world.walkNpc('han', stop.path, { lead: true });
     await speak(stop.lines);
+    if (stop.coffee) await coffeeBreak(stop);
     // the last stop keeps chatting over coffee until the runtime is ready (at most every extra group once)
     for (const more of stop.extra || []) {
       if (await runtimeReady()) break;
@@ -326,6 +343,7 @@ async function runTour() {
   await speak(TOUR_END.lines);
   await world.walkNpc('han', TOUR_END.path, { lead: true });
   world.freeNpc('han');
+  world.holdCup('me', false); world.holdCup('han', false);
   touring = false;
   $('.java-state').style.visibility = '';
   store.setToured();

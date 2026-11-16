@@ -181,6 +181,19 @@ export function makePerson(look = {}) {
 }
 
 /** Animates walking (t = time, moving = bool). sitting: legs forward, hips on a chair seat. */
+/** Puts a coffee cup in a person's right hand (on) or takes it away. */
+export function holdCup(p, on) {
+  if (!on) { if (p.parts.cup) { p.parts.cup.parent.remove(p.parts.cup); p.parts.cup = null; } return; }
+  if (p.parts.cup) return;
+  const cup = new THREE.Group();
+  cyl(cup, 0.1, 0.08, 0.2, '#ffffff', 0, 0, 0);
+  cyl(cup, 0.09, 0.09, 0.02, '#6f4e37', 0, 0.105, 0, { cast: false });
+  cup.position.set(0, -0.58, 0.1); // at the hand
+  cup.rotation.x = 1.1; // upright while the arm is bent; tips toward the mouth on a sip
+  p.parts.armR.add(cup); // rides along with the arm, so a sip lifts the cup too
+  p.parts.cup = cup;
+}
+
 export function animatePerson(p, t, moving, sitting = false) {
   const { body, legL, legR, armL, armR, carry } = p.parts;
   if (sitting) {
@@ -193,5 +206,10 @@ export function animatePerson(p, t, moving, sitting = false) {
   legL.rotation.x = s * 0.6;
   legR.rotation.x = -s * 0.6;
   if (!carry) { armL.rotation.x = -s * 0.5; armR.rotation.x = s * 0.5; }
+  if (p.parts.cup && !carry) {
+    // holding a paper cup: arm bent, and every ~4 s it comes up to the mouth for a sip
+    const sip = Math.max(0, Math.sin(t * 1.6) - 0.85) / 0.15;
+    armR.rotation.x = -1.1 - sip * 0.9;
+  }
   body.position.y = moving ? Math.abs(Math.sin(t * 11)) * 0.08 : Math.sin(t * 2) * 0.015;
 }

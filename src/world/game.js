@@ -1,7 +1,7 @@
 // The 3D center: renderer, camera that follows 김사원, walking, NPC wandering, name tags, quest marks.
 import { tr } from '../i18n.js';
 import * as THREE from 'three';
-import { makePerson, animatePerson } from './builders.js';
+import { makePerson, animatePerson, holdCup } from './builders.js';
 import { buildCenter, buildTape, makeForklift, TAPE, ZONES } from './layout.js';
 
 const PLAYER_R = 0.42;
@@ -411,6 +411,11 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       const last = g.path[g.path.length - 1];
       n.holder.position.set(last.x, 0, last.z);
       g.i = g.path.length;
+    },
+    /** Gives the player ('me') or an NPC a coffee cup to hold (on) or takes it away. */
+    holdCup(id, on) {
+      const p = id === 'me' ? me : people.find((q) => q.id === id)?.p;
+      if (p) holdCup(p, on);
     },
     /** Lets an NPC go back to wandering in its own area. */
     freeNpc(id) {
