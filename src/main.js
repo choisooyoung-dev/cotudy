@@ -171,14 +171,7 @@ async function talkTo(id) {
   const who = whoOf(npc);
   const look = npc.look;
   const q = nextQuest();
-  if (q && q.npc === id) {
-    const choice = await dialog({
-      who, look, lines: q.request,
-      buttons: [{ label: tr('나중에 할게요', 'Maybe later'), value: 'later' }, { label: tr('퀘스트 시작', 'Start quest'), value: 'start', primary: true }],
-    });
-    if (choice === 'start') await startQuest(q);
-    return;
-  }
+  if (q && q.npc === id) return offerQuest(q);
   // replay: talking to a quest giver whose quests are done
   const doneHere = quests.filter((x) => x.npc === id && store.isDone(x.id));
   const line = npc.talk[Math.floor(Math.random() * npc.talk.length)];
@@ -201,6 +194,24 @@ async function talkTo(id) {
   await dialog({ who, look, lines: [line] });
 }
 
+/** The quest giver asks for `q`. `lead` lines come first (e.g. "thanks, and one more thing…"). */
+async function offerQuest(q, lead = []) {
+  const npc = NPCS[q.npc];
+  const choice = await dialog({
+    who: whoOf(npc), look: npc.look, lines: [...lead, ...q.request],
+    buttons: [{ label: tr('나중에 할게요', 'Maybe later'), value: 'later' }, { label: tr('퀘스트 시작', 'Start quest'), value: 'start', primary: true }],
+  });
+  if (choice === 'start') await startQuest(q);
+}
+
+/** Said right after a mission when the same person has the next job too. */
+const CHAIN_LINES = [
+  ['덕분에 해결됐어요! 그런데 하나만 더 부탁해도 될까요?', 'That did it, thanks! Could I ask you for one more thing?'],
+  ['고마워요! 온 김에 다음 일도 좀 봐 줄래요?', 'Thank you! While you\'re here, could you look at the next job too?'],
+  ['역시 김사원님! 이어서 이것도 부탁해요.', 'Knew I could count on you, Kim! Here\'s the next one.'],
+  ['일이 확 줄었어요! 그럼 다음 일은 이거예요~', 'That saved me so much work! So, here\'s the next job~'],
+];
+
 async function startQuest(q) {
   busy = true;
   world.setFrozen(true);
@@ -215,6 +226,14 @@ async function startQuest(q) {
   setTimeout(checkHqVisit, 2500);
   const after = currentStageIndex();
   const nq = nextQuest();
+  // same person has the next job: keep talking instead of sending the player back to press Space
+  if (wasNext?.id === q.id && nq && nq.npc === q.npc) {
+    if (after > before) toast(tr(`✅ ${STAGES[before].name} 완료!`, `✅ ${STAGES[before].name} done!`), 3000);
+    const [ko, en] = CHAIN_LINES[Math.floor(Math.random() * CHAIN_LINES.length)];
+    busy = true; // no Space-talk sneaking in before the dialog opens
+    await new Promise((r) => setTimeout(r, 250));
+    return offerQuest(nq, [tr(ko, en)]);
+  }
   if (after > before) {
     const done = STAGES[before];
     const next = STAGES[after];
