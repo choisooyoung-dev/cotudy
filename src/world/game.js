@@ -167,7 +167,8 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   // touch / mouse d-pad
   const pad = { x: 0, z: 0 };
   // touch to walk: hold a finger (or pen) on the floor and Kim walks toward it, following as it slides.
-  // Letting go keeps walking to the last point, so a tap means "go there". A tap on whoever/whatever
+  // Holding still keeps walking that way (the point under the finger moves as the camera follows).
+  // Letting go stops; only a quick tap means "go there". A tap on whoever/whatever
   // is already in reach uses it (same as Space).
   let walkTo = null, stuck = 0;
   const ray = new THREE.Raycaster(), ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
@@ -181,7 +182,7 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   cv.style.touchAction = 'none';
   cv.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' || frozen) return;
-    touch = { id: e.pointerId, t: performance.now(), x: e.clientX, y: e.clientY };
+    touch = { id: e.pointerId, t: performance.now(), x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY };
     cv.setPointerCapture(e.pointerId);
     // tapped right on the person/thing in reach (anywhere from feet to head on screen): use it instead of walking
     if (nearest) {
@@ -195,12 +196,16 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   });
   cv.addEventListener('pointermove', (e) => {
     if (!touch || e.pointerId !== touch.id || frozen) return;
-    if (Math.hypot(e.clientX - touch.x, e.clientY - touch.y) > 12) touch.use = false; // it's a drag, not a tap
+    touch.cx = e.clientX; touch.cy = e.clientY;
+    if (Math.hypot(e.clientX - touch.x, e.clientY - touch.y) > 12) { touch.use = false; touch.drag = true; } // a drag, not a tap
     if (!touch.use) { walkTo = floorAt(e); stuck = 0; }
   });
   const endTouch = (e) => {
     if (!touch || e.pointerId !== touch.id) return;
-    if (touch.use && performance.now() - touch.t < 400 && nearest && !frozen) interact();
+    const quick = performance.now() - touch.t < 300 && !touch.drag;
+    if (touch.use && quick && nearest && !frozen) interact();
+    // a quick tap on the floor walks there; letting go after holding or sliding stops right away
+    if (!quick || e.type === 'pointercancel') walkTo = null;
     touch = null;
   };
   cv.addEventListener('pointerup', endTouch);
@@ -277,6 +282,8 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
       if (keys.has('arrowright') || keys.has('d')) ix += 1;
       ix += pad.x; iz += pad.z;
     }
+    // finger held down: re-aim every frame at the floor under it, so holding still keeps walking that way
+    if (touch && !touch.use && !frozen) { walkTo = floorAt({ clientX: touch.cx, clientY: touch.cy }); }
     let moving = ix !== 0 || iz !== 0;
     let wx = 0, wz = 0;
     if (moving) {
