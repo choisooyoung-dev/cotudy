@@ -224,7 +224,7 @@ function dialog({ who, lines, buttons, look }) {
         const el = document.createElement('button');
         el.className = 'btn' + (b.primary ? ' go' : '');
         el.disabled = !!b.disabled;
-        el.innerHTML = b.html || b.label + (b.primary ? '<kbd>Space</kbd>' : '');
+        el.innerHTML = b.html || b.label + (b.primary && !TOUCH ? '<kbd>Space</kbd>' : '');
         el.addEventListener('click', () => (b.value === '__next' ? (i++, draw()) : finish(b.value)));
         btns.appendChild(el);
         if (b.primary) el.dataset.primary = '1';

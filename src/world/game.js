@@ -112,7 +112,7 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   const makeTag = (html, cls = '') => { const d = document.createElement('div'); d.className = 'tag ' + cls; d.innerHTML = html; tagLayer.appendChild(d); return d; };
   const meTag = makeTag(tr('<b>물류팀</b>김사원', '<b>Logistics</b>Kim'), 'me');
   for (const n of people) n.tag = makeTag(`<b>${n.def.role}</b>${n.def.name}`);
-  const prompt = makeTag(tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
+  const prompt = makeTag(COARSE ? tr('👆 말 걸기', '👆 Talk') : tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
   const talkHTML = prompt.innerHTML;
   let promptFor;
   // interactive spots: { id, x, z, label?, action?, r? }. label = a name tag that is always shown (the retry board),
