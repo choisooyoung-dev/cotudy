@@ -1,4 +1,5 @@
 import './style.css';
+import { installErrorLog, logError, playErrors, clearPlayErrors } from './errlog.js';
 import { createWorld } from './world/game.js';
 import { store, LOOKS as CHAR_LOOKS } from './store.js';
 import { STAGES } from './content/stages.js';
@@ -28,6 +29,8 @@ import { RETRY_SPOT, OBJECT_SPOTS } from './world/layout.js';
 // (The first Java load takes 10+ seconds on a new browser; after that the browser cache makes it ~2s.)
 const warm = (store.lang || 'java') === 'java' ? warmUpJava() : Promise.resolve();
 if (store.lang === 'python') warmUpPython();
+
+installErrorLog();
 
 const LANGS = [
   { id: 'java', name: 'Java', icon: '<img class="lang-ico" src="./icons/java-original.svg" alt="">', quests: [...(isEn ? JAVA_QUESTS_EN : JAVA_QUESTS), ...JAVA_MORE] },
@@ -687,6 +690,7 @@ $('.menu-btn').addEventListener('click', async () => {
       { label: tr('🌐 화면 언어: English', '🌐 Display language: 한국어'), value: 'ui' },
       { label: tr('💾 저장 파일 받기', '💾 Download save file'), value: 'export' },
       { label: tr('📂 저장 파일 불러오기', '📂 Load save file'), value: 'import' },
+      { label: tr(`🐞 오류 기록 받기 (${playErrors().length})`, `🐞 Download error log (${playErrors().length})`), value: 'errors' },
       { label: tr('진행 초기화', 'Reset progress'), value: 'reset' },
       ...(store.chars.length > 1 ? [{ label: tr('🗑️ 이 캐릭터 지우기', '🗑️ Delete this character'), value: 'delchar' }] : []),
       { label: tr('닫기', 'Close'), value: null, primary: true },
@@ -697,6 +701,7 @@ $('.menu-btn').addEventListener('click', async () => {
   if (v === 'lang') chooseLanguage();
   if (v === 'ui') setUiLang(UI_LANG === 'en' ? 'ko' : 'en');
   if (v === 'export') exportSave();
+  if (v === 'errors') exportErrors();
   if (v === 'import') importSave();
   if (v === 'reset' && confirm(tr('모든 진행 상황을 지울까요? 되돌릴 수 없어요.\n(지우기 전에 저장 파일을 받아 두면 나중에 불러올 수 있어요)', 'Delete all progress? This can\'t be undone.\n(Download a save file first if you might want it back.)'))) { store.reset(); location.reload(); }
 });
@@ -712,6 +717,24 @@ function exportSave() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   toast(tr('💾 저장 파일을 받았어요. 다른 컴퓨터에서 ⚙️ 설정 → 저장 파일 불러오기로 이어 할 수 있어요', '💾 Save file downloaded. On another computer, use ⚙️ Settings → Load save file to continue'), 5000);
+}
+
+function exportErrors() {
+  const list = playErrors();
+  if (!list.length) { toast(tr('🐞 기록된 오류가 없어요', '🐞 No errors recorded'), 3000); return; }
+  const d = new Date();
+  const p2 = (n) => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}`;
+  const blob = new Blob([JSON.stringify({ app: 'cotudy-errors', version: 1, exportedAt: d.toISOString(), errors: list }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cotudy-errors-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  clearPlayErrors(); // they're in the file now
+  toast(tr(`🐞 오류 ${list.length}개를 파일로 받았어요. 맥의 다운로드 폴더에 있으면 매일 밤 비공개 기록 저장소로 정리돼요`, `🐞 Downloaded ${list.length} errors. Files in the Mac's Downloads folder are filed into the private log repo every night`), 5000);
 }
 
 function importSave() {
@@ -745,13 +768,16 @@ if ((store.lang || 'java') === 'java') {
   // a minute or more, so say so instead of looking frozen.
   let javaReady = false;
   warm.finally(() => { javaReady = true; });
+  setTimeout(() => { if (!javaReady) logError('runner', 'Java still not ready after 45s'); }, 45000);
   setTimeout(() => { if (!javaReady) $('.java-state').textContent = tr('☕ 자바 서버가 느려요… 1분 넘게 안 되면 새로고침해 주세요', '☕ The Java server is slow… if it takes over a minute, reload the page'); }, 45000);
-  warm.then(() => { $('.java-state').textContent = tr('☕ 자바 준비 완료', '☕ Java ready'); }, () => { $('.java-state').textContent = tr('⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)', '⚠️ Couldn\'t load Java (check your internet connection)'); });
+  warm.then(() => { $('.java-state').textContent = tr('☕ 자바 준비 완료', '☕ Java ready'); }, (e) => {
+    logError('runner', 'Java load failed: ' + (e?.message || e)); $('.java-state').textContent = tr('⚠️ 자바를 불러오지 못했어요 (인터넷 연결 확인)', '⚠️ Couldn\'t load Java (check your internet connection)'); });
 } else if (store.lang === 'python') {
   $('.java-state').textContent = tr('🐍 파이썬 준비 중…', '🐍 Getting Python ready…');
-  warmUpPython().then(() => { $('.java-state').textContent = tr('🐍 파이썬 준비 완료', '🐍 Python ready'); }, () => { $('.java-state').textContent = tr('⚠️ 파이썬을 불러오지 못했어요 (인터넷 연결 확인)', '⚠️ Couldn\'t load Python (check your internet connection)'); });
+  warmUpPython().then(() => { $('.java-state').textContent = tr('🐍 파이썬 준비 완료', '🐍 Python ready'); }, (e) => {
+    logError('runner', 'Python load failed: ' + (e?.message || e)); $('.java-state').textContent = tr('⚠️ 파이썬을 불러오지 못했어요 (인터넷 연결 확인)', '⚠️ Couldn\'t load Python (check your internet connection)'); });
 } else {
   $('.java-state').textContent = `⚡ ${langInfo().name}`;
 }
 // debug helper for development
-window.cotudy = { hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };
+window.cotudy = { hq: { java: JAVA_HQ, javascript: JS_HQ, python: PY_HQ }, hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };

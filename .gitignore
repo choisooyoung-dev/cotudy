@@ -5,3 +5,6 @@ dist
 # 개인 문서 (GitHub 에 올리지 않음)
 PLAN.md
 CLAUDE.md
+
+# 매일 점검을 로컬에서 돌린 결과 (기록은 비공개 저장소 cotudy-logs 에)
+logs/
