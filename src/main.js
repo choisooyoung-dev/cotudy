@@ -1,6 +1,6 @@
 import './style.css';
 import { createWorld } from './world/game.js';
-import { store } from './store.js';
+import { store, LOOKS as CHAR_LOOKS } from './store.js';
 import { STAGES } from './content/stages.js';
 import { NPCS } from './content/npcs.js';
 import { QUESTS as JAVA_QUESTS } from './content/java/quests.js';
@@ -69,9 +69,8 @@ function nextQuest() {
   return questsOf(stage.id).find((q) => !store.isDone(q.id)) || null;
 }
 /** Progress of a language in % (default: the current one). Each 1회차 stage counts the same. */
-function percent(langId = store.lang || 'java') {
+function percent(langId = store.lang || 'java', done = store.doneOf(langId)) {
   const lang = LANGS.find((l) => l.id === langId);
-  const done = store.doneOf(langId);
   let sum = 0;
   for (const s of STAGES) {
     const qs = (lang?.quests || []).filter((q) => q.stage === s.id);
@@ -157,6 +156,7 @@ const savedPos = store.pos;
 const world = createWorld($('#world'), {
   npcs: NPCS,
   playerStart: savedPos || { x: -19.8, z: 11.3 },
+  playerLook: store.look,
   onInteract: (id) => talkTo(id),
   onMove: (x, z) => store.savePos(x, z),
   onPrompt: (act) => { const b = $('.pad .act'); if (!b) return; b.textContent = act || ''; b.classList.toggle('off', !act); },
@@ -198,7 +198,7 @@ function toast(html, ms = 3200) {
 
 // ---------- dialog ----------
 /** Same colors as the player character in src/world/game.js. */
-const PLAYER_LOOK = { hair: '#5a3825', vest: '#ff9f43', shirt: '#ffffff' };
+const PLAYER_LOOK = store.look;
 
 function dialog({ who, lines, buttons, look }) {
   return new Promise((resolve) => {
@@ -374,6 +374,49 @@ async function chooseLanguage() {
   toast(TOUCH
     ? tr('👆 바닥을 누른 채 끌면 따라 걸어요. 사람 옆에서 오른쪽 아래 버튼(또는 그 사람)을 누르면 말을 걸어요', '👆 Hold and drag on the floor to walk. Next to someone, tap the button at the bottom right (or them) to talk')
     : tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Space</kbd> next to someone to talk'), 6000);
+}
+
+// ---------- characters (one save each) ----------
+// Shown when the page opens (once per tab) if a character already exists, so a second language can get
+// its own character with its own first day.
+const PICKED = 'cotudy.picked';
+const markPicked = () => { try { sessionStorage.setItem(PICKED, '1'); } catch { /* ignore */ } };
+const wasPicked = () => { try { return !!sessionStorage.getItem(PICKED); } catch { return true; } };
+const mini = (look) => `<span class="mini-face">${faceHTML(look, { bust: true })}</span>`;
+function charLabel(c) {
+  const l = LANGS.find((x) => x.id === c.lang);
+  if (!l) return tr('김사원 · 언어 아직 안 고름', 'Kim · no language yet');
+  return `${tr('김사원', 'Kim')} · ${l.icon}${l.name}<span class="lang-pct">${percent(l.id, c.byLang[l.id]?.done || {})}%</span>`;
+}
+async function chooseCharacter() {
+  markPicked();
+  const list = store.chars;
+  const v = await dialog({
+    who: tr('출근하기', 'Clock in'),
+    lines: [tr('누구로 출근할까요? 캐릭터마다 진행 상황이 따로 저장돼요.', 'Who is clocking in today? Each character has its own saved progress.')],
+    buttons: [
+      ...list.map((c) => ({ html: `${mini(c.look)}${charLabel(c)}`, value: c.id, primary: c.id === store.charId })),
+      ...(list.length < CHAR_LOOKS.length ? [{ label: tr('➕ 새 캐릭터', '➕ New character'), value: 'new' }] : []),
+    ],
+  });
+  if (v === 'new') return newCharacter();
+  if (v && v !== store.charId) { store.switchChar(v); location.reload(); return; }
+  if (!store.lang) chooseLanguage();
+}
+async function newCharacter() {
+  const used = new Set(store.chars.map((c) => c.lookIdx));
+  const first = CHAR_LOOKS.findIndex((_, i) => !used.has(i));
+  const v = await dialog({
+    who: tr('새 캐릭터', 'New character'),
+    lines: [tr('어떤 모습으로 출근할까요? 새 캐릭터는 첫날부터 시작해요.', 'How will your new character look? A new character starts from day one.')],
+    buttons: [
+      ...CHAR_LOOKS.map((l, i) => ({ html: mini(l), value: String(i), primary: i === first })),
+      { label: tr('취소', 'Cancel'), value: null },
+    ],
+  });
+  if (v == null) return chooseCharacter();
+  store.newChar(+v);
+  location.reload();
 }
 
 // ---------- "go there" button ----------
@@ -639,14 +682,18 @@ $('.menu-btn').addEventListener('click', async () => {
     who: tr('설정', 'Settings'),
     lines: [tr('진행 상황은 이 브라우저에만 저장돼요. 다른 컴퓨터에서 이어 하려면 저장 파일을 받아서 거기서 불러오세요.', 'Your progress is saved only in this browser. To continue on another computer, download a save file and load it there.')],
     buttons: [
+      { label: tr('👥 캐릭터 바꾸기', '👥 Switch character'), value: 'char' },
       { label: tr('💻 코딩 언어 바꾸기', '💻 Change coding language'), value: 'lang' },
       { label: tr('🌐 화면 언어: English', '🌐 Display language: 한국어'), value: 'ui' },
       { label: tr('💾 저장 파일 받기', '💾 Download save file'), value: 'export' },
       { label: tr('📂 저장 파일 불러오기', '📂 Load save file'), value: 'import' },
       { label: tr('진행 초기화', 'Reset progress'), value: 'reset' },
+      ...(store.chars.length > 1 ? [{ label: tr('🗑️ 이 캐릭터 지우기', '🗑️ Delete this character'), value: 'delchar' }] : []),
       { label: tr('닫기', 'Close'), value: null, primary: true },
     ],
   });
+  if (v === 'char') chooseCharacter();
+  if (v === 'delchar' && confirm(tr('이 캐릭터를 지울까요? 이 캐릭터의 진행 상황이 모두 사라지고 되돌릴 수 없어요.', 'Delete this character? All of its progress will be gone, and this can\'t be undone.'))) { store.deleteChar(); markPicked(); location.reload(); }
   if (v === 'lang') chooseLanguage();
   if (v === 'ui') setUiLang(UI_LANG === 'en' ? 'ko' : 'en');
   if (v === 'export') exportSave();
@@ -689,7 +736,9 @@ function importSave() {
 // ---------- start ----------
 refresh();
 setTimeout(checkHqVisit, 4000);
-if (!store.lang) setTimeout(chooseLanguage, 400);
+if (!wasPicked() && (store.lang || store.chars.length > 1)) setTimeout(chooseCharacter, 400);
+else if (!store.lang) setTimeout(chooseLanguage, 400);
+markPicked();
 
 if ((store.lang || 'java') === 'java') {
   // The first load downloads Java from the CheerpJ server. When that server is slow it can take

@@ -9,7 +9,7 @@ const SPEED = 5.5;
 const COARSE = matchMedia('(pointer: coarse)').matches; // phone/tablet: tap instead of Space
 const VIEW = 22; // ortho frustum height (bigger = farther)
 
-export function createWorld(container, { npcs, playerStart, onInteract, onMove, onPrompt, spots = [] }) {
+export function createWorld(container, { npcs, playerStart, playerLook, onInteract, onMove, onPrompt, spots = [] }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
@@ -53,7 +53,7 @@ export function createWorld(container, { npcs, playerStart, onInteract, onMove, 
   };
 
   // ---- player ----
-  const me = makePerson({ hair: '#5a3825', vest: '#ff9f43', shirt: '#ffffff', pants: '#2d3e66' });
+  const me = makePerson(playerLook || { hair: '#5a3825', vest: '#ff9f43', shirt: '#ffffff', pants: '#2d3e66' });
   me.group.position.set(playerStart.x, 0, playerStart.z);
   scene.add(me.group);
 

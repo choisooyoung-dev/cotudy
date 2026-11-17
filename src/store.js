@@ -1,15 +1,42 @@
-// Progress lives in the browser's localStorage, separately for each language.
+// Progress lives in the browser's localStorage. Each character (save slot) has its own save, and inside it
+// progress is kept separately for each language.
 import { tr } from './i18n.js';
-// Shape: { lang: 'java', byLang: { java: { done: { questId: stars }, pos: {x,z} } } }
+// Character list: cotudy.chars = { current: 'c1', list: [{ id, look, created }] }
+// One character's save: cotudy.char.<id> = { lang: 'java', toured, byLang: { java: { done: { questId: stars }, pos: {x,z} } } }
 
-const KEY = 'cotudy.v1';
+/** Looks a character can have (index stored per character). The first one is the original 김사원. */
+export const LOOKS = [
+  { hair: '#5a3825', vest: '#ff9f43', shirt: '#ffffff', pants: '#2d3e66' },
+  { hair: '#1e1e1e', vest: '#4fc3f7', shirt: '#ffffff', pants: '#3d4a5c' },
+  { hair: '#7b4a2a', vest: '#c792ea', shirt: '#ffffff', pants: '#2d3e66', style: 'long' },
+  { hair: '#c49a3a', vest: '#7ed37e', shirt: '#ffffff', pants: '#4a4a4a' },
+  { hair: '#3b2a20', vest: '#f48fb1', shirt: '#ffffff', pants: '#2d3e66', style: 'bun' },
+  { hair: '#6d4c41', vest: '#ffd54f', shirt: '#ffffff', pants: '#3d4a5c', glasses: true },
+];
+const LEGACY = 'cotudy.v1'; // the single save from before characters existed
+const INDEX = 'cotudy.chars';
+const slotKey = (id) => 'cotudy.char.' + id;
 
-function read() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
+function load(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
 }
-function write(s) {
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* private mode etc. */ }
+function save(key, v) {
+  try { localStorage.setItem(key, JSON.stringify(v)); } catch { /* private mode etc. */ }
 }
+
+let index = load(INDEX);
+if (!index?.list?.length) {
+  // first run with characters: the old save (if any) becomes the first character
+  index = { current: 'c1', list: [{ id: 'c1', look: 0, created: Date.now() }] };
+  const old = load(LEGACY);
+  if (old) save(slotKey('c1'), old);
+  save(INDEX, index);
+}
+if (!index.list.some((c) => c.id === index.current)) index.current = index.list[0].id;
+const KEY = slotKey(index.current);
+
+function read() { return load(KEY) || {}; }
+function write(s) { save(KEY, s); }
 
 let state = read();
 state.byLang ||= {};
@@ -21,6 +48,38 @@ function langState() {
 }
 
 export const store = {
+  /** All characters, with what's needed for the picker: { id, look (object), lookIdx, lang, byLang, last }. */
+  get chars() {
+    return index.list.map((c) => {
+      const d = c.id === index.current ? state : load(slotKey(c.id)) || {};
+      return { id: c.id, lookIdx: c.look, look: LOOKS[c.look] || LOOKS[0], lang: d.lang || null, byLang: d.byLang || {}, last: c.last || c.created };
+    });
+  },
+  get charId() { return index.current; },
+  get look() { return LOOKS[index.list.find((c) => c.id === index.current)?.look] || LOOKS[0]; },
+  /** Makes a new empty character and makes it current (the page reloads after this). */
+  newChar(look) {
+    const id = 'c' + (Math.max(0, ...index.list.map((c) => +c.id.slice(1) || 0)) + 1);
+    index.list.push({ id, look, created: Date.now() });
+    index.current = id;
+    save(INDEX, index);
+    return id;
+  },
+  switchChar(id) {
+    if (!index.list.some((c) => c.id === id)) return;
+    index.current = id;
+    index.list.find((c) => c.id === id).last = Date.now();
+    save(INDEX, index);
+  },
+  /** Deletes the current character (only when another one is left) and switches to another. */
+  deleteChar() {
+    if (index.list.length < 2) return false;
+    try { localStorage.removeItem(KEY); } catch { /* ignore */ }
+    index.list = index.list.filter((c) => c.id !== index.current);
+    index.current = index.list[0].id;
+    save(INDEX, index);
+    return true;
+  },
   get lang() { return state.lang || null; },
   setLang(l) { state.lang = l; langState(); write(state); },
   isDone(qid) { return qid in langState().done; },

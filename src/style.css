@@ -76,6 +76,8 @@ kbd { background: var(--line); color: #fff; border-radius: 5px; padding: 0 6px; 
 .lang-ico { width: 26px; height: 26px; margin-right: 8px; vertical-align: -7px; background: #fff; border-radius: 7px; padding: 2px; box-sizing: border-box; }
 .lang-pct { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #3f8f2a; color: #fff; font-size: 12px; font-weight: 800; vertical-align: 2px; }
 .btn.go .lang-pct { background: #fff; color: #3f8f2a; }
+.mini-face { display: inline-block; position: relative; width: 32px; height: 40px; margin-right: 8px; vertical-align: middle; overflow: hidden; }
+.mini-face .face.bust { position: absolute; left: 0; top: 0; transform: scale(.42); transform-origin: top left; }
 .lang-list { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 6px; }
 .lang-list .btn { flex: 1; min-width: 150px; padding: 12px; font-size: 16px; text-align: left; }
 .lang-list .btn small { display: block; font-size: 12px; font-weight: 600; opacity: .7; }
