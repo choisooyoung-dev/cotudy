@@ -45,6 +45,7 @@ ws.onmessage = (m) => {
     const e = d.params.exceptionDetails;
     pageErrors.push(`[${screen}] ${(e.exception?.description || e.text || '').split('\n').slice(0, 3).join(' / ')}`);
   }
+  if (d.method === 'Runtime.consoleAPICalled' && d.params.args[0]?.value?.startsWith?.('[check]')) console.log(d.params.args[0].value);
   if (d.method === 'Network.loadingFailed' && !d.params.canceled) pageErrors.push(`[${screen}] network: ${d.params.errorText} (${d.params.type})`);
   if (d.method === 'Network.responseReceived' && d.params.response.status >= 400) pageErrors.push(`[${screen}] HTTP ${d.params.response.status} ${d.params.response.url}`);
 };
@@ -72,11 +73,20 @@ const CHECK = (lang) => `(async () => {
   const norm = (s) => (s || '').replace(/\\r/g, '').split('\\n').map((l) => l.replace(/\\s+$/, '')).join('\\n').replace(/\\n+$/, '');
   const short = (s) => (s || '').replace(/\\n/g, '⏎').slice(0, 120);
   const bad = []; let count = 0;
+  // a run that never answers (or a runner that never gets ready) must not hang the whole check
+  const timed = (p, ms, what) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(what + ' 시간 초과 ' + ms / 1000 + '초')), ms))]);
+  const t0 = performance.now();
+  try {
+    await timed(run({ java: 'public class Main { public static void main(String[] a) { System.out.println(1); } }', javascript: 'console.log(1)', python: 'print(1)' }['${lang}']), 180000, '실행기 준비');
+  } catch (e) { return { count: 0, bad: ['실행기를 준비하지 못함 · ' + e.message], quests: c.current['${lang}'].length }; }
+  console.log('[check] ${lang} ready in ' + Math.round(performance.now() - t0) + 'ms');
   // examples that fail on purpose (the "read the error message" quest): these must give an error
   const MUST_FAIL = ['office-2 개념2', 'office-2 출력 맞히기'];
   const expect = async (where, code, expected, mustInclude) => {
     count++;
-    const r = await run(code);
+    let r;
+    try { r = await timed(run(code), 30000, '실행'); } catch (e) { bad.push(where + ': ' + e.message); return; }
+    if (count % 40 === 0) console.log('[check] ${lang} ' + count + ' runs');
     if (MUST_FAIL.includes(where)) { if (r.ok) bad.push(where + ': 일부러 에러가 나야 하는 예제인데 그냥 실행됨'); return; }
     if (!r.ok) { bad.push(where + ': 에러 · ' + short(r.error)); return; }
     if (expected != null && norm(r.output) !== norm(expected)) bad.push(where + ': 출력 다름 · 나옴 "' + short(r.output) + '" / 기대 "' + short(expected) + '"');
