@@ -1,5 +1,5 @@
 // Files the play-error logs downloaded from the game (⚙️ Settings → 🐞 Download error log) into the private
-// repo cotudy-log, then commits and pushes. Run every night at 22:00 by launchd (~/Library/LaunchAgents/dev.cotudy.collect-errors.plist, not in this repo).
+// repo cotudy-log, then commits and pushes. Run every night by scripts/nightly.mjs.
 //
 //  - looks for cotudy-errors-*.json in ~/Downloads
 //  - adds them to cotudy-log/play/YYYY-MM-DD.md (today, Korean date) and keeps the file in cotudy-log/play/raw/

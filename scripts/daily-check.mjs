@@ -1,4 +1,5 @@
-// Daily check of the deployed game. Opens it in headless Chrome and
+// Daily check of the game (scripts/nightly.mjs builds this repo's code and points it here every night).
+// Opens it in headless Chrome and
 //  1. records errors the page throws while loading (Korean and English screens),
 //  2. runs every quest's example, predict, fill-in and answer code in Java, JavaScript and Python
 //     and compares the output with what the quest expects (same check as the game's grading),
@@ -6,7 +7,7 @@
 // Writes the result to $LOG_DIR/daily/YYYY-MM-DD.md (Korean date; LOG_DIR defaults to ./logs) and exits with 1
 // when something is wrong. The console only gets counts: details stay in the file (the logs repo is private).
 //
-// usage: node scripts/daily-check.mjs [url]       (default: the GitHub Pages site)
+// usage: node scripts/daily-check.mjs [url]       (default: the GitHub Pages site; CHECK_LABEL names it in the log)
 // Chrome: CHROME_PATH, or the usual macOS / Linux location.
 
 import { spawn } from 'node:child_process';
@@ -140,7 +141,7 @@ const LANG = { java: 'Java', javascript: 'JavaScript', python: 'Python' };
 const lines = [
   `# ${day} 매일 점검`,
   '',
-  `- 대상: ${URL_}`,
+  `- 대상: ${process.env.CHECK_LABEL || URL_}`,
   `- 시각: ${kst.toISOString().slice(11, 16)} (한국 시간), ${Math.round((Date.now() - started) / 1000)}초 걸림`,
   `- 결과: ${problems === 0 ? '✅ 문제 없음' : `❌ 문제 ${problems}개`}`,
   '',
