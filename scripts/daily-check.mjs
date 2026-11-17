@@ -25,11 +25,14 @@ if (!chromePath) { console.error('Chrome not found (set CHROME_PATH)'); process.
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const chrome = spawn(chromePath, [
   '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cotudy-check-'))}`,
-  '--no-first-run', '--no-default-browser-check', '--no-sandbox', '--window-size=1280,800', 'about:blank',
-], { stdio: 'ignore' });
+  '--no-first-run', '--no-default-browser-check', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1280,800', 'about:blank',
+], { stdio: ['ignore', 'ignore', 'pipe'] });
+let chromeErr = '';
+chrome.stderr.on('data', (b) => { chromeErr = (chromeErr + b).slice(-2000); });
 let up = false;
-for (let i = 0; i < 50 && !up; i++) { try { await fetch(`http://127.0.0.1:${PORT}/json/version`); up = true; } catch { await sleep(200); } }
-if (!up) { console.error('Chrome did not start'); chrome.kill(); process.exit(2); }
+for (let i = 0; i < 300 && !up; i++) { try { await fetch(`http://127.0.0.1:${PORT}/json/version`); up = true; } catch { await sleep(200); } }
+if (!up) { console.error('Chrome did not start in 60s\n' + chromeErr); chrome.kill(); process.exit(2); }
+console.log('chrome up');
 
 const tab = await (await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })).json();
 const ws = new WebSocket(tab.webSocketDebuggerUrl);
