@@ -29,10 +29,16 @@ export function faceHTML(look = {}, { bust = false } = {}) {
     : `<i style="left:6px;top:64px;width:64px;height:16px;background:${vest};border-radius:6px 6px 0 0"></i>`;
   return `<div class="face${bust ? ' bust' : ''}">
     ${bust ? body : ''}
-    <i style="left:12px;top:${cap ? 16 : 10}px;width:52px;height:20px;background:${hair};border-radius:6px 6px 2px 2px"></i>
+    ${cap ? '' : `<i style="left:12px;top:10px;width:52px;height:20px;background:${hair};border-radius:6px 6px 2px 2px"></i>`}
     <i style="left:13px;top:18px;width:50px;height:46px;background:${look.skin || '#ffd9b8'};border-radius:8px"></i>
-    <i style="left:12px;top:${cap ? 14 : 10}px;width:52px;height:${cap ? 10 : 18}px;background:${cap || hair};border-radius:6px 6px 2px 2px"></i>
-    <i style="left:14px;top:26px;width:24px;height:8px;background:${hair};border-radius:2px"></i>
+    ${cap
+      // cap/helmet: a crown down to the brow with a brim, short hair peeking out at the sides
+      ? `<i style="left:12px;top:26px;width:6px;height:12px;background:${hair};border-radius:2px"></i>
+    <i style="left:58px;top:26px;width:6px;height:12px;background:${hair};border-radius:2px"></i>
+    <i style="left:11px;top:6px;width:54px;height:22px;background:${cap};border-radius:14px 14px 2px 2px"></i>
+    <i style="left:9px;top:24px;width:58px;height:5px;background:${cap};filter:brightness(0.8);border-radius:3px"></i>`
+      : `<i style="left:12px;top:10px;width:52px;height:18px;background:${hair};border-radius:6px 6px 2px 2px"></i>
+    <i style="left:14px;top:26px;width:24px;height:8px;background:${hair};border-radius:2px"></i>`}
     ${look.glasses ? `<i style="left:21px;top:36px;width:17px;height:14px;border:3px solid #222;border-radius:4px;box-sizing:border-box"></i><i style="left:39px;top:36px;width:17px;height:14px;border:3px solid #222;border-radius:4px;box-sizing:border-box"></i><i style="left:36px;top:40px;width:5px;height:3px;background:#222"></i>` : ''}
     ${look.style === 'bun' ? `<i style="left:28px;top:${cap ? 4 : 0}px;width:20px;height:14px;background:${hair};border-radius:7px 7px 3px 3px"></i>` : ''}
     ${look.style === 'long' ? `<i style="left:8px;top:22px;width:8px;height:44px;background:${hair};border-radius:3px"></i><i style="left:60px;top:22px;width:8px;height:44px;background:${hair};border-radius:3px"></i>` : ''}
