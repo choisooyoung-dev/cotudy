@@ -106,7 +106,7 @@ export const QUESTS = [
       hints: [t('"만약"과 "아니면"에 해당하는 단어예요.', 'The words for "if" and "otherwise".'), 'if, else'], solution: ['if', 'else'],
     },
     write: {
-      prompt: t('랙 번호 <code>rack</code> 이 12예요. 10 이하는 "A구역", 20 이하는 "B구역", 그 외는 "C구역"을 찍어 주세요.', 'The <code>rack</code> number is 12. Print "Zone A" for 10 or less, "Zone B" for 20 or less, otherwise "Zone C".'),
+      prompt: t('랙 번호 <code>rack</code> 이 12예요. 10 이하는 "A구역", 10 초과 20 이하는 "B구역", 그 외(20 초과)는 "C구역"을 찍어 주세요.', 'The <code>rack</code> number is 12. Print "Zone A" for 10 or less, "Zone B" for more than 10 up to 20, otherwise (more than 20) "Zone C".'),
       starter: main(W), expected: t('B구역', 'Zone B'),
       mustInclude: [{ re: 'else\\s+if', msg: t('<code>else if</code> 를 써 주세요.', 'Use <code>else if</code>.') }],
       hints: [t('if (rack <= 10) … else if (rack <= 20) … else …', 'if (rack <= 10) … else if (rack <= 20) … else …'), t('위 순서대로 세 갈래를 만들면 12 는 두 번째에 걸려요.', 'Make three branches in that order; 12 lands in the second.')],
