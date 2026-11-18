@@ -18,37 +18,75 @@ const URL_ = process.argv[2] || 'http://localhost:5180/';
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'content', 'outputs.json');
 const PORT = 9445;
 const LANGS = ['java', 'python']; // JavaScript runs instantly, no need
-const chromePath = process.env.CHROME_PATH
-  || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium']
-    .find((p) => existsSync(p));
-if (!chromePath) { console.error('Chrome not found (set CHROME_PATH)'); process.exit(2); }
+const chromePath =
+    process.env.CHROME_PATH ||
+    [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium',
+    ].find((p) => existsSync(p));
+if (!chromePath) {
+    console.error('Chrome not found (set CHROME_PATH)');
+    process.exit(2);
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const chrome = spawn(chromePath, [
-  '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cotudy-pre-'))}`,
-  '--no-first-run', '--no-default-browser-check', '--no-sandbox', '--disable-dev-shm-usage', 'about:blank',
-], { stdio: 'ignore' });
+const chrome = spawn(
+    chromePath,
+    [
+        '--headless=new',
+        `--remote-debugging-port=${PORT}`,
+        `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cotudy-pre-'))}`,
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        'about:blank',
+    ],
+    { stdio: 'ignore' },
+);
 let up = false;
-for (let i = 0; i < 300 && !up; i++) { try { await fetch(`http://127.0.0.1:${PORT}/json/version`); up = true; } catch { await sleep(200); } }
-if (!up) { console.error('Chrome did not start'); chrome.kill(); process.exit(2); }
+for (let i = 0; i < 300 && !up; i++) {
+    try {
+        await fetch(`http://127.0.0.1:${PORT}/json/version`);
+        up = true;
+    } catch {
+        await sleep(200);
+    }
+}
+if (!up) {
+    console.error('Chrome did not start');
+    chrome.kill();
+    process.exit(2);
+}
 
 const tab = await (await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })).json();
 const ws = new WebSocket(tab.webSocketDebuggerUrl);
 let id = 0;
 const pending = new Map();
-const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+const send = (method, params = {}) =>
+    new Promise((r) => {
+        const i = ++id;
+        pending.set(i, r);
+        ws.send(JSON.stringify({ id: i, method, params }));
+    });
 ws.onmessage = (m) => {
-  const d = JSON.parse(m.data);
-  if (d.id && pending.has(d.id)) { pending.get(d.id)(d.result ?? d.error); pending.delete(d.id); }
-  if (d.method === 'Runtime.consoleAPICalled' && String(d.params.args[0]?.value).startsWith('[pre]')) console.log(d.params.args[0].value);
+    const d = JSON.parse(m.data);
+    if (d.id && pending.has(d.id)) {
+        pending.get(d.id)(d.result ?? d.error);
+        pending.delete(d.id);
+    }
+    if (d.method === 'Runtime.consoleAPICalled' && String(d.params.args[0]?.value).startsWith('[pre]'))
+        console.log(d.params.args[0].value);
 };
 await new Promise((r) => (ws.onopen = r));
 await send('Runtime.enable');
 await send('Page.enable');
 const ev = async (expression) => {
-  const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: 1200000 });
-  if (r?.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
-  return r?.result?.value;
+    const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: 1200000 });
+    if (r?.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
+    return r?.result?.value;
 };
 
 const prepare = (ui, lang) => `localStorage.clear(); sessionStorage.clear();
@@ -80,25 +118,29 @@ const RUN = (lang) => `(async () => {
 
 const all = {};
 try {
-  for (const ui of ['ko', 'en']) {
-    for (const lang of LANGS) {
-      await send('Page.navigate', { url: 'about:blank' });
-      await sleep(800);
-      await send('Page.navigate', { url: URL_ });
-      await sleep(1500);
-      await ev(prepare(ui, lang) + ' location.reload()');
-      await sleep(3000);
-      const t0 = Date.now();
-      const got = await ev(RUN(lang));
-      Object.assign(all, got);
-      console.log(ui, lang, Object.keys(got).length, 'codes', Math.round((Date.now() - t0) / 1000) + 's');
+    for (const ui of ['ko', 'en']) {
+        for (const lang of LANGS) {
+            await send('Page.navigate', { url: 'about:blank' });
+            await sleep(800);
+            await send('Page.navigate', { url: URL_ });
+            await sleep(1500);
+            await ev(prepare(ui, lang) + ' location.reload()');
+            await sleep(3000);
+            const t0 = Date.now();
+            const got = await ev(RUN(lang));
+            Object.assign(all, got);
+            console.log(ui, lang, Object.keys(got).length, 'codes', Math.round((Date.now() - t0) / 1000) + 's');
+        }
     }
-  }
 } finally {
-  ws.close();
-  chrome.kill();
+    ws.close();
+    chrome.kill();
 }
-const sorted = Object.fromEntries(Object.keys(all).sort().map((k) => [k, all[k]]));
+const sorted = Object.fromEntries(
+    Object.keys(all)
+        .sort()
+        .map((k) => [k, all[k]]),
+);
 writeFileSync(OUT, JSON.stringify(sorted, null, 0).replace(/},"/g, '},\n"') + '\n');
 console.log('saved', Object.keys(sorted).length, 'results to src/content/outputs.json');
 process.exit(0);

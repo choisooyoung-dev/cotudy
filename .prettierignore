@@ -1,0 +1,7 @@
+dist
+node_modules
+public
+docs
+logs
+src/content/outputs.json
+package-lock.json

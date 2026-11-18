@@ -19,21 +19,53 @@ import { join } from 'node:path';
 const URL_ = process.argv[2] || 'https://choisooyoung-dev.github.io/cotudy/';
 const PORT = 9444;
 const LOG_DIR = process.env.LOG_DIR || 'logs';
-const chromePath = process.env.CHROME_PATH
-  || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium']
-    .find((p) => existsSync(p));
-if (!chromePath) { console.error('Chrome not found (set CHROME_PATH)'); process.exit(2); }
+const chromePath =
+    process.env.CHROME_PATH ||
+    [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium',
+    ].find((p) => existsSync(p));
+if (!chromePath) {
+    console.error('Chrome not found (set CHROME_PATH)');
+    process.exit(2);
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const chrome = spawn(chromePath, [
-  '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cotudy-check-'))}`,
-  '--no-first-run', '--no-default-browser-check', '--no-sandbox', '--disable-dev-shm-usage', '--window-size=1280,800', 'about:blank',
-], { stdio: ['ignore', 'ignore', 'pipe'] });
+const chrome = spawn(
+    chromePath,
+    [
+        '--headless=new',
+        `--remote-debugging-port=${PORT}`,
+        `--user-data-dir=${mkdtempSync(join(tmpdir(), 'cotudy-check-'))}`,
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--window-size=1280,800',
+        'about:blank',
+    ],
+    { stdio: ['ignore', 'ignore', 'pipe'] },
+);
 let chromeErr = '';
-chrome.stderr.on('data', (b) => { chromeErr = (chromeErr + b).slice(-2000); });
+chrome.stderr.on('data', (b) => {
+    chromeErr = (chromeErr + b).slice(-2000);
+});
 let up = false;
-for (let i = 0; i < 300 && !up; i++) { try { await fetch(`http://127.0.0.1:${PORT}/json/version`); up = true; } catch { await sleep(200); } }
-if (!up) { console.error('Chrome did not start in 60s\n' + chromeErr); chrome.kill(); process.exit(2); }
+for (let i = 0; i < 300 && !up; i++) {
+    try {
+        await fetch(`http://127.0.0.1:${PORT}/json/version`);
+        up = true;
+    } catch {
+        await sleep(200);
+    }
+}
+if (!up) {
+    console.error('Chrome did not start in 60s\n' + chromeErr);
+    chrome.kill();
+    process.exit(2);
+}
 console.log('chrome up');
 
 const tab = await (await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })).json();
@@ -42,26 +74,39 @@ let id = 0;
 const pending = new Map();
 const pageErrors = [];
 let screen = '';
-const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+const send = (method, params = {}) =>
+    new Promise((r) => {
+        const i = ++id;
+        pending.set(i, r);
+        ws.send(JSON.stringify({ id: i, method, params }));
+    });
 ws.onmessage = (m) => {
-  const d = JSON.parse(m.data);
-  if (d.id && pending.has(d.id)) { pending.get(d.id)(d.result ?? d.error); pending.delete(d.id); }
-  if (d.method === 'Runtime.exceptionThrown') {
-    const e = d.params.exceptionDetails;
-    pageErrors.push(`[${screen}] ${(e.exception?.description || e.text || '').split('\n').slice(0, 3).join(' / ')}`);
-  }
-  if (d.method === 'Runtime.consoleAPICalled' && d.params.args[0]?.value?.startsWith?.('[check]')) console.log(d.params.args[0].value);
-  if (d.method === 'Network.loadingFailed' && !d.params.canceled) pageErrors.push(`[${screen}] network: ${d.params.errorText} (${d.params.type})`);
-  if (d.method === 'Network.responseReceived' && d.params.response.status >= 400) pageErrors.push(`[${screen}] HTTP ${d.params.response.status} ${d.params.response.url}`);
+    const d = JSON.parse(m.data);
+    if (d.id && pending.has(d.id)) {
+        pending.get(d.id)(d.result ?? d.error);
+        pending.delete(d.id);
+    }
+    if (d.method === 'Runtime.exceptionThrown') {
+        const e = d.params.exceptionDetails;
+        pageErrors.push(
+            `[${screen}] ${(e.exception?.description || e.text || '').split('\n').slice(0, 3).join(' / ')}`,
+        );
+    }
+    if (d.method === 'Runtime.consoleAPICalled' && d.params.args[0]?.value?.startsWith?.('[check]'))
+        console.log(d.params.args[0].value);
+    if (d.method === 'Network.loadingFailed' && !d.params.canceled)
+        pageErrors.push(`[${screen}] network: ${d.params.errorText} (${d.params.type})`);
+    if (d.method === 'Network.responseReceived' && d.params.response.status >= 400)
+        pageErrors.push(`[${screen}] HTTP ${d.params.response.status} ${d.params.response.url}`);
 };
 await new Promise((r) => (ws.onopen = r));
 await send('Runtime.enable');
 await send('Network.enable');
 await send('Page.enable');
 const ev = async (expression) => {
-  const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
-  if (r?.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
-  return r?.result?.value;
+    const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
+    if (r?.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
+    return r?.result?.value;
 };
 
 // one character that already did the tour, so no dialogs open
@@ -129,26 +174,26 @@ const started = Date.now();
 const results = [];
 let fatal = null;
 try {
-  for (const ui of ['ko', 'en']) {
-    screen = ui === 'ko' ? '한국어 화면' : '영어 화면';
-    // free the last page's Java/Python memory first (a second load in a full tab can fail to allocate)
-    await send('Page.navigate', { url: 'about:blank' });
-    await sleep(1000);
-    await send('Page.navigate', { url: URL_ });
-    await sleep(1500);
-    await ev(prepare(ui) + ' location.reload()');
-    await sleep(4000);
-    if (!(await ev('!!window.cotudy'))) throw new Error(`${screen}: 게임이 뜨지 않았어요 (window.cotudy 없음)`);
-    for (const lang of ['java', 'javascript', 'python']) {
-      const t0 = Date.now();
-      const r = await ev(CHECK(lang));
-      results.push({ ui, lang, ...r, sec: Math.round((Date.now() - t0) / 1000) });
-      console.log(ui, lang, r.count, 'runs,', r.bad.length, 'problems');
+    for (const ui of ['ko', 'en']) {
+        screen = ui === 'ko' ? '한국어 화면' : '영어 화면';
+        // free the last page's Java/Python memory first (a second load in a full tab can fail to allocate)
+        await send('Page.navigate', { url: 'about:blank' });
+        await sleep(1000);
+        await send('Page.navigate', { url: URL_ });
+        await sleep(1500);
+        await ev(prepare(ui) + ' location.reload()');
+        await sleep(4000);
+        if (!(await ev('!!window.cotudy'))) throw new Error(`${screen}: 게임이 뜨지 않았어요 (window.cotudy 없음)`);
+        for (const lang of ['java', 'javascript', 'python']) {
+            const t0 = Date.now();
+            const r = await ev(CHECK(lang));
+            results.push({ ui, lang, ...r, sec: Math.round((Date.now() - t0) / 1000) });
+            console.log(ui, lang, r.count, 'runs,', r.bad.length, 'problems');
+        }
     }
-  }
 } catch (e) {
-  fatal = e.message;
-  console.error('check stopped');
+    fatal = e.message;
+    console.error('check stopped');
 }
 ws.close();
 chrome.kill();
@@ -159,24 +204,34 @@ const day = kst.toISOString().slice(0, 10);
 const problems = results.reduce((n, r) => n + r.bad.length, 0) + pageErrors.length + (fatal ? 1 : 0);
 const LANG = { java: 'Java', javascript: 'JavaScript', python: 'Python' };
 const lines = [
-  `# ${day} 매일 점검`,
-  '',
-  `- 대상: ${process.env.CHECK_LABEL || URL_}`,
-  `- 시각: ${kst.toISOString().slice(11, 16)} (한국 시간), ${Math.round((Date.now() - started) / 1000)}초 걸림`,
-  `- 결과: ${problems === 0 ? '✅ 문제 없음' : `❌ 문제 ${problems}개`}`,
-  '',
-  '## 페이지 오류',
-  '',
-  ...(fatal ? [`- ❌ 점검 중단: ${fatal}`] : []),
-  ...(pageErrors.length ? pageErrors.map((e) => `- ${e}`) : fatal ? [] : ['- 없음']),
-  '',
-  '## 퀘스트 코드 실행',
-  '',
-  '| 화면 | 언어 | 퀘스트 | 실행한 코드 | 문제 | 시간 |',
-  '|---|---|---|---|---|---|',
-  ...results.map((r) => `| ${r.ui === 'ko' ? '한국어' : '영어'} | ${LANG[r.lang]} | ${r.quests} | ${r.count} | ${r.bad.length ? '❌ ' + r.bad.length : '✅ 0'} | ${r.sec}초 |`),
-  '',
-  ...results.filter((r) => r.bad.length).flatMap((r) => [`### ${r.ui === 'ko' ? '한국어' : '영어'} · ${LANG[r.lang]}`, '', ...r.bad.map((b) => `- ${b}`), '']),
+    `# ${day} 매일 점검`,
+    '',
+    `- 대상: ${process.env.CHECK_LABEL || URL_}`,
+    `- 시각: ${kst.toISOString().slice(11, 16)} (한국 시간), ${Math.round((Date.now() - started) / 1000)}초 걸림`,
+    `- 결과: ${problems === 0 ? '✅ 문제 없음' : `❌ 문제 ${problems}개`}`,
+    '',
+    '## 페이지 오류',
+    '',
+    ...(fatal ? [`- ❌ 점검 중단: ${fatal}`] : []),
+    ...(pageErrors.length ? pageErrors.map((e) => `- ${e}`) : fatal ? [] : ['- 없음']),
+    '',
+    '## 퀘스트 코드 실행',
+    '',
+    '| 화면 | 언어 | 퀘스트 | 실행한 코드 | 문제 | 시간 |',
+    '|---|---|---|---|---|---|',
+    ...results.map(
+        (r) =>
+            `| ${r.ui === 'ko' ? '한국어' : '영어'} | ${LANG[r.lang]} | ${r.quests} | ${r.count} | ${r.bad.length ? '❌ ' + r.bad.length : '✅ 0'} | ${r.sec}초 |`,
+    ),
+    '',
+    ...results
+        .filter((r) => r.bad.length)
+        .flatMap((r) => [
+            `### ${r.ui === 'ko' ? '한국어' : '영어'} · ${LANG[r.lang]}`,
+            '',
+            ...r.bad.map((b) => `- ${b}`),
+            '',
+        ]),
 ];
 mkdirSync(join(LOG_DIR, 'daily'), { recursive: true });
 writeFileSync(join(LOG_DIR, 'daily', `${day}.md`), lines.join('\n') + '\n');

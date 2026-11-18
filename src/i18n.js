@@ -5,11 +5,13 @@
 const KEY = 'cotudy.ui';
 
 function detect() {
-  try {
-    const v = localStorage.getItem(KEY);
-    if (v === 'ko' || v === 'en') return v;
-  } catch { /* storage blocked */ }
-  return (navigator.language || '').toLowerCase().startsWith('ko') ? 'ko' : 'en';
+    try {
+        const v = localStorage.getItem(KEY);
+        if (v === 'ko' || v === 'en') return v;
+    } catch {
+        /* storage blocked */
+    }
+    return (navigator.language || '').toLowerCase().startsWith('ko') ? 'ko' : 'en';
 }
 
 export const UI_LANG = detect();
@@ -19,8 +21,12 @@ export const isEn = UI_LANG === 'en';
 export const tr = (ko, en) => (isEn ? en : ko);
 
 export function setUiLang(v) {
-  try { localStorage.setItem(KEY, v); } catch { /* storage blocked */ }
-  location.reload();
+    try {
+        localStorage.setItem(KEY, v);
+    } catch {
+        /* storage blocked */
+    }
+    location.reload();
 }
 
 document.documentElement.lang = UI_LANG;
