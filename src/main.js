@@ -360,18 +360,22 @@ function toast(html, ms = 3200) {
 const PLAYER_LOOK = store.look;
 
 // 대화창 키보드: Enter·Space 로 선택된 버튼을 누르고(처음엔 기본 버튼), 방향키로 선택을 옮기고, Esc 로 닫는다.
-// 키 안내는 맨 처음 대화창에서만 보여 준다 (그다음엔 다들 아니까).
-const KEY_HINT = 'cotudy.keyhint'; // 키 안내를 이미 봤는지 저장하는 키
-const keyHintSeen = () => {
+// 키 안내는 한 번씩만 보여 준다 (그다음엔 다들 아니까): "Enter 누르기"는 맨 처음 대화창에서,
+// "←→ 고르기"는 선택지가 처음 나오는 대화창에서 (QA 2026-11-18: 첫 대화엔 선택지가 없어서 고르기 안내가 안 보였음).
+const KEY_HINT = 'cotudy.keyhint'; // "Enter 누르기" 안내를 이미 봤는지 저장하는 키
+const KEY_HINT_CHOOSE = 'cotudy.keyhint.choose'; // "←→ 고르기" 안내를 이미 봤는지 저장하는 키
+/** 그 안내를 이미 봤는지 (저장이 막힌 브라우저면 봤다고 친다). */
+const keyHintSeen = (key = KEY_HINT) => {
     try {
-        return !!localStorage.getItem(KEY_HINT);
+        return !!localStorage.getItem(key);
     } catch {
         return true;
     }
 };
-const markKeyHint = () => {
+/** 그 안내를 봤다고 저장한다. */
+const markKeyHint = (key = KEY_HINT) => {
     try {
-        localStorage.setItem(KEY_HINT, '1');
+        localStorage.setItem(key, '1');
     } catch {
         /* ignore */
     }
@@ -392,13 +396,16 @@ function dialog({ who, lines, buttons, look }) {
         let i = 0;
         let els = [],
             sel = 0;
-        const hint = !TOUCH && !keyHintSeen();
+        const hint = !TOUCH && !keyHintSeen(); // 이 대화창에서 "Enter 누르기"를 보여 줄지
+        const hintChoose = !TOUCH && !keyHintSeen(KEY_HINT_CHOOSE); // 선택지가 나오면 "←→ 고르기"를 보여 줄지
+        let choseShown = false; // 이 대화창에서 "←→ 고르기"를 실제로 보여 줬는지
         const finish = (v) => {
             d.remove();
             removeEventListener('keydown', onKey, true);
             busy = false;
             world.setFrozen(false);
             if (hint) markKeyHint();
+            if (choseShown) markKeyHint(KEY_HINT_CHOOSE);
             resolve(v);
         };
         // 선택된 버튼이 초록: 방향키로 옮기면 초록이 따라간다
@@ -421,10 +428,13 @@ function dialog({ who, lines, buttons, look }) {
                 ? buttons || [{ label: tr('닫기', 'Close'), value: null, primary: true }]
                 : [{ label: tr('다음', 'Next'), value: '__next', primary: true }];
             els = [];
-            if (hint)
+            const many = list.filter((b) => !b.disabled).length > 1; // 고를 버튼이 둘 이상인지
+            const showChoose = many && hintChoose;
+            if (showChoose) choseShown = true;
+            if (hint || showChoose)
                 btns.insertAdjacentHTML(
                     'beforeend',
-                    `<span class="keyhint">${list.filter((b) => !b.disabled).length > 1 ? tr('<kbd>←</kbd><kbd>→</kbd> 고르기 · ', '<kbd>←</kbd><kbd>→</kbd> choose · ') : ''}<kbd>Enter</kbd> ${tr('누르기', 'press')}</span>`,
+                    `<span class="keyhint">${showChoose ? tr('<kbd>←</kbd><kbd>→</kbd> 고르기 · ', '<kbd>←</kbd><kbd>→</kbd> choose · ') : ''}<kbd>Enter</kbd> ${tr('누르기', 'press')}</span>`,
                 );
             list.forEach((b) => {
                 const el = document.createElement('button');
