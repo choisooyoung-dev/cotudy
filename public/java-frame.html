@@ -1,12 +1,15 @@
 <!doctype html>
 <meta charset="utf-8">
 <title>java</title>
-<!-- One CheerpJ Java 21 instance for src/runner/java.js (which replaces this frame every 50 compiles). -->
+<!-- One CheerpJ Java 21 instance for src/runner/java.js (which replaces this frame every 50 compiles).
+     The helper jar's number is in its name so browsers never keep an old copy: bump it when Runner.java changes. -->
 <script src="https://cjrtnc.leaningtech.com/5.0/loader.js"></script>
 <pre id="console" style="display:none"></pre>
 <script>
   // "/app/..." is this web server's root inside CheerpJ, e.g. "/app/cotudy/cotudy-runner-1.jar" on GitHub Pages
-  const jar = '/app' + new URL('cotudy-runner-1.jar', location.href).pathname;
+  const jar = '/app' + new URL('cotudy-runner-2.jar', location.href).pathname;
+  // each frame works in its own folder (frames share /files/): ?slot=a|b|c from src/runner/java.js
+  const base = '/files/' + (new URLSearchParams(location.search).get('slot') || 'a') + '/';
   let Runner = null;
   const ready = (async () => {
     await cheerpjInit({ version: 21, status: 'none' });
@@ -21,7 +24,7 @@
     if (!id) return;
     try {
       await ready;
-      say({ id, res: String(await Runner.run(code)) });
+      say({ id, res: String(await Runner.run(code, base)) });
     } catch (err) {
       // a Java exception arrives as a Java object: don't try to turn it into a primitive
       say({ id, fail: typeof err === 'string' ? err : (err && err.message) || 'java error' });

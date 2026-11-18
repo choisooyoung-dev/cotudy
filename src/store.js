@@ -97,6 +97,9 @@ export const store = {
   get hq() { const l = langState(); l.hq ||= { week: '', at: 0, done: false, failed: [], passed: [] }; return l.hq; },
   saveHq() { write(state); },
   /** True after the first-day tour (greeting the team) has been played once. */
+  /** What the HQ interview asked and whether it was right: { lang, at, items: [{ kind, stage, quest?, right, retried? }] }. */
+  get interview() { return state.interview || null; },
+  setInterview(v) { state.interview = v; write(state); },
   /** Where the HQ interview placed this character: stage id, or null (no interview yet / older character). */
   get placement() { return state.placement || null; },
   setPlacement(stage) { state.placement = stage; write(state); },

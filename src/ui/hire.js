@@ -69,6 +69,7 @@ export async function runHiring(ctx) {
   const stages = ctx.stagesFor(L).filter((st) => ctx.questsFor(L).some((q) => q.stage === st.id));
   const quests = ctx.questsFor(L);
   const known = new Set();
+  const items = []; // every question asked: { kind: 'combined' | 'concept', stage, quest?, right } (for the retry board)
   const BUDGET = 10;
   if (!skip) {
     await say(cha, [
@@ -85,13 +86,18 @@ export async function runHiring(ctx) {
       talking(null);
       return r;
     };
-    const askConcept = (q, si) => ask({ type: 'predict', prompt: q.predict.prompt, code: q.predict.code, choices: q.predict.choices, answer: q.predict.answer }, si, tr('개념 확인', 'concept check'));
+    const askConcept = async (q, si) => {
+      const right = await ask(conceptQuestion(q), si, tr('개념 확인', 'concept check'));
+      items.push({ kind: 'concept', stage: stages[si].id, quest: q.id, right });
+      return right;
+    };
     // 1) binary search: lo = first stage that might be unknown, hi = first stage known to be unknown
     let lo = 0, hi = stages.length;
     while (lo < hi && n < BUDGET - 2) {
       const mid = Math.floor((lo + hi) / 2);
       const g = groups.find((x) => x.stage === stages[mid].id);
       const right = g ? await ask(g, mid, tr('종합', 'combined')) : false;
+      if (g) items.push({ kind: 'combined', stage: stages[mid].id, right });
       if (right) lo = mid + 1; else hi = mid;
     }
     for (const st of stages.slice(0, lo)) quests.filter((q) => q.stage === st.id).forEach((q) => known.add(q.id));
@@ -119,11 +125,42 @@ export async function runHiring(ctx) {
   room.appendChild(later);
   await sleep(1700);
   later.remove();
-  await showMail(room, { stage: stages.find((s) => s.id === start), quest: first, known: known.size, total: quests.length }, npcs, whoOf);
+  await showMail(room, { stage: stages.find((s) => s.id === start), quest: first, known: known.size, total: quests.length, board: conceptBoard(stages, quests, known, items) }, npcs, whoOf);
   room.classList.remove('in');
   await sleep(350);
   room.remove();
-  return { start, known: [...known] };
+  return { start, known: [...known], items };
+}
+
+/** A quest's own predict question in the interview's question shape. */
+export const conceptQuestion = (q) => ({ type: 'predict', prompt: q.predict.prompt, code: q.predict.code, choices: q.predict.choices, answer: q.predict.answer, explain: q.predict.explain });
+
+/**
+ * The concept squares: one row per stage, one square per concept (quest).
+ * state: 'right' (shown in the interview), 'skip' (easier than what they showed, so not asked), 'wrong' (its own
+ * concept question was missed), 'todo' (to learn).
+ */
+export function conceptBoard(stages, quests, known, items) {
+  const rightStages = new Set(items.filter((x) => x.kind === 'combined' && x.right).map((x) => x.stage));
+  const res = new Map(items.filter((x) => x.kind === 'concept').map((x) => [x.quest, x.right]));
+  return stages.map((st) => ({
+    stage: st,
+    cells: quests.filter((q) => q.stage === st.id).map((q) => ({
+      title: q.title,
+      state: res.has(q.id) ? (res.get(q.id) ? 'right' : 'wrong') : rightStages.has(st.id) ? 'right' : known.has(q.id) ? 'skip' : 'todo',
+    })),
+  })).filter((row) => row.cells.length);
+}
+
+/** The concept gauges as HTML (used in the offer mail): one overall bar, then one same-length bar per stage. */
+export function boardHTML(board) {
+  const esc2 = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const cells = board.flatMap((r) => r.cells);
+  const knownN = cells.filter((c) => c.state === 'right' || c.state === 'skip').length;
+  const bar = (list) => `<span class="iv-gauge">${list.map((c) => `<i class="${c.state}" title="${esc2(c.title)}"></i>`).join('')}</span>`;
+  return `<div class="iv-total"><span>${tr('아는 개념', 'Known concepts')} <b>${knownN} / ${cells.length}</b></span>${bar(cells)}</div>
+    <div class="iv-board">${board.map((row) => `<div class="iv-row"><span>${row.stage.name} <small>${row.stage.topic}</small></span>${bar(row.cells)}</div>`).join('')}</div>
+    <div class="iv-legend"><i class="right"></i>${tr('면접에서 확인', 'Shown in interview')} <i class="skip"></i>${tr('면제 (더 쉬운 단계)', 'Waived (easier)')} <i class="wrong"></i>${tr('틀림·모름', 'Missed')} <i class="todo"></i>${tr('배울 것', 'To learn')}</div>`;
 }
 
 const norm = (s) => (s || '').replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
@@ -132,7 +169,7 @@ const norm = (s) => (s || '').replace(/\r/g, '').split('\n').map((l) => l.replac
  * One question: { type: 'predict' | 'bug' | 'fill', code, choices + answer (default 0), prompt?, blanks, expected, solution }.
  * Resolves true when answered right. `run(code)` runs code for fill questions.
  */
-function askQuestion(app, q, n, tag, who, run) {
+export function askQuestion(app, q, n, tag, who, run) {
   return new Promise((resolve) => {
     const type = q.type || 'predict';
     const el = document.createElement('div');
@@ -172,17 +209,27 @@ function askQuestion(app, q, n, tag, who, run) {
         done(!!r?.ok && norm(r.output) === norm(q.expected));
       });
     }
+    // keys: 1–4 pick a choice; arrow keys move the (green) selection over the choices and "I don't know",
+    // Enter presses it (fill: Enter checks)
+    const opts = [...el.querySelectorAll('.iv-choice'), el.querySelector('.iv-skip')];
+    let sel = -1;
+    const select = (k) => { sel = (k + opts.length) % opts.length; opts.forEach((b, j) => b.classList.toggle('sel', j === sel)); };
     const onKey = (e) => {
       if (type === 'fill') { if (e.key === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); check.click(); } return; }
+      const stop = () => { e.preventDefault(); e.stopImmediatePropagation(); };
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { stop(); select(sel + 1); return; }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { stop(); select(sel < 0 ? opts.length - 1 : sel - 1); return; }
+      if (e.key === 'Enter') { stop(); if (sel >= 0) opts[sel].click(); return; }
+      if (e.key === ' ') { stop(); return; }
       const k = +e.key;
-      if (k >= 1 && k <= choices.length) { e.preventDefault(); e.stopImmediatePropagation(); done(choices[k - 1].right); }
+      if (k >= 1 && k <= choices.length) { stop(); done(choices[k - 1].right); }
     };
     setTimeout(() => addEventListener('keydown', onKey, true), 150);
   });
 }
 
 /** The phone mail box: one unread offer mail → open it → 「출근하기」. */
-function showMail(room, { stage, quest, known, total }, npcs, whoOf) {
+function showMail(room, { stage, quest, known, total, board }, npcs, whoOf) {
   return new Promise((resolve) => {
     const boss = npcs[quest.npc];
     const fromStart = known === 0;
@@ -210,6 +257,9 @@ function showMail(room, { stage, quest, known, total }, npcs, whoOf) {
             <tr><th>${tr('담당', 'Contact')}</th><td>${whoOf(boss)}</td></tr>
             <tr><th>${tr('출근', 'Start')}</th><td>${tr('내일 오전 9시', 'Tomorrow, 9 AM')}</td></tr>
           </table>
+          <h4>${tr('개념 상태', 'Concepts')}</h4>
+          ${boardHTML(board)}
+          <p class="iv-note">${tr('면접에서 푼 문제는 휴게실 「재도전 게시판」에서 다시 볼 수 있어요.', 'You can look at the interview questions again on the Retry board in the break room.')}</p>
           <button class="btn go iv-go">${tr('출근하기', 'Go to work')}</button>
         </div>`;
       phone.querySelector('.iv-go').addEventListener('click', () => { phone.remove(); resolve(); });

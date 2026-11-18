@@ -101,7 +101,7 @@ http://localhost:5180 으로 열려요. `main` 에 푸시하면 GitHub Actions �
 - `src/content/stages.js`, `npcs.js`, `tour.js` 공간 순서, 등장인물, 첫 출근 투어
 - `src/i18n.js` 화면 언어. 화면 글자는 `tr('한국어', 'English')` 로 써요
 - `public/java-frame.html` 자바(CheerpJ Java 21, javac 내장)를 돌리는 숨은 창. 50번 컴파일마다 새 창으로 바꿔요 (CheerpJ javac 가 68번째에 멈추는 문제 때문)
-- `public/cotudy-runner-1.jar` 한 번 부르면 컴파일과 실행을 하는 도우미 ([소스](src/runner/java-helper/cotudy/Runner.java))
+- `public/cotudy-runner-2.jar` 한 번 부르면 컴파일과 실행을 하는 도우미 ([소스](src/runner/java-helper/cotudy/Runner.java))
 - `src/content/outputs.json` Java·Python 예제와 정답 코드를 미리 돌려 둔 결과. 퀘스트를 고치면 `node scripts/precompute-outputs.mjs` 로 다시 만들어요
 
 퀘스트는 세 언어 모두 같은 `id`, `stage`, `npc` 로 넣어요. 정답 코드를 실제로 돌렸을 때 `expected` 와 똑같이 나와야 하고, 설명은 그 언어만으로 써요.

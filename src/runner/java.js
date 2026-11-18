@@ -1,6 +1,6 @@
 // Runs real Java 21 in the browser with CheerpJ (https://cheerpj.com). CheerpJ's Java 21 runtime has javac built in.
 // Java runs inside a hidden iframe (public/java-frame.html) that loads CheerpJ and our small helper
-// (src/runner/java-helper/cotudy/Runner.java → public/cotudy-runner-1.jar): one call compiles + runs Main.java.
+// (src/runner/java-helper/cotudy/Runner.java → public/cotudy-runner-2.jar): one call compiles + runs Main.java.
 //
 // Why an iframe: CheerpJ's javac on Java 17/21/25 breaks on the 68th compile in one page (tested 2026-11-18;
 // a CheerpJ issue, not ours). So after FRAME_RUNS compiles a fresh frame takes over; a spare is started a bit
@@ -14,9 +14,11 @@ import { tr } from '../i18n.js';
 export const JAVA_VERSION = 21;
 const FRAME_RUNS = 50; // compiles per frame (CheerpJ breaks at 68)
 const SPARE_AT = 40; // start the next frame after this many compiles
-const TIME_LIMIT = 15000; // ms for one compile + run (not counting the first load)
+const TIME_LIMIT = 60000; // ms for one compile + run: only to notice a broken frame (an endless loop can't be timed out anyway)
 
-const frameUrl = () => new URL(import.meta.env.BASE_URL + 'java-frame.html', location.href).href;
+let slotN = 0;
+// a different folder per frame (a/b/c, in turn): at most two frames live at once, plus one being thrown away
+const frameUrl = () => new URL(import.meta.env.BASE_URL + 'java-frame.html?slot=' + 'abc'[slotN++ % 3], location.href).href;
 
 let seq = 0;
 /** Creates a hidden Java frame. Returns { el, ready: Promise, runs, send(code) → Promise<raw result> }. */
@@ -59,10 +61,29 @@ let current = null; // the frame in use
 let spare = null; // the next one, warming up
 const loadFailed = () => new Error(tr('CheerpJ 를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', 'Couldn\'t load CheerpJ. Check your internet connection.'));
 
+const WARM_CODE = `import java.util.*;
+import java.util.stream.*;
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> a = new ArrayList<>(Arrays.asList(3, 1, 2));
+        a.sort((x, y) -> y - x);
+        a.removeIf(x -> x < 0);
+        a.forEach(x -> { });
+        Map<String, Integer> m = new HashMap<>();
+        m.put("a", 1);
+        String s = a.stream().filter(x -> x > 0).map(x -> x * 2).map(String::valueOf).collect(Collectors.joining(","));
+        int t = a.stream().mapToInt(x -> x).sum();
+        StringBuilder sb = new StringBuilder(String.format("%s %d %.1f", s, t, 1.5));
+        sb.append(new TreeSet<>(a)).append(m);
+    }
+}`;
+
 /** A frame that has loaded and compiled once (so its first real run is fast). */
 function warmFrame() {
   const f = makeFrame();
-  f.warm = f.ready.then(() => f.send('public class Main { public static void main(String[] a) { } }')).then(() => { f.runs = 1; });
+  // warm-up touches lambdas, streams, collections and String.format once: their first use in a fresh JVM is slow
+  // (QA 2026-11-18: one j-lambda run right after a swap hit the time limit), so it happens here, in the background
+  f.warm = f.ready.then(() => f.send(WARM_CODE)).then(() => { f.runs = 1; });
   f.warm.catch(() => {});
   return f;
 }
@@ -123,7 +144,7 @@ async function doRun(source) {
   }
   const res = d.res;
   const kind = res[0];
-  const text = res.slice(1).replaceAll('/files/src/', '');
+  const text = res.slice(1).replace(/\/files\/(?:[a-z]\/)?src\//g, '');
   if (kind === 'C') {
     return { ok: false, phase: 'compile', output: '', error: text.trim(), line: +(text.match(/Main\.java:(\d+)/)?.[1] || 0), ms };
   }

@@ -6,16 +6,24 @@ package cotudy;
 import java.io.*; import java.net.*; import java.lang.reflect.*;
 public class Runner {
   public static String run(String code) throws Exception {
-    File dir = new File("/files/run/");
+    return run(code, "/files/");
+  }
+
+  /**
+   * Compiles and runs Main.java inside `base` (e.g. "/files/a/"). Every Java frame gets its own base: the frames
+   * share one /files/ folder (IndexedDB), and a warming-up frame must not overwrite the class another one runs.
+   */
+  public static String run(String code, String base) throws Exception {
+    File dir = new File(base + "run/");
     dir.mkdirs();
-    new File("/files/src/").mkdirs();
-    String src = "/files/src/Main.java";
+    new File(base + "src/").mkdirs();
+    String src = base + "src/Main.java";
     Writer w = new OutputStreamWriter(new FileOutputStream(src), "UTF-8");
     w.write(code);
     w.close();
     StringWriter log = new StringWriter();
     PrintWriter pw = new PrintWriter(log);
-    int rc = com.sun.tools.javac.Main.compile(new String[] { src, "-d", "/files/run/", "-encoding", "UTF-8" }, pw);
+    int rc = com.sun.tools.javac.Main.compile(new String[] { src, "-d", base + "run/", "-encoding", "UTF-8" }, pw);
     pw.flush();
     if (rc != 0) return "C" + log;
     PrintStream oldOut = System.out, oldErr = System.err;

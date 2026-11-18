@@ -302,7 +302,7 @@ export function makeForklift() {
 export { canvasTexture };
 
 /**
- * Things you can use or look at with Space: { id, kind, x, z, r }. x/z is the object itself, r how close
+ * Things you can use or look at with Enter: { id, kind, x, z, r }. x/z is the object itself, r how close
  * Kim must stand. What each kind does lives in main.js (useObject). Seats are separate (every seat is sittable).
  */
 export const OBJECT_SPOTS = [

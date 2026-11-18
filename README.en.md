@@ -101,7 +101,7 @@ Opens at http://localhost:5180. Pushing to `main` deploys to GitHub Pages via Gi
 - `src/content/stages.js`, `npcs.js`, `tour.js` area order, characters, first-day tour
 - `src/i18n.js` display language; on-screen text is written as `tr('한국어', 'English')`
 - `public/java-frame.html` the hidden frame that runs Java (CheerpJ Java 21, javac built in), replaced every 50 compiles (CheerpJ's javac stops at the 68th)
-- `public/cotudy-runner-1.jar` a small helper that compiles and runs in one call ([source](src/runner/java-helper/cotudy/Runner.java))
+- `public/cotudy-runner-2.jar` a small helper that compiles and runs in one call ([source](src/runner/java-helper/cotudy/Runner.java))
 - `src/content/outputs.json` pre-run results of the Java and Python examples and solutions; regenerate with `node scripts/precompute-outputs.mjs` after editing quests
 
 Add quests to all three languages with the same `id`, `stage` and `npc`. The solution code must produce exactly `expected` when run, and explanations use only that language's terms.

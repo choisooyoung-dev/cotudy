@@ -9,7 +9,7 @@ import { QUESTS as JS_QUESTS } from './content/javascript/quests.js';
 import { QUESTS as PY_QUESTS } from './content/python/quests.js';
 import { RUNTIMES } from './runner/index.js';
 import { openMission, faceHTML } from './ui/mission.js';
-import { runHiring } from './ui/hire.js';
+import { runHiring, askQuestion, conceptQuestion } from './ui/hire.js';
 import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
 import { codeKey, savedOutputs } from './runner/cache.js';
@@ -91,7 +91,7 @@ function percent(langId = store.lang || 'java', done = store.doneOf(langId)) {
 const TOUCH = matchMedia('(pointer: coarse)').matches;
 
 // ---------- things around the center ----------
-// What Space does next to an object (spots from OBJECT_SPOTS in world/layout.js). Looking at something is a
+// What Enter does next to an object (spots from OBJECT_SPOTS in world/layout.js). Looking at something is a
 // short thought from Kim; the water cooler and the coffee machine put a cup in Kim's hand.
 const OBJECT_ACTIONS = {
   water: () => tr('물 마시기', 'Drink water'),
@@ -208,6 +208,12 @@ function toast(html, ms = 3200) {
 /** Same colors as the player character in src/world/game.js. */
 const PLAYER_LOOK = store.look;
 
+// Keyboard in dialogs: Enter presses the selected button (the primary one at first), arrow keys move the selection,
+// Escape closes. The key hint is shown only in the very first dialog (then everyone knows).
+const KEY_HINT = 'cotudy.keyhint';
+const keyHintSeen = () => { try { return !!localStorage.getItem(KEY_HINT); } catch { return true; } };
+const markKeyHint = () => { try { localStorage.setItem(KEY_HINT, '1'); } catch { /* ignore */ } };
+
 function dialog({ who, lines, buttons, look }) {
   return new Promise((resolve) => {
     busy = true;
@@ -216,7 +222,11 @@ function dialog({ who, lines, buttons, look }) {
     d.className = 'dlg';
     app.appendChild(d);
     let i = 0;
-    const finish = (v) => { d.remove(); removeEventListener('keydown', onKey, true); busy = false; world.setFrozen(false); resolve(v); };
+    let els = [], sel = 0;
+    const hint = !TOUCH && !keyHintSeen();
+    const finish = (v) => { d.remove(); removeEventListener('keydown', onKey, true); busy = false; world.setFrozen(false); if (hint) markKeyHint(); resolve(v); };
+    // the selected button is the green one: moving with the arrow keys moves the green
+    const select = (k) => { if (!els.length) return; sel = (k + els.length) % els.length; els.forEach((el, j) => el.classList.toggle('go', j === sel)); };
     const draw = () => {
       const last = i === lines.length - 1;
       // a line is a string (said by `who`) or { who, text, me } for conversations with several people
@@ -228,19 +238,27 @@ function dialog({ who, lines, buttons, look }) {
       d.innerHTML = `${face ? `<div class="portrait">${faceHTML(face, { bust: true })}</div>` : ''}<div class="who${line?.me ? ' me' : ''}">${speaker}</div><p>${text}</p><div class="btns"></div>`;
       const btns = d.querySelector('.btns');
       const list = last ? (buttons || [{ label: tr('닫기', 'Close'), value: null, primary: true }]) : [{ label: tr('다음', 'Next'), value: '__next', primary: true }];
-      list.forEach((b, k) => {
+      els = [];
+      if (hint) btns.insertAdjacentHTML('beforeend', `<span class="keyhint">${list.filter((b) => !b.disabled).length > 1 ? tr('<kbd>←</kbd><kbd>→</kbd> 고르기 · ', '<kbd>←</kbd><kbd>→</kbd> choose · ') : ''}<kbd>Enter</kbd> ${tr('누르기', 'press')}</span>`);
+      list.forEach((b) => {
         const el = document.createElement('button');
         el.className = 'btn' + (b.primary ? ' go' : '');
         el.disabled = !!b.disabled;
-        el.innerHTML = b.html || b.label + (b.primary && !TOUCH ? '<kbd>Space</kbd>' : '');
+        el.innerHTML = b.html || b.label;
         el.addEventListener('click', () => (b.value === '__next' ? (i++, draw()) : finish(b.value)));
         btns.appendChild(el);
+        if (!b.disabled) els.push(el);
         if (b.primary) el.dataset.primary = '1';
       });
+      if (!TOUCH) select(Math.max(0, els.findIndex((el) => el.dataset.primary)));
     };
     const onKey = (e) => {
-      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); d.querySelector('[data-primary]')?.click(); }
-      else if (e.key === 'Escape') { e.stopImmediatePropagation(); finish(null); }
+      const k = e.key;
+      if (k === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); (els[sel] || d.querySelector('[data-primary]'))?.click(); }
+      else if (k === 'ArrowLeft' || k === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); select(sel - 1); }
+      else if (k === 'ArrowRight' || k === 'ArrowDown') { e.preventDefault(); e.stopImmediatePropagation(); select(sel + 1); }
+      else if (k === ' ') { e.preventDefault(); e.stopImmediatePropagation(); } // no Space in dialogs (Enter or a click)
+      else if (k === 'Escape') { e.stopImmediatePropagation(); finish(null); }
     };
     setTimeout(() => addEventListener('keydown', onKey, true), 150);
     draw();
@@ -336,11 +354,11 @@ async function startQuest(q) {
   setTimeout(checkHqVisit, 2500);
   const after = currentStageIndex();
   const nq = nextQuest();
-  // same person has the next job: keep talking instead of sending the player back to press Space
+  // same person has the next job: keep talking instead of sending the player back to press Enter
   if (wasNext?.id === q.id && nq && nq.npc === q.npc) {
     if (after > before) toast(tr(`✅ ${STAGES[before].name} 완료!`, `✅ ${STAGES[before].name} done!`), 3000);
     const [ko, en] = CHAIN_LINES[Math.floor(Math.random() * CHAIN_LINES.length)];
-    busy = true; // no Space-talk sneaking in before the dialog opens
+    busy = true; // no Enter-talk sneaking in before the dialog opens
     await new Promise((r) => setTimeout(r, 250));
     return offerQuest(nq, [tr(ko, en)]);
   }
@@ -377,7 +395,7 @@ async function chooseLanguage() {
   if (!store.toured) { runTour(); return; }
   toast(TOUCH
     ? tr('👆 바닥을 누른 채 끌면 따라 걸어요. 사람 옆에서 오른쪽 아래 버튼(또는 그 사람)을 누르면 말을 걸어요', '👆 Hold and drag on the floor to walk. Next to someone, tap the button at the bottom right (or them) to talk')
-    : tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Space</kbd> next to someone to talk'), 6000);
+    : tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Enter</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Enter</kbd> next to someone to talk'), 6000);
 }
 
 /** Sets the language of a character that has none yet and starts getting its runner ready. */
@@ -394,7 +412,7 @@ function applyLang(id) {
 const INTERVIEWS = { java: JAVA_IV, javascript: JS_IV, python: PY_IV };
 async function startHiring() {
   interviewing = true;
-  const { start, known } = await runHiring({
+  const { start, known, items } = await runHiring({
     app, dialog, npcs: NPCS, whoOf, langs: LANGS,
     pickLang: (id) => applyLang(id),
     stagesFor,
@@ -403,6 +421,7 @@ async function startHiring() {
     run: (id, code) => RUNTIMES[id].run(code),
   });
   store.setPlacement(start);
+  store.setInterview({ lang: store.lang, at: Date.now(), items });
   // concepts the interview showed they know count as done: "passed in interview" (0 stars until replayed)
   for (const id of known) if (!store.isDone(id)) store.complete(id, 0);
   interviewing = false;
@@ -693,15 +712,54 @@ async function retryBoard() {
   const h = store.hq;
   const board = tr('재도전 게시판', 'Retry board');
   const tests = hqTests().filter((p) => h.failed.includes(p.id));
-  if (!tests.length) {
+  const iv = store.interview?.lang === store.lang ? store.interview.items : [];
+  if (!tests.length && !iv.length) {
     await dialog({ who: board, lines: [tr('붙어 있는 문제가 없어요. 본사 직원이 내는 코딩테스트를 못 풀면 여기에 붙어요.', 'Nothing pinned here. HQ coding tests you don\'t pass get pinned here.')] });
     return;
   }
+  const missed = iv.filter((x) => !x.right && !x.retried).length;
   const pick = await dialog({ who: board, lines: [tr('다시 풀어 볼 문제를 골라요.', 'Pick a problem to try again.')],
-    buttons: [...tests.map((p) => ({ label: `📌 [${LEVEL[p.level]}] ${p.title}`, value: p.id })), { label: tr('닫기', 'Close'), value: null, primary: true }] });
+    buttons: [
+      ...tests.map((p) => ({ label: `📌 [${LEVEL[p.level]}] ${p.title}`, value: p.id })),
+      ...(iv.length ? [{ label: tr(`🗂️ 면접 문제 (${iv.length}개, 다시 볼 것 ${missed}개)`, `🗂️ Interview questions (${iv.length}, ${missed} to review)`), value: '__interview' }] : []),
+      { label: tr('닫기', 'Close'), value: null, primary: true },
+    ] });
+  if (pick === '__interview') return interviewReview();
   const p = tests.find((x) => x.id === pick);
   if (!p) return;
   if (await runHqTest(p)) toast(tr(`✅ "${p.title}" 통과! 게시판에서 뗐어요`, `✅ "${p.title}" passed! Taken off the board`), 4000);
+}
+
+/** The HQ interview's questions, to look at again: ✅ / ❌ as answered then, pick one to try it again. */
+async function interviewReview() {
+  const rec = store.interview;
+  const items = rec.items;
+  const board = tr('재도전 게시판 · 면접 문제', 'Retry board · Interview');
+  const stageOf = (id) => STAGES.find((x) => x.id === id);
+  const v = await dialog({ who: board, lines: [tr('면접에서 풀었던 문제예요. ❌ 는 틀렸거나 모른다고 한 문제예요. 골라서 다시 풀어 봐요.', 'These are the interview questions. ❌ means missed or "I don\'t know". Pick one to try again.')],
+    buttons: [
+      ...items.map((x, i) => ({ label: `${x.right || x.retried ? '✅' : '❌'} ${i + 1}. ${stageOf(x.stage)?.name || x.stage} · ${x.kind === 'combined' ? tr('종합', 'combined') : tr('개념', 'concept')}${!x.right && x.retried ? tr(' (다시 풀어 맞힘)', ' (solved later)') : ''}`, value: String(i) })),
+      { label: tr('닫기', 'Close'), value: null, primary: true },
+    ] });
+  if (v == null) return;
+  const x = items[+v];
+  const st = stageOf(x.stage);
+  const q = x.kind === 'combined' ? INTERVIEWS[store.lang].find((g) => g.stage === x.stage) : (() => { const qq = quests.find((y) => y.id === x.quest); return qq && conceptQuestion(qq); })();
+  if (!q || !st) return;
+  busy = true;
+  world.setFrozen(true);
+  const right = await askQuestion(app, q, +v + 1, `${st.name} · ${x.kind === 'combined' ? tr('종합', 'combined') : tr('개념 확인', 'concept check')}`, board, (code) => RUNTIMES[store.lang].run(code));
+  busy = false;
+  world.setFrozen(false);
+  if (right && !x.right) { x.retried = true; store.setInterview(rec); }
+  const escA = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const answer = q.type === 'fill'
+    ? tr(`빈칸 정답: <code>${q.solution.map(escA).join('</code>, <code>')}</code>`, `Blank answers: <code>${q.solution.map(escA).join('</code>, <code>')}</code>`)
+    : `${tr('정답', 'Answer')}:<pre class="iv-answer">${escA(q.choices[q.answer ?? 0])}</pre>`;
+  await dialog({ who: board, lines: right
+    ? [tr('정답이에요! 👏', 'Correct! 👏') + (q.explain ? ' ' + q.explain : '')]
+    : [tr('아쉬워요.', 'Not quite.') + ' ' + answer + (q.explain ? `<br>${q.explain}` : '')] });
+  return interviewReview();
 }
 setInterval(checkHqVisit, 30000);
 
@@ -713,7 +771,7 @@ for (const [cls, [x, z]] of Object.entries(padMap)) {
   const off = () => world.setPad(0, 0);
   b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off);
 }
-$('.pad .act').addEventListener('click', () => dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })));
+$('.pad .act').addEventListener('click', () => dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })));
 
 // ---------- settings ----------
 $('.menu-btn').addEventListener('click', async () => {

@@ -6,7 +6,10 @@ import { buildCenter, buildTape, makeForklift, TAPE, ZONES } from './layout.js';
 
 const PLAYER_R = 0.42;
 const SPEED = 5.5;
-const COARSE = matchMedia('(pointer: coarse)').matches; // phone/tablet: tap instead of Space
+const COARSE = matchMedia('(pointer: coarse)').matches; // phone/tablet: tap instead of Enter
+// The Enter key is shown on the prompt only until the first time someone uses it (then everyone knows).
+const HINT_KEY = 'cotudy.keyhint.world';
+let enterHint = (() => { try { return !localStorage.getItem(HINT_KEY); } catch { return false; } })();
 const VIEW = 22; // ortho frustum height (bigger = farther)
 
 export function createWorld(container, { npcs, playerStart, playerLook, onInteract, onMove, onPrompt, spots = [] }) {
@@ -112,18 +115,18 @@ export function createWorld(container, { npcs, playerStart, playerLook, onIntera
   const makeTag = (html, cls = '') => { const d = document.createElement('div'); d.className = 'tag ' + cls; d.innerHTML = html; tagLayer.appendChild(d); return d; };
   const meTag = makeTag(tr('<b>물류팀</b>김사원', '<b>Logistics</b>Kim'), 'me');
   for (const n of people) n.tag = makeTag(`<b>${n.def.role}</b>${n.def.name}`);
-  const prompt = makeTag(COARSE ? tr('👆 말 걸기', '👆 Talk') : tr('<kbd>Space</kbd> 말 걸기', '<kbd>Space</kbd> Talk'), 'prompt');
-  const talkHTML = prompt.innerHTML;
+  const keyHTML = () => (COARSE ? '👆 ' : enterHint ? '<kbd>Enter</kbd> ' : '');
+  const prompt = makeTag(keyHTML() + tr('말 걸기', 'Talk'), 'prompt');
   let promptFor;
   // interactive spots: { id, x, z, label?, action?, r? }. label = a name tag that is always shown (the retry board),
-  // action = what the Space prompt says, r = how close you must be. Space near one calls onInteract('spot:' + id).
+  // action = what the prompt says, r = how close you must be. Enter near one calls onInteract('spot:' + id).
   const spotList = spots.map((sp) => {
     const holder = new THREE.Object3D();
     holder.position.set(sp.x, 0, sp.z);
     scene.add(holder);
     return { id: 'spot:' + sp.id, holder, tag: sp.label ? makeTag(sp.label, 'spot') : null, action: sp.action, r: sp.r || 2, def: {} };
   });
-  // every seat is a spot too: Space sits Kim down, moving (or Space again) stands back up
+  // every seat is a spot too: Enter sits Kim down, moving (or Enter again) stands back up
   for (const [i, st] of seats.entries()) {
     const holder = new THREE.Object3D();
     holder.position.set(st.x, 0, st.z);
@@ -152,12 +155,13 @@ export function createWorld(container, { npcs, playerStart, playerLook, onIntera
       if (down) keys.add(k); else keys.delete(k);
       if (!frozen) e.preventDefault();
     }
-    if (down && (k === ' ' || k === 'enter') && !frozen && nearest) {
+    if (down && k === 'enter' && !frozen && nearest) {
       e.preventDefault();
       interact();
     }
   };
   const interact = () => {
+    if (enterHint) { enterHint = false; promptFor = undefined; try { localStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ } }
     if (nearest.seat) { if (mySeat) standUp(); else sitDown(nearest.seat); }
     else { standUp(); onInteract(nearest.id); }
   };
@@ -169,7 +173,7 @@ export function createWorld(container, { npcs, playerStart, playerLook, onIntera
   // touch to walk: hold a finger (or pen) on the floor and Kim walks toward it, following as it slides.
   // Holding still keeps walking that way (the point under the finger moves as the camera follows).
   // Letting go stops; only a quick tap means "go there". A tap on whoever/whatever
-  // is already in reach uses it (same as Space).
+  // is already in reach uses it (same as Enter).
   let walkTo = null, stuck = 0;
   const ray = new THREE.Raycaster(), ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
   const floorAt = (e) => {
@@ -439,7 +443,7 @@ export function createWorld(container, { npcs, playerStart, playerLook, onIntera
     const act = !nearest ? null : nearest.seat && mySeat ? tr('일어나기', 'Stand up') : nearest.action || tr('말 걸기', 'Talk');
     if (act !== promptFor) {
       promptFor = act;
-      prompt.innerHTML = act ? `${COARSE ? '👆' : '<kbd>Space</kbd>'} ${act}` : talkHTML;
+      prompt.innerHTML = act ? keyHTML() + act : keyHTML() + tr('말 걸기', 'Talk');
       onPrompt?.(act); // the phone's action button shows the same words
     }
     placeTag(meTag, me.group, 2.95);
