@@ -3,7 +3,8 @@
 //  1. records errors the page throws while loading (Korean and English screens),
 //  2. runs every quest's example, predict, fill-in and answer code in Java, JavaScript and Python
 //     and compares the output with what the quest expects (same check as the game's grading),
-//  3. does the same for the HQ coding tests and the job-interview questions (right answer = choices[0]).
+//  3. does the same for the HQ coding tests and the job-interview questions (right answer = choices[0]),
+//  4. checks that every pre-run result the game shows (src/content/outputs.json) matches the real run.
 // Writes the result to $LOG_DIR/daily/YYYY-MM-DD.md (Korean date; LOG_DIR defaults to ./logs) and exits with 1
 // when something is wrong. The console only gets counts: details stay in the file (the logs repo is private).
 //
@@ -91,6 +92,9 @@ const CHECK = (lang) => `(async () => {
     let r;
     try { r = await timed(run(code), 30000, '실행'); } catch (e) { bad.push(where + ': ' + e.message); return; }
     if (count % 40 === 0) console.log('[check] ${lang} ' + count + ' runs');
+    // a saved result (src/content/outputs.json) must match the real run, or the game shows something stale
+    const saved = c.savedOutputs?.[c.codeKey('${lang}', code)];
+    if (saved && (saved.ok !== r.ok || norm(saved.output) !== norm(r.output))) bad.push(where + ': 미리 저장한 결과가 실제와 다름 (scripts/precompute-outputs.mjs 다시 실행)');
     if (MUST_FAIL.includes(where)) { if (r.ok) bad.push(where + ': 일부러 에러가 나야 하는 예제인데 그냥 실행됨'); return; }
     if (!r.ok) { bad.push(where + ': 에러 · ' + short(r.error)); return; }
     if (expected != null && norm(r.output) !== norm(expected)) bad.push(where + ': 출력 다름 · 나옴 "' + short(r.output) + '" / 기대 "' + short(expected) + '"');

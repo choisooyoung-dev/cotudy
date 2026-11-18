@@ -100,8 +100,9 @@ Opens at http://localhost:5180. Pushing to `main` deploys to GitHub Pages via Gi
 - `src/content/<language>/` quest data. `quests.js` (Korean) and `quests.en.js` (English) cover areas 1–2; `more.js` covers areas 3–10 with both languages via `t('한국어', 'English')`
 - `src/content/stages.js`, `npcs.js`, `tour.js` area order, characters, first-day tour
 - `src/i18n.js` display language; on-screen text is written as `tr('한국어', 'English')`
-- `public/tools.jar` javac running in the browser (Eclipse Temurin OpenJDK 8u512)
-- `public/cotudy-runner-1.jar` a small helper that keeps javac loaded between runs ([source](src/runner/java-helper/cotudy/Runner.java))
+- `public/java-frame.html` the hidden frame that runs Java (CheerpJ Java 21, javac built in), replaced every 50 compiles (CheerpJ's javac stops at the 68th)
+- `public/cotudy-runner-1.jar` a small helper that compiles and runs in one call ([source](src/runner/java-helper/cotudy/Runner.java))
+- `src/content/outputs.json` pre-run results of the Java and Python examples and solutions; regenerate with `node scripts/precompute-outputs.mjs` after editing quests
 
 Add quests to all three languages with the same `id`, `stage` and `npc`. The solution code must produce exactly `expected` when run, and explanations use only that language's terms.
 While developing, open a quest straight from the browser console, e.g. `cotudy.startQuest(cotudy.current.java[0])`.

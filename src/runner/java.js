@@ -1,71 +1,104 @@
-// Runs real Java in the browser with CheerpJ (https://cheerpj.com).
-// The CheerpJ runtime comes from its CDN; javac comes from public/tools.jar (Eclipse Temurin OpenJDK 8u512).
-// CheerpJ maps "/app/..." to this web server's root, "/str/..." to in-memory files,
-// and "/files/..." to a writable IndexedDB folder.
+// Runs real Java 21 in the browser with CheerpJ (https://cheerpj.com). CheerpJ's Java 21 runtime has javac built in.
+// Java runs inside a hidden iframe (public/java-frame.html) that loads CheerpJ and our small helper
+// (src/runner/java-helper/cotudy/Runner.java → public/cotudy-runner-1.jar): one call compiles + runs Main.java.
+//
+// Why an iframe: CheerpJ's javac on Java 17/21/25 breaks on the 68th compile in one page (tested 2026-11-18;
+// a CheerpJ issue, not ours). So after FRAME_RUNS compiles a fresh frame takes over; a spare is started a bit
+// earlier so the swap doesn't make anyone wait (tested: 120 runs in a row, none slower than 1.5s).
+// A frame that stops answering (TIME_LIMIT) is thrown away and the next run gets a fresh one. A tight endless loop
+// still freezes the page, though: a same-site iframe runs on the page's own thread, so no timer can fire.
+// Most code never gets here: examples and exact fill-in answers come pre-run from src/content/outputs.json.
 
 import { tr } from '../i18n.js';
 
-const LOADER_URL = 'https://cjrtnc.leaningtech.com/5.0/loader.js';
+export const JAVA_VERSION = 21;
+const FRAME_RUNS = 50; // compiles per frame (CheerpJ breaks at 68)
+const SPARE_AT = 40; // start the next frame after this many compiles
+const TIME_LIMIT = 15000; // ms for one compile + run (not counting the first load)
 
-let initPromise = null;
-let queue = Promise.resolve();
-let runCount = 0;
+const frameUrl = () => new URL(import.meta.env.BASE_URL + 'java-frame.html', location.href).href;
 
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = () => reject(new Error(tr('CheerpJ 를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', 'Couldn\'t load CheerpJ. Check your internet connection.')));
-    document.head.appendChild(s);
+let seq = 0;
+/** Creates a hidden Java frame. Returns { el, ready: Promise, runs, send(code) → Promise<raw result> }. */
+function makeFrame() {
+  const el = document.createElement('iframe');
+  el.src = frameUrl();
+  el.title = 'java';
+  el.setAttribute('aria-hidden', 'true');
+  el.tabIndex = -1;
+  el.style.cssText = 'position:fixed;left:-10px;top:-10px;width:1px;height:1px;border:0;opacity:0;pointer-events:none';
+  const waiting = new Map();
+  const f = { el, runs: 0, dead: false, waiting };
+  f.ready = new Promise((resolve, reject) => {
+    f.onMessage = (e) => {
+      if (e.source !== el.contentWindow) return;
+      const d = e.data || {};
+      if (d.ready) resolve();
+      else if (d.loadError) reject(new Error(d.loadError));
+      else if (d.id && waiting.has(d.id)) { waiting.get(d.id)(d); waiting.delete(d.id); }
+    };
+    addEventListener('message', f.onMessage);
+    el.onerror = () => reject(new Error('frame failed to load'));
   });
+  f.send = (code) => new Promise((resolve) => {
+    const id = ++seq;
+    waiting.set(id, resolve);
+    el.contentWindow.postMessage({ id, code }, location.origin);
+  });
+  document.body.appendChild(el);
+  return f;
+}
+function killFrame(f) {
+  if (!f || f.dead) return;
+  f.dead = true;
+  removeEventListener('message', f.onMessage);
+  f.el.remove();
 }
 
-function consoleEl() {
-  let el = document.getElementById('console');
-  if (!el) {
-    // CheerpJ writes System.out / System.err into an element with id="console".
-    el = document.createElement('pre');
-    el.id = 'console';
-    el.style.display = 'none';
-    document.body.appendChild(el);
+let current = null; // the frame in use
+let spare = null; // the next one, warming up
+const loadFailed = () => new Error(tr('CheerpJ 를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', 'Couldn\'t load CheerpJ. Check your internet connection.'));
+
+/** A frame that has loaded and compiled once (so its first real run is fast). */
+function warmFrame() {
+  const f = makeFrame();
+  f.warm = f.ready.then(() => f.send('public class Main { public static void main(String[] a) { } }')).then(() => { f.runs = 1; });
+  f.warm.catch(() => {});
+  return f;
+}
+
+async function frameForRun() {
+  if (!current) current = warmFrame();
+  if (current.runs >= SPARE_AT && !spare) spare = warmFrame();
+  if (current.runs >= FRAME_RUNS) {
+    const old = current;
+    current = spare || warmFrame();
+    spare = null;
+    setTimeout(() => killFrame(old), 2000); // let anything still in flight finish
   }
-  return el;
+  try { await current.warm; } catch { killFrame(current); current = null; throw loadFailed(); }
+  return current;
 }
 
-function toolsJarPath() {
-  // e.g. "/app/tools.jar" on localhost, "/app/cotudy/tools.jar" on GitHub Pages.
-  const url = new URL(import.meta.env.BASE_URL + 'tools.jar', location.href);
-  return '/app' + url.pathname;
-}
-
-/** Starts loading CheerpJ (safe to call many times). */
+/** Starts loading Java in the background (safe to call many times). */
 export function initJava() {
-  if (!initPromise) {
-    initPromise = (async () => {
-      consoleEl();
-      await loadScript(LOADER_URL);
-      await window.cheerpjInit({ status: 'none' });
-    })();
-    initPromise.catch(() => { initPromise = null; });
-  }
-  return initPromise;
+  if (!current) current = warmFrame();
+  return current.warm;
 }
 
-let warm = null;
-/** Loads CheerpJ and runs javac once in the background so the first real run is fast. */
+/** Loads Java and compiles once in the background so the first real run is fast. */
 export function warmUpJava() {
-  warm ||= runJava('public class Main { public static void main(String[] a) { } }').catch(() => { warm = null; });
-  return warm;
+  return initJava().catch((e) => { killFrame(current); current = null; throw e; });
 }
 
 export function isJavaReady() {
-  return !!initPromise && window.__cotudyJavaReady === true;
+  return window.__cotudyJavaReady === true;
 }
 
+let queue = Promise.resolve();
 /**
  * Compiles and runs a single Main.java source.
- * Returns { ok, phase: 'compile' | 'run', output, error, ms }.
+ * Returns { ok, phase: 'compile' | 'run', output, error, line, ms }.
  */
 export function runJava(source) {
   const job = queue.then(() => doRun(source));
@@ -73,40 +106,22 @@ export function runJava(source) {
   return job;
 }
 
-// ---- fast path ----
-// Starting javac with cheerpjRunMain for every run is slow (javac + a second JVM main each time).
-// Instead we load a small helper (src/runner/java-helper/cotudy/Runner.java, shipped precompiled in
-// public/cotudy-runner-1.jar) with cheerpjRunLibrary. Then each run is one Java method call: compile with
-// javac's API, then call Main.main through a fresh class loader.
-function helperPath() {
-  // The version number is in the file name: CheerpJ keeps downloaded files in the browser, so a new
-  // name makes sure nobody gets an old (or broken) copy. Bump it whenever the helper changes.
-  const url = new URL(import.meta.env.BASE_URL + 'cotudy-runner-1.jar', location.href);
-  return '/app' + url.pathname;
-}
-
-let fastRunner = null; // Promise<Runner class | null>
-function loadFastRunner() {
-  fastRunner ||= (async () => {
-    const load = (async () => {
-      const lib = await window.cheerpjRunLibrary(`${toolsJarPath()}:${helperPath()}`);
-      return await lib.cotudy.Runner;
-    })();
-    // never wait forever on the fast path: after 30s fall back to the slow (but proven) way
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout loading the helper')), 30000));
-    return await Promise.race([load, timeout]);
-  })().catch((e) => { console.warn('[cotudy] fast Java runner unavailable, using the slow path', e); return null; });
-  return fastRunner;
-}
-
 async function doRun(source) {
-  await initJava();
+  const f = await frameForRun();
   window.__cotudyJavaReady = true;
-  const Runner = await loadFastRunner();
-  if (!Runner) return doRunSlow(source);
+  f.runs++;
   const t0 = performance.now();
-  const res = String(await Runner.run(source));
+  const timer = new Promise((resolve) => setTimeout(() => resolve({ timeout: true }), TIME_LIMIT));
+  const d = await Promise.race([f.send(source), timer]);
   const ms = performance.now() - t0;
+  if (d.timeout || d.fail) {
+    // no answer (or Java broke): throw this frame away, the next run gets a fresh one
+    if (current === f) current = null;
+    killFrame(f);
+    if (d.timeout) return { ok: false, phase: 'run', output: '', line: 0, ms, error: tr(`시간 초과: ${TIME_LIMIT / 1000}초 안에 끝나지 않았어요.`, `Time limit: it didn't finish within ${TIME_LIMIT / 1000} seconds.`) };
+    return { ok: false, phase: 'run', output: '', line: 0, ms, error: tr('자바 실행기에 문제가 생겨서 다시 준비할게요. 한 번 더 실행해 주세요.', 'The Java runner had a problem and is restarting. Please run it again.') };
+  }
+  const res = d.res;
   const kind = res[0];
   const text = res.slice(1).replaceAll('/files/src/', '');
   if (kind === 'C') {
@@ -114,36 +129,9 @@ async function doRun(source) {
   }
   // drop the reflection frames our helper adds under the user's own stack trace
   const output = kind === 'X'
-    ? text.split('\n').filter((l) => !/^\s+at (sun\.reflect|java\.lang\.reflect|jdk\.internal|cotudy\.Runner|com\.leaningtech)/.test(l)).join('\n')
+    ? text.split('\n').filter((l) => !/^\s+at (sun\.reflect|java\.lang\.reflect|java\.lang\.invoke|jdk\.internal|cotudy\.Runner|com\.leaningtech)/.test(l)).join('\n')
     : text;
   return { ok: kind === 'R', phase: 'run', output, error: kind === 'X' ? output.trim() : '', line: +(output.match(/Main\.java:(\d+)\)/)?.[1] || 0), ms };
-}
-
-async function doRunSlow(source) {
-  const t0 = performance.now();
-  const out = consoleEl();
-  ++runCount;
-  const dir = '/files/';
-  const classPath = `${toolsJarPath()}:${dir}`;
-
-  (window.cheerpOSAddStringFile || window.cheerpjAddStringFile)('/str/Main.java', new TextEncoder().encode(source));
-
-  out.textContent = '';
-  const code = await window.cheerpjRunMain(
-    'com.sun.tools.javac.Main', classPath,
-    '/str/Main.java', '-d', dir, '-encoding', 'UTF-8',
-  );
-  const compileLog = out.textContent.replaceAll('/str/', '');
-  if (code !== 0) {
-    return { ok: false, phase: 'compile', output: '', error: compileLog.trim(), line: +(compileLog.match(/Main\.java:(\d+)/)?.[1] || 0), ms: performance.now() - t0 };
-  }
-
-  out.textContent = '';
-  const runCode = await window.cheerpjRunMain('Main', classPath);
-  await new Promise((r) => setTimeout(r, 30)); // let the last console write land
-  const output = out.textContent;
-  const crashed = runCode !== 0 || /Exception in thread/.test(output);
-  return { ok: !crashed, phase: 'run', output, error: crashed ? output.trim() : '', line: +(output.match(/Main\.java:(\d+)\)/)?.[1] || 0), ms: performance.now() - t0 };
 }
 
 /** Turns common javac / runtime errors into short Korean explanations. */

@@ -138,7 +138,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
       box.appendChild(view.el);
       const bar = document.createElement('div');
       bar.className = 'runbar';
-      bar.innerHTML = `<button class="btn run">${tr('▶ 실행해 보기', '▶ Try it')}</button>${javaNote()}<span class="status"></span>`;
+      bar.innerHTML = `<button class="btn run">${tr('▶ 실행해 보기', '▶ Try it')}</button>${rt.saved?.(c.code) ? '' : javaNote()}<span class="status"></span>`;
       box.appendChild(bar);
       const out = consoleBox(true);
       out.innerHTML = `<div class="col"><h5>${tr('실행 결과', 'Output')}</h5><span class="muted">${tr('▶ 실행해 보기를 눌러 보세요', 'Press ▶ Try it')}</span></div>`;
@@ -148,7 +148,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         bar.querySelector('.status').textContent = tr('실행 중…', 'Running…');
         const r = await rt.run(c.code);
         b.disabled = false;
-        bar.querySelector('.status').textContent = r.phase === 'compile' && !r.ok ? tr('컴파일 에러', 'Compile error') : tr(`실행 ${(r.ms / 1000).toFixed(1)}초`, `Ran in ${(r.ms / 1000).toFixed(1)}s`);
+        bar.querySelector('.status').textContent = r.phase === 'compile' && !r.ok ? tr('컴파일 에러', 'Compile error') : r.saved ? tr('실행 결과', 'Output') : tr(`실행 ${(r.ms / 1000).toFixed(1)}초`, `Ran in ${(r.ms / 1000).toFixed(1)}s`);
         if (r.ok) out.innerHTML = `<div class="col"><h5>${tr('실행 결과', 'Output')}</h5><span class="ok">${esc(r.output) || `<span class="muted">${tr('(출력 없음)', '(no output)')}</span>`}</span></div>`;
         else {
           out.classList.remove('single');
@@ -255,7 +255,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         }
       }
       const r = await rt.run(code);
-      statusEl.textContent = r.phase === 'compile' && !r.ok ? tr('컴파일 실패', 'Compile failed') : tr(`실행 ${(r.ms / 1000).toFixed(1)}초`, `Ran in ${(r.ms / 1000).toFixed(1)}s`);
+      statusEl.textContent = r.phase === 'compile' && !r.ok ? tr('컴파일 실패', 'Compile failed') : r.saved ? '' : tr(`실행 ${(r.ms / 1000).toFixed(1)}초`, `Ran in ${(r.ms / 1000).toFixed(1)}s`);
       if (!r.ok) {
         const line = r.line;
         view.markLine(line);

@@ -12,6 +12,7 @@ import { openMission, faceHTML } from './ui/mission.js';
 import { runHiring } from './ui/hire.js';
 import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
+import { codeKey, savedOutputs } from './runner/cache.js';
 import { runPython, warmUpPython } from './runner/python.js';
 import { QUESTS as JAVA_QUESTS_EN } from './content/java/quests.en.js';
 import { QUESTS as JS_QUESTS_EN } from './content/javascript/quests.en.js';
@@ -818,4 +819,4 @@ if ((store.lang || 'java') === 'java') {
   $('.java-state').textContent = `⚡ ${langInfo().name}`;
 }
 // debug helper for development
-window.cotudy = { hq: { java: JAVA_HQ, javascript: JS_HQ, python: PY_HQ }, interview: { java: JAVA_IV, javascript: JS_IV, python: PY_IV }, hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };
+window.cotudy = { codeKey, savedOutputs, hq: { java: JAVA_HQ, javascript: JS_HQ, python: PY_HQ }, interview: { java: JAVA_IV, javascript: JS_IV, python: PY_IV }, hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };

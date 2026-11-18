@@ -43,12 +43,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-## javac (`public/tools.jar`) — Eclipse Temurin OpenJDK 8u512-b09
+## Java 21 런타임과 javac (CheerpJ CDN 에서 받음, 이 저장소에 넣지 않음)
 
-- 브라우저 안에서 자바 코드를 컴파일하는 데 쓴다. [Eclipse Temurin](https://adoptium.net/) JDK 8u512-b09 의 `lib/tools.jar` 를 그대로 넣었다.
-- 라이선스: **GNU General Public License v2 + Classpath Exception** (OpenJDK). cotudy 의 LICENSE 는 이 파일에 적용되지 않는다.
-- 라이선스 전문은 사이트와 저장소에 함께 둔다: [`public/licenses/openjdk/LICENSE`](public/licenses/openjdk/LICENSE), [`ASSEMBLY_EXCEPTION`](public/licenses/openjdk/ASSEMBLY_EXCEPTION), [`THIRD_PARTY_README`](public/licenses/openjdk/THIRD_PARTY_README)
-- 소스 코드: https://github.com/adoptium/jdk8u (태그 `jdk8u512-b09`)
+- 2026-11-18 부터 자바는 CheerpJ 의 Java 21 런타임으로 돌리고, 컴파일도 그 런타임에 들어 있는 javac 로 한다. 이 파일들은 Leaning Technologies 의 CDN(`cjrtnc.leaningtech.com`)에서 브라우저가 직접 받으며, cotudy 는 다시 배포하지 않는다. 사용 조건은 위 CheerpJ 항목을 따른다.
+- (그 전에는 Eclipse Temurin OpenJDK 8u512 의 `tools.jar` 를 `public/` 에 넣어 썼다. 지금은 빠졌다.)
 - Java 와 OpenJDK 는 Oracle 및 그 계열사의 상표다.
 
 ## 언어 로고 (`public/icons/`)

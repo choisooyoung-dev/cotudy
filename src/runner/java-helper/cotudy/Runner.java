@@ -1,5 +1,6 @@
-// Helper loaded by src/runner/java.js. Precompiled into public/cotudy-runner-<N>.jar (bump N in java.js when this changes):
-//   javac -source 8 -target 8 -cp public/tools.jar -d /tmp/jh src/runner/java-helper/cotudy/Runner.java
+// Helper loaded by src/runner/java.js. Precompiled into public/cotudy-runner-<N>.jar (bump N in public/java-frame.html when this changes):
+//   javac -source 8 -target 8 -d /tmp/jh src/runner/java-helper/cotudy/Runner.java   (with JDK 11+; checked with JDK 17)
+//   (runs on CheerpJ's Java 21 runtime, whose built-in javac it calls; Java 8 bytecode loads fine there)
 //   jar cf public/cotudy-runner-<N>.jar -C /tmp/jh cotudy
 package cotudy;
 import java.io.*; import java.net.*; import java.lang.reflect.*;

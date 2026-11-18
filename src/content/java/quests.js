@@ -1,5 +1,5 @@
 // Java quests for 1회차. One quest = request → concepts → predict → fill → write.
-// Codes are full Main.java files (Java 8). In `fill.code`, {{0}} {{1}} … are blanks.
+// Codes are full Main.java files (run on Java 21; written to also compile on Java 8). In `fill.code`, {{0}} {{1}} … are blanks.
 // Grading runs the code for real and compares the output with `expected`.
 //
 // Add a quest: copy one object below, give it a new `id`, set `stage` (see ../stages.js) and `npc` (see ../npcs.js).

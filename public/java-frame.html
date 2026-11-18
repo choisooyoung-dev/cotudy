@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>java</title>
+<!-- One CheerpJ Java 21 instance for src/runner/java.js (which replaces this frame every 50 compiles). -->
+<script src="https://cjrtnc.leaningtech.com/5.0/loader.js"></script>
+<pre id="console" style="display:none"></pre>
+<script>
+  // "/app/..." is this web server's root inside CheerpJ, e.g. "/app/cotudy/cotudy-runner-1.jar" on GitHub Pages
+  const jar = '/app' + new URL('cotudy-runner-1.jar', location.href).pathname;
+  let Runner = null;
+  const ready = (async () => {
+    await cheerpjInit({ version: 21, status: 'none' });
+    const lib = await cheerpjRunLibrary(jar);
+    Runner = await lib.cotudy.Runner;
+  })();
+  const say = (msg) => parent.postMessage(msg, location.origin);
+  ready.then(() => say({ ready: true }), (e) => say({ loadError: String((e && e.message) || e) }));
+  addEventListener('message', async (e) => {
+    if (e.source !== parent || e.origin !== location.origin) return;
+    const { id, code } = e.data || {};
+    if (!id) return;
+    try {
+      await ready;
+      say({ id, res: String(await Runner.run(code)) });
+    } catch (err) {
+      // a Java exception arrives as a Java object: don't try to turn it into a primitive
+      say({ id, fail: typeof err === 'string' ? err : (err && err.message) || 'java error' });
+    }
+  });
+</script>

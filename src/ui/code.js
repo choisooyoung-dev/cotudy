@@ -32,7 +32,7 @@ export function highlight(code) {
 }
 
 /** Read-only code box. `blanks` turns {{i}} into inputs. Returns { el, values(), inputs }. */
-const badgeHTML = (badge, color) => `<span class="java" style="background:${color || '#f89820'}">${badge || 'Java 8'}</span>`;
+const badgeHTML = (badge, color) => `<span class="java" style="background:${color || '#f89820'}">${badge || 'Java 21'}</span>`;
 
 export function codeView(code, { title = 'Main.java', blanks = null, badge, badgeColor } = {}) {
   const el = document.createElement('div');

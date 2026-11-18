@@ -1,5 +1,5 @@
 // Java quests for the rest of lap 1 (operators → classes). Korean and English sit side by side:
-// t('한국어', 'English') picks the display language. Codes are full Main.java files (Java 8).
+// t('한국어', 'English') picks the display language. Codes are full Main.java files (run on Java 21; written to also compile on Java 8).
 // Every example, fill solution and write solution was run for real and matches `expected`.
 import { tr as t } from '../../i18n.js';
 

@@ -1,6 +1,6 @@
 // Java quests beyond the basics (after 1회차): encapsulation, inheritance, interfaces, static, enum, generics,
 // collections, lambdas, streams, custom exceptions. One quest = one concept. Stages are the Java-only ones in
-// ../stages.js. Codes are full Main.java files (Java 8: no var / List.of / records).
+// ../stages.js. Codes are full Main.java files (run on Java 21; these avoid var / List.of / records).
 // Korean and English side by side via t('한국어', 'English'). Explained only in Java terms.
 // Every example, predict, fill and write solution was run for real (scripts/daily-check.mjs checks them daily).
 import { tr as t } from '../../i18n.js';
