@@ -946,8 +946,14 @@ async function runTour() {
               ]
             : TOUR_END.lines,
     );
-    await world.walkNpc('han', TOUR_END.path, { lead: true });
-    world.freeNpc('han');
+    if (placed) {
+        // 배치된 담당자에게 가라고 했으니, 한지원은 혼자 사무실로 돌아가고 투어는 바로 끝난다
+        // (예전엔 김사원이 따라오길 기다려서 투어가 안 끝나고 말 걸기·바로 가기가 막혔음, 2026-11-18)
+        world.walkNpc('han', TOUR_END.path).then(() => world.freeNpc('han'));
+    } else {
+        await world.walkNpc('han', TOUR_END.path, { lead: true });
+        world.freeNpc('han');
+    }
     world.holdCup('me', false);
     world.holdCup('han', false);
     touring = false;
