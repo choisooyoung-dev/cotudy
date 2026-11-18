@@ -17,13 +17,20 @@ function format(v) {
 }
 
 // Line 1 of the worker script is this prelude (no newline inside), so user line N = worker line N + 1.
-const PRELUDE = `const __f=${format.toString().replace(/\n\s*/g, ' ')};const __o=[];self.console={log:(...a)=>__o.push(a.map(__f).join(' ')),error:(...a)=>__o.push(a.map(__f).join(' ')),warn:(...a)=>__o.push(a.map(__f).join(' '))};self.onerror=null;`;
+// Code with timers/promises (setTimeout, Promise, async/await) prints later, so the run ends only when no timer
+// is left and the microtasks are drained; a promise rejected with nobody catching it counts as an error.
+const PRELUDE = `const __f=${format.toString().replace(/\n\s*/g, ' ')};const __o=[];self.console={log:(...a)=>__o.push(a.map(__f).join(' ')),error:(...a)=>__o.push(a.map(__f).join(' ')),warn:(...a)=>__o.push(a.map(__f).join(' '))};self.onerror=null;`
+  + `let __n=0,__sent=false;const __st=self.setTimeout.bind(self),__ct=self.clearTimeout.bind(self),__ids=new Set();`
+  + `const __end=()=>__st(()=>__st(()=>{if(!__sent&&__n===0){__sent=true;postMessage({done:true,out:__o});}},0),0);`
+  + `self.setTimeout=(f,ms,...a)=>{__n++;const id=__st(()=>{__ids.delete(id);__n--;try{typeof f==='function'&&f(...a);}finally{__end();}},ms);__ids.add(id);return id;};`
+  + `self.clearTimeout=(id)=>{if(__ids.delete(id)){__n--;__ct(id);__end();}};`
+  + `self.onunhandledrejection=(e)=>{if(__sent)return;__sent=true;const r=e.reason;postMessage({rejected:true,out:__o,msg:(r&&r.name?r.name+': '+r.message:String(r))});};`;
 
 /** Runs code. Returns { ok, phase: 'compile' | 'run', output, error, line, ms }. */
 export function runJs(source) {
   return new Promise((resolve) => {
     const t0 = performance.now();
-    const script = `${PRELUDE}\n${source}\n;postMessage({done:true,out:__o});`;
+    const script = `${PRELUDE}\n${source}\n;__end();`;
     const url = URL.createObjectURL(new Blob([script], { type: 'text/javascript' }));
     const w = new Worker(url);
     let settled = false;
@@ -41,6 +48,7 @@ export function runJs(source) {
     }), TIME_LIMIT);
     w.onmessage = (e) => {
       if (e.data?.done) finish({ ok: true, phase: 'run', output: e.data.out.join('\n') + (e.data.out.length ? '\n' : ''), error: '', line: 0 });
+      else if (e.data?.rejected) finish({ ok: false, phase: 'run', output: e.data.out.join('\n'), line: 0, error: e.data.msg });
     };
     w.onerror = (e) => {
       e.preventDefault();

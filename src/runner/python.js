@@ -13,17 +13,24 @@ let py = null;
 const ready = loadPyodide({ indexURL: '${PYODIDE}' }).then((p) => { py = p; postMessage({ ready: true }); });
 self.onmessage = async (e) => {
   await ready;
-  const out = [];
-  py.setStdout({ batched: (s) => out.push(s) });
-  py.setStderr({ batched: (s) => out.push(s) });
+  // raw writes (not line-batched), and a flush at the end: output that doesn't end with a newline
+  // (print(..., end="")) must show up in this run, not leak into the next one
+  let out = '';
+  const dec = new TextDecoder();
+  const sink = { write: (buf) => { out += dec.decode(buf, { stream: true }); return buf.length; } };
+  py.setStdout(sink);
+  py.setStderr(sink);
+  const flush = () => { try { py.runPython('import sys\\nsys.stdout.flush()\\nsys.stderr.flush()'); } catch {} };
   try {
     // fresh globals each run so variables from the last run don't leak in
     const ns = py.toPy({});
     py.runPython(e.data.code, { globals: ns, filename: 'main.py' });
     ns.destroy();
-    postMessage({ id: e.data.id, ok: true, out: out.join('\\n') });
+    flush();
+    postMessage({ id: e.data.id, ok: true, out });
   } catch (err) {
-    postMessage({ id: e.data.id, ok: false, out: out.join('\\n'), err: String(err.message || err) });
+    flush();
+    postMessage({ id: e.data.id, ok: false, out, err: String(err.message || err) });
   }
 };`;
 

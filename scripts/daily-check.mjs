@@ -3,7 +3,7 @@
 //  1. records errors the page throws while loading (Korean and English screens),
 //  2. runs every quest's example, predict, fill-in and answer code in Java, JavaScript and Python
 //     and compares the output with what the quest expects (same check as the game's grading),
-//  3. does the same for the HQ coding tests.
+//  3. does the same for the HQ coding tests and the job-interview questions (right answer = choices[0]).
 // Writes the result to $LOG_DIR/daily/YYYY-MM-DD.md (Korean date; LOG_DIR defaults to ./logs) and exits with 1
 // when something is wrong. The console only gets counts: details stay in the file (the logs repo is private).
 //
@@ -105,6 +105,19 @@ const CHECK = (lang) => `(async () => {
     if (q.write) await expect(q.id + ' 직접 쓰기', q.write.solution, q.write.expected, q.write.mustInclude);
   }
   for (const p of c.hq['${lang}']) await expect(p.id + ' (본사)', p.solution, p.expected, p.mustInclude);
+  for (const [i, q] of (c.interview?.['${lang}'] || []).entries()) {
+    const where = '면접 ' + (i + 1) + ' (' + q.stage + ', ' + (q.type || 'predict') + ')';
+    if (!q.type || q.type === 'predict') await expect(where, q.code, q.choices[0]);
+    else if (q.type === 'fill') await expect(where, q.code.replace(/\\{\\{(\\d+)\\}\\}/g, (_, n) => q.solution[n]), q.expected);
+    else if (q.type === 'bug') {
+      count++;
+      let r;
+      try { r = await timed(run(q.code), 30000, '실행'); } catch (e) { bad.push(where + ': ' + e.message); continue; }
+      if (q.errorLine != null && (r.ok || r.line !== q.errorLine)) bad.push(where + ': ' + q.errorLine + '번째 줄 에러가 나야 하는데 · ' + (r.ok ? '그냥 실행됨' : r.line + '번째 줄 에러'));
+      if (q.output != null && (!r.ok || norm(r.output) !== norm(q.output))) bad.push(where + ': 출력이 "' + q.output + '" 이어야 하는데 · ' + short(r.ok ? r.output : r.error));
+    }
+    if (q.choices && new Set(q.choices.map(norm)).size !== q.choices.length) bad.push(where + ': 선택지가 겹침');
+  }
   return { count, bad, quests: c.current['${lang}'].length };
 })()`;
 
@@ -114,6 +127,9 @@ let fatal = null;
 try {
   for (const ui of ['ko', 'en']) {
     screen = ui === 'ko' ? '한국어 화면' : '영어 화면';
+    // free the last page's Java/Python memory first (a second load in a full tab can fail to allocate)
+    await send('Page.navigate', { url: 'about:blank' });
+    await sleep(1000);
     await send('Page.navigate', { url: URL_ });
     await sleep(1500);
     await ev(prepare(ui) + ' location.reload()');

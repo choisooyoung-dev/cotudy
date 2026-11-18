@@ -2,13 +2,14 @@ import './style.css';
 import { installErrorLog, logError, playErrors, clearPlayErrors } from './errlog.js';
 import { createWorld } from './world/game.js';
 import { store, LOOKS as CHAR_LOOKS } from './store.js';
-import { STAGES } from './content/stages.js';
+import { stagesFor } from './content/stages.js';
 import { NPCS } from './content/npcs.js';
 import { QUESTS as JAVA_QUESTS } from './content/java/quests.js';
 import { QUESTS as JS_QUESTS } from './content/javascript/quests.js';
 import { QUESTS as PY_QUESTS } from './content/python/quests.js';
 import { RUNTIMES } from './runner/index.js';
 import { openMission, faceHTML } from './ui/mission.js';
+import { runHiring } from './ui/hire.js';
 import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
 import { runPython, warmUpPython } from './runner/python.js';
@@ -18,12 +19,18 @@ import { QUESTS as PY_QUESTS_EN } from './content/python/quests.en.js';
 import { QUESTS as JAVA_MORE } from './content/java/more.js';
 import { QUESTS as JS_MORE } from './content/javascript/more.js';
 import { QUESTS as PY_MORE } from './content/python/more.js';
+import { QUESTS as JS_ADV } from './content/javascript/advanced.js';
+import { QUESTS as JAVA_ADV } from './content/java/advanced.js';
+import { QUESTS as PY_ADV } from './content/python/advanced.js';
 import { isEn, tr, setUiLang, UI_LANG } from './i18n.js';
 import { TOUR_START, TOUR_STOPS, TOUR_END } from './content/tour.js';
 import { HQ_TESTS as JAVA_HQ } from './content/java/hq.js';
 import { HQ_TESTS as JS_HQ } from './content/javascript/hq.js';
 import { HQ_TESTS as PY_HQ } from './content/python/hq.js';
 import { RETRY_SPOT, OBJECT_SPOTS } from './world/layout.js';
+import { INTERVIEW as JAVA_IV } from './content/java/interview.js';
+import { INTERVIEW as JS_IV } from './content/javascript/interview.js';
+import { INTERVIEW as PY_IV } from './content/python/interview.js';
 
 // Start loading the language runtime first, before the 3D center is built, so it is ready sooner.
 // (The first Java load takes 10+ seconds on a new browser; after that the browser cache makes it ~2s.)
@@ -33,9 +40,9 @@ if (store.lang === 'python') warmUpPython();
 installErrorLog();
 
 const LANGS = [
-  { id: 'java', name: 'Java', icon: '<img class="lang-ico" src="./icons/java-original.svg" alt="">', quests: [...(isEn ? JAVA_QUESTS_EN : JAVA_QUESTS), ...JAVA_MORE] },
-  { id: 'javascript', name: 'JavaScript', icon: '<img class="lang-ico" src="./icons/javascript-original.svg" alt="">', quests: [...(isEn ? JS_QUESTS_EN : JS_QUESTS), ...JS_MORE] },
-  { id: 'python', name: 'Python', icon: '<img class="lang-ico" src="./icons/python-original.svg" alt="">', quests: [...(isEn ? PY_QUESTS_EN : PY_QUESTS), ...PY_MORE] },
+  { id: 'java', name: 'Java', icon: '<img class="lang-ico" src="./icons/java-original.svg" alt="">', quests: [...(isEn ? JAVA_QUESTS_EN : JAVA_QUESTS), ...JAVA_MORE, ...JAVA_ADV] },
+  { id: 'javascript', name: 'JavaScript', icon: '<img class="lang-ico" src="./icons/javascript-original.svg" alt="">', quests: [...(isEn ? JS_QUESTS_EN : JS_QUESTS), ...JS_MORE, ...JS_ADV] },
+  { id: 'python', name: 'Python', icon: '<img class="lang-ico" src="./icons/python-original.svg" alt="">', quests: [...(isEn ? PY_QUESTS_EN : PY_QUESTS), ...PY_MORE, ...PY_ADV] },
 ];
 
 const app = document.getElementById('app');
@@ -52,10 +59,12 @@ app.innerHTML = `
 const $ = (s) => app.querySelector(s);
 const langInfo = () => LANGS.find((l) => l.id === (store.lang || 'java'));
 let quests = langInfo().quests;
+let STAGES = stagesFor(store.lang || 'java'); // this language's stages, in order
 /** "인사팀 한지원" / "Jiwon · HR" */
 const whoOf = (npc) => (isEn ? `${npc.name} · ${npc.role}` : `${npc.role} ${npc.name}`);
 const LAP = tr('1회차', 'Lap 1');
 let busy = false;
+let interviewing = false; // HQ interview / offer mail on screen
 let touring = false; // first-day tour in progress: Jiwon leads, normal talking is off
 
 // ---------- progress ----------
@@ -73,13 +82,8 @@ function nextQuest() {
 }
 /** Progress of a language in % (default: the current one). Each 1회차 stage counts the same. */
 function percent(langId = store.lang || 'java', done = store.doneOf(langId)) {
-  const lang = LANGS.find((l) => l.id === langId);
-  let sum = 0;
-  for (const s of STAGES) {
-    const qs = (lang?.quests || []).filter((q) => q.stage === s.id);
-    if (qs.length) sum += qs.filter((q) => q.id in done).length / qs.length;
-  }
-  return Math.round((sum / STAGES.length) * 100);
+  const qs = LANGS.find((l) => l.id === langId)?.quests || [];
+  return qs.length ? Math.round((qs.filter((q) => q.id in done).length / qs.length) * 100) : 0;
 }
 
 /** Phone or tablet: you walk by touching the floor instead of arrow keys. */
@@ -264,7 +268,7 @@ async function talkTo(id) {
     if (v === 'replay') {
       const pick = await dialog({
         who, look, lines: [tr('어떤 걸 다시 해 볼래요?', 'Which one do you want to redo?')],
-        buttons: [...doneHere.map((x) => ({ label: `${x.title} ${'★'.repeat(store.stars(x.id))}`, value: x.id })), { label: tr('닫기', 'Close'), value: null, primary: true }],
+        buttons: [...doneHere.map((x) => ({ label: `${x.title} ${store.stars(x.id) ? '★'.repeat(store.stars(x.id)) : tr('· 면접 통과', '· passed in interview')}`, value: x.id })), { label: tr('닫기', 'Close'), value: null, primary: true }],
       });
       const rq = quests.find((x) => x.id === pick);
       if (rq) await startQuest(rq);
@@ -366,17 +370,43 @@ async function chooseLanguage() {
   });
   const first = !store.lang;
   if (!first && (!v || v === store.lang)) return; // closed, or picked the same language
-  store.setLang(v || 'java');
-  if (!first) { location.reload(); return; } // other language = other progress and position
-  quests = langInfo().quests;
-  if (store.lang === 'javascript') $('.java-state').textContent = '⚡ JavaScript';
-  if (store.lang === 'java') warmUpJava();
-  if (store.lang === 'python') { $('.java-state').textContent = tr('🐍 파이썬 준비 중…', '🐍 Getting Python ready…'); warmUpPython().then(() => { $('.java-state').textContent = tr('🐍 파이썬 준비 완료', '🐍 Python ready'); }); }
+  if (!first) { store.setLang(v); location.reload(); return; } // other language = other progress and position
+  applyLang(v || 'java');
   refresh();
   if (!store.toured) { runTour(); return; }
   toast(TOUCH
     ? tr('👆 바닥을 누른 채 끌면 따라 걸어요. 사람 옆에서 오른쪽 아래 버튼(또는 그 사람)을 누르면 말을 걸어요', '👆 Hold and drag on the floor to walk. Next to someone, tap the button at the bottom right (or them) to talk')
     : tr('⌨️ 방향키(또는 WASD)로 움직여요. 사람 앞에서 <kbd>Space</kbd> 를 누르면 말을 걸어요', '⌨️ Move with the arrow keys (or WASD). Press <kbd>Space</kbd> next to someone to talk'), 6000);
+}
+
+/** Sets the language of a character that has none yet and starts getting its runner ready. */
+function applyLang(id) {
+  store.setLang(id);
+  quests = langInfo().quests;
+  STAGES = stagesFor(id);
+  if (store.lang === 'javascript') $('.java-state').textContent = '⚡ JavaScript';
+  if (store.lang === 'java') warmUpJava();
+  if (store.lang === 'python') { $('.java-state').textContent = tr('🐍 파이썬 준비 중…', '🐍 Getting Python ready…'); warmUpPython().then(() => { $('.java-state').textContent = tr('🐍 파이썬 준비 완료', '🐍 Python ready'); }); }
+}
+
+// ---------- hiring: HQ interview → offer mail → first day (PLAN.md §8) ----------
+const INTERVIEWS = { java: JAVA_IV, javascript: JS_IV, python: PY_IV };
+async function startHiring() {
+  interviewing = true;
+  const { start, known } = await runHiring({
+    app, dialog, npcs: NPCS, whoOf, langs: LANGS,
+    pickLang: (id) => applyLang(id),
+    stagesFor,
+    questsFor: (id) => LANGS.find((l) => l.id === id)?.quests || [],
+    interviewFor: (id) => INTERVIEWS[id],
+    run: (id, code) => RUNTIMES[id].run(code),
+  });
+  store.setPlacement(start);
+  // concepts the interview showed they know count as done: "passed in interview" (0 stars until replayed)
+  for (const id of known) if (!store.isDone(id)) store.complete(id, 0);
+  interviewing = false;
+  refresh();
+  runTour();
 }
 
 // ---------- characters (one save each) ----------
@@ -404,7 +434,9 @@ async function chooseCharacter() {
   });
   if (v === 'new') return newCharacter();
   if (v && v !== store.charId) { store.switchChar(v); location.reload(); return; }
-  if (!store.lang) chooseLanguage();
+  if (!store.toured && (!store.lang || !store.placement)) startHiring();
+  else if (!store.toured) runTour();
+  else if (!store.lang) chooseLanguage();
 }
 async function newCharacter() {
   const used = new Set(store.chars.map((c) => c.lookIdx));
@@ -492,7 +524,10 @@ async function runTour() {
     }
     world.freeNpc(stop.npc);
   }
-  await speak(TOUR_END.lines);
+  const placed = store.placement && store.placement !== STAGES[0].id ? STAGES.find((s) => s.id === store.placement) : null;
+  await speak(placed
+    ? [{ who: 'han', text: tr(`김사원님은 면접 결과대로 ${placed.name}(${placed.topic})부터 시작해요! ${whoOf(NPCS[placed.npc])}님께 가 보세요. 저는 사무실로 돌아갈게요~`, `Kim, based on your interview you start at ${placed.name} (${placed.topic})! Go see ${whoOf(NPCS[placed.npc])}. I'll head back to the office~`) }]
+    : TOUR_END.lines);
   await world.walkNpc('han', TOUR_END.path, { lead: true });
   world.freeNpc('han');
   world.holdCup('me', false); world.holdCup('han', false);
@@ -502,6 +537,7 @@ async function runTour() {
   refresh();
   const q = nextQuest();
   if (q?.npc === 'han') await talkTo('han');
+  else if (q) toast(tr(`📍 ${NPCS[q.npc].name}님에게 가 보세요. 위쪽 「바로 가기」로 옆까지 갈 수 있어요`, `📍 Go see ${NPCS[q.npc].name}. The "Go there" button at the top takes you right next to them`), 6000);
 }
 
 // ---------- HQ staff visits ----------
@@ -525,7 +561,7 @@ const stageIsDone = (id) => { const st = STAGES.find((x) => x.id === id); return
 const hqAvailable = () => HQ_IDS.filter((id) => stageIsDone(NPCS[id].unlock));
 
 function checkHqVisit() {
-  if (hqVisitor || busy || touring || !store.lang) return;
+  if (hqVisitor || busy || touring || interviewing || !store.lang) return;
   const avail = hqAvailable();
   if (!avail.length) return;
   const h = store.hq;
@@ -760,6 +796,8 @@ function importSave() {
 refresh();
 setTimeout(checkHqVisit, 4000);
 if (!wasPicked() && (store.lang || store.chars.length > 1)) setTimeout(chooseCharacter, 400);
+else if (!store.toured && (!store.lang || !store.placement)) setTimeout(startHiring, 400); // new hire (or left mid-interview)
+else if (!store.toured) setTimeout(runTour, 400); // hired, left before the first-day tour ended
 else if (!store.lang) setTimeout(chooseLanguage, 400);
 markPicked();
 
@@ -780,4 +818,4 @@ if ((store.lang || 'java') === 'java') {
   $('.java-state').textContent = `⚡ ${langInfo().name}`;
 }
 // debug helper for development
-window.cotudy = { hq: { java: JAVA_HQ, javascript: JS_HQ, python: PY_HQ }, hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };
+window.cotudy = { hq: { java: JAVA_HQ, javascript: JS_HQ, python: PY_HQ }, interview: { java: JAVA_IV, javascript: JS_IV, python: PY_IV }, hqArrive: (id = 'hq1') => hqArrive(id), store, refresh, world, runJava, runJs, runPython, warm, talkTo, startQuest, runTour, current: Object.fromEntries(LANGS.map((l) => [l.id, l.quests])), quests: { java: JAVA_QUESTS, javascript: JS_QUESTS, python: PY_QUESTS, en: { java: JAVA_QUESTS_EN, javascript: JS_QUESTS_EN, python: PY_QUESTS_EN } } };

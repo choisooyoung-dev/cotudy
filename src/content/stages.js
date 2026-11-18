@@ -1,4 +1,4 @@
-// 1회차: the tutorial lap around the center. One stage = one area + one quest giver.
+// The stages, in order: 1회차 (the tutorial lap around the center) and then, per language, beyond the basics. One stage = one area + one quest giver.
 // A stage is finished when all its quests are done. Stages open in this order.
 // `zone` is the area id in src/world/layout.js. `quests` are ids from src/content/<lang>/.
 
@@ -15,6 +15,26 @@ const ALL = [
   { id: 'forklift',  name: '지게차 통로',   topic: '메서드 · 함수',    npc: 'choi', zone: 'receiving', en: { name: 'Forklift lane', topic: 'Methods and functions' } },
   { id: 'parttime',  name: '패킹 작업대',   topic: '맵 · 딕셔너리',    npc: 'kang', zone: 'packing',   en: { name: 'Packing bench', topic: 'Maps and dictionaries' } },
   { id: 'rest',      name: '센터장실',      topic: '클래스 · 예외 · 복습', npc: 'moon', zone: 'rest', en: { name: 'Director\'s office', topic: 'Classes, errors, review' } },
+  // beyond the basics: only for languages listed in `langs` (the concepts differ by language)
+  { id: 'js-fn',     name: '지게차 통로',   topic: '스코프 · 클로저',   npc: 'choi', zone: 'receiving', langs: ['javascript'], en: { name: 'Forklift lane', topic: 'Scope and closures' } },
+  { id: 'js-array',  name: '출고장',        topic: '콜백 · 배열 메서드', npc: 'oh',  zone: 'shipping',  langs: ['javascript'], en: { name: 'Shipping', topic: 'Callbacks and array methods' } },
+  { id: 'js-data',   name: '주문 출력실',   topic: '구조 분해 · JSON',  npc: 'lee',  zone: 'printing',  langs: ['javascript'], en: { name: 'Order printing', topic: 'Destructuring and JSON' } },
+  { id: 'js-class',  name: '센터장실',      topic: '상속',              npc: 'moon', zone: 'rest',      langs: ['javascript'], en: { name: 'Director\'s office', topic: 'Inheritance' } },
+  { id: 'js-async',  name: '택배 상차장',   topic: '비동기 · async',    npc: 'yoon', zone: 'shipping',  langs: ['javascript'], en: { name: 'Courier loading', topic: 'Async code' } },
+  { id: 'j-oop',     name: '센터장실',      topic: '캡슐화 · 상속 · 인터페이스', npc: 'moon', zone: 'rest',   langs: ['java'], en: { name: 'Director\'s office', topic: 'Encapsulation, inheritance, interfaces' } },
+  { id: 'j-tools',   name: '지게차 통로',   topic: 'static · enum',      npc: 'choi', zone: 'receiving', langs: ['java'], en: { name: 'Forklift lane', topic: 'static and enum' } },
+  { id: 'j-collect', name: '출고장',        topic: '제네릭 · 컬렉션',    npc: 'oh',   zone: 'shipping',  langs: ['java'], en: { name: 'Shipping', topic: 'Generics and collections' } },
+  { id: 'j-func',    name: '패킹 작업대',   topic: '람다 · 스트림',      npc: 'kang', zone: 'packing',   langs: ['java'], en: { name: 'Packing bench', topic: 'Lambdas and streams' } },
+  { id: 'j-error',   name: '택배 상차장',   topic: '직접 만든 예외',     npc: 'yoon', zone: 'shipping',  langs: ['java'], en: { name: 'Courier loading', topic: 'Custom exceptions' } },
+  { id: 'py-data',   name: '출고장',        topic: '컴프리헨션 · lambda · zip', npc: 'oh', zone: 'shipping', langs: ['python'], en: { name: 'Shipping', topic: 'Comprehensions, lambda, zip' } },
+  { id: 'py-func',   name: '지게차 통로',   topic: '인자 · 클로저 · 데코레이터', npc: 'choi', zone: 'receiving', langs: ['python'], en: { name: 'Forklift lane', topic: 'Arguments, closures, decorators' } },
+  { id: 'py-iter',   name: '패킹',          topic: '제너레이터',         npc: 'song', zone: 'packing',   langs: ['python'], en: { name: 'Packing', topic: 'Generators' } },
+  { id: 'py-class',  name: '센터장실',      topic: '상속 · 특별 메서드', npc: 'moon', zone: 'rest',      langs: ['python'], en: { name: 'Director\'s office', topic: 'Inheritance, special methods' } },
+  { id: 'py-error',  name: '택배 상차장',   topic: '예외 만들기 · with', npc: 'yoon', zone: 'shipping',  langs: ['python'], en: { name: 'Courier loading', topic: 'Custom exceptions, with' } },
 ];
 
-export const STAGES = ALL.map((s) => (isEn ? { ...s, ...s.en } : s));
+const ALL_L = ALL.map((s) => (isEn ? { ...s, ...s.en } : s));
+/** Every stage, in order (all languages). */
+export const STAGES = ALL_L;
+/** The stages of one language, in order. */
+export const stagesFor = (lang) => ALL_L.filter((s) => !s.langs || s.langs.includes(lang));
