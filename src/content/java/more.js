@@ -1743,8 +1743,8 @@ export const QUESTS = [
             {
                 title: t('맵으로 개수 세기', 'Counting with a map'),
                 body: t(
-                    '없으면 0 에서 시작해서 1 씩 더해요. <code>getOrDefault(키, 0) + 1</code> 을 다시 <code>put</code> 하는 게 흔한 모양이에요.',
-                    'Start at 0 if missing and add 1. Putting back <code>getOrDefault(key, 0) + 1</code> is the usual pattern.',
+                    '맵에 "이름 → 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄 <code>count.put(p, count.getOrDefault(p, 0) + 1);</code> 이 세 가지 일을 해요.<br>① <code>count.getOrDefault(p, 0)</code>: 지금까지 센 개수를 꺼내요. 처음 나온 이름이라 맵에 없으면 대신 0 을 줘요. (<code>get</code> 은 없으면 <code>null</code> 을 줘서 <code>+ 1</code> 하면 에러가 나요.)<br>② <code>+ 1</code>: 거기에 하나 더해요.<br>③ <code>count.put(p, …)</code>: 더한 값을 같은 키로 다시 넣어요. 같은 키에 <code>put</code> 하면 예전 값이 새 값으로 바뀌어요.<br>아래 예제에서 "A" 는 나올 때마다 1 → 2 → 3, "B" 는 1 이 돼요.',
+                    'Keep "name → count so far" in the map, and add 1 each time a name shows up. The one line in the loop, <code>count.put(p, count.getOrDefault(p, 0) + 1);</code>, does three things.<br>① <code>count.getOrDefault(p, 0)</code>: takes out the count so far. If the name is new and not in the map yet, it gives 0 instead. (<code>get</code> gives <code>null</code> when missing, and <code>+ 1</code> on it is an error.)<br>② <code>+ 1</code>: adds one to it.<br>③ <code>count.put(p, …)</code>: puts the new number back under the same key. A <code>put</code> to an existing key replaces the old value.<br>In the example below, "A" goes 1 → 2 → 3 each time it appears, and "B" becomes 1.',
                 ),
                 code: main(
                     'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A"));\nSystem.out.println(count.get("B"));',
