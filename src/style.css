@@ -1252,6 +1252,9 @@ kbd {
     .side-card {
         display: none;
     }
+    .side-card.learn-goal {
+        display: block; /* 휴대폰에서도 「이번에 배우는 것」은 보인다 */
+    }
     .npc .face {
         transform: scale(0.74);
         transform-origin: top left;
@@ -1777,4 +1780,15 @@ kbd {
 .iv-choice.sel b {
     background: #fff;
     color: var(--dgreen);
+}
+
+/* 미션 창 「🎯 이번에 배우는 개념」 */
+.side-card.learn-goal p {
+    margin: 4px 0 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+.side-card.learn-goal p.learn-name {
+    font-weight: 700;
+    font-size: 15px;
 }
