@@ -596,6 +596,25 @@ async function startQuest(q) {
     world.setFrozen(false);
     if (!res) return;
     store.complete(q.id, res.stars);
+    // 정답을 보고 끝냈으면 재도전 게시판에 붙이고, 정답 없이 다시 풀었으면 뗀다
+    const wasPinned = store.peeked.includes(q.id);
+    store.setPeeked(q.id, !!res.peeked);
+    if (res.peeked && !wasPinned)
+        toast(
+            tr(
+                `📌 「${q.title}」 퀘스트는 정답을 보고 끝내서 휴게실 재도전 게시판에 붙었어요`,
+                `📌 "${q.title}" was finished with the answer shown, so it's pinned on the break room Retry board`,
+            ),
+            4500,
+        );
+    else if (!res.peeked && wasPinned)
+        toast(
+            tr(
+                `✅ 「${q.title}」 정답 없이 통과! 게시판에서 뗐어요`,
+                `✅ "${q.title}" solved without the answer! Taken off the board`,
+            ),
+            4000,
+        );
     refresh();
     setTimeout(checkHqVisit, 2500);
     const after = currentStageIndex();
@@ -1206,13 +1225,14 @@ async function retryBoard() {
     const board = tr('재도전 게시판', 'Retry board');
     const tests = hqTests().filter((p) => h.failed.includes(p.id));
     const iv = store.interview?.lang === store.lang ? store.interview.items : [];
-    if (!tests.length && !iv.length) {
+    const peeked = store.peeked.map((id) => quests.find((q) => q.id === id)).filter(Boolean); // 정답 보고 끝낸 퀘스트
+    if (!tests.length && !iv.length && !peeked.length) {
         await dialog({
             who: board,
             lines: [
                 tr(
-                    '붙어 있는 문제가 없어요. 본사 직원이 내는 코딩테스트를 못 풀면 여기에 붙어요.',
-                    "Nothing pinned here. HQ coding tests you don't pass get pinned here.",
+                    '붙어 있는 문제가 없어요. 본사 직원이 내는 코딩테스트를 못 풀거나, 퀘스트를 정답을 보고 끝내면 여기에 붙어요.',
+                    "Nothing pinned here. HQ coding tests you don't pass, and quests you finish by showing the answer, get pinned here.",
                 ),
             ],
         });
@@ -1224,6 +1244,10 @@ async function retryBoard() {
         lines: [tr('다시 풀어 볼 문제를 골라요.', 'Pick a problem to try again.')],
         buttons: [
             ...tests.map((p) => ({ label: `📌 [${LEVEL[p.level]}] ${p.title}`, value: p.id })),
+            ...peeked.map((q) => ({
+                label: tr(`📝 [정답 보고 끝냄] ${q.title}`, `📝 [Answer shown] ${q.title}`),
+                value: 'quest:' + q.id,
+            })),
             ...(iv.length
                 ? [
                       {
@@ -1239,6 +1263,7 @@ async function retryBoard() {
         ],
     });
     if (pick === '__interview') return interviewReview();
+    if (pick?.startsWith('quest:')) return startQuest(peeked.find((q) => 'quest:' + q.id === pick));
     const p = tests.find((x) => x.id === pick);
     if (!p) return;
     if (await runHqTest(p))

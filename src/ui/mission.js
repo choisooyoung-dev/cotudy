@@ -118,7 +118,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             resolve(result);
         };
         bg.querySelector('.back').addEventListener('click', () => {
-            if (st.step === 'done') return close({ stars: starCount() });
+            if (st.step === 'done') return close({ stars: starCount(), peeked: st.solutionShown });
             if (
                 confirm(
                     test
@@ -136,7 +136,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         });
         /** 창이 열린 동안의 키보드 (Esc 로 닫기 등). */
         const onKey = (e) => {
-            if (e.key === 'Escape' && st.step === 'done') close({ stars: starCount() });
+            if (e.key === 'Escape' && st.step === 'done') close({ stars: starCount(), peeked: st.solutionShown });
         };
         addEventListener('keydown', onKey, true);
 
@@ -169,9 +169,24 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             reactEl?.remove();
             reactEl = document.createElement('div');
             reactEl.className = 'react' + (ok ? '' : ' err');
-            reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div>`;
+            reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div><button class="rclose" aria-label="${tr('닫기', 'Close')}">✕</button>`;
             win.appendChild(reactEl);
-            if (!ok) setTimeout(() => reactEl?.classList.contains('err') && reactEl.remove(), 6000);
+            // 누르면 닫힌다 (휴대폰에서 아래쪽 「다음」 버튼을 가리던 문제, 2026-11-19)
+            const el = reactEl;
+            el.addEventListener('click', () => {
+                el.remove();
+                if (reactEl === el) reactEl = null;
+            });
+            // 틀렸을 때는 6초, 휴대폰에서는 맞았을 때도 4초 뒤에 저절로 사라진다
+            const phone = matchMedia('(max-width: 700px)').matches;
+            if (!ok || phone)
+                setTimeout(
+                    () => {
+                        el.remove();
+                        if (reactEl === el) reactEl = null;
+                    },
+                    ok ? 4000 : 6000,
+                );
         }
         /** 반응 말풍선을 지운다. */
         const clearReact = () => {
@@ -634,9 +649,26 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             right.innerHTML = `<div class="done-screen">
         <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
         <h2>${test ? tr('코딩테스트 통과!', 'Coding test passed!') : tr('퀘스트 완료!', 'Quest complete!')} ${quest.title}</h2>
-        <p style="margin:0;opacity:.8">${stars === 3 ? tr('힌트 없이 해냈어요!', 'You did it without hints!') : stars === 2 ? tr('힌트를 보고 해냈어요. 다음엔 힌트 없이 도전!', 'You did it with hints. Try it without hints next time!') : tr('정답을 보고 끝냈어요. 나중에 안 보고 다시 써 봐요.', 'You finished after seeing the answer. Try writing it again later without looking.')}</p>
+        <p style="margin:0;opacity:.8">${
+            !st.solutionShown && st.hintsUsed === 0
+                ? tr('힌트 없이 해냈어요!', 'You did it without hints!')
+                : !st.solutionShown
+                  ? tr(
+                        '힌트를 보고 해냈어요. 다음엔 힌트 없이 도전!',
+                        'You did it with hints. Try it without hints next time!',
+                    )
+                  : test
+                    ? tr(
+                          '정답을 보고 끝냈어요. 나중에 안 보고 다시 써 봐요.',
+                          'You finished after seeing the answer. Try writing it again later without looking.',
+                      )
+                    : tr(
+                          '정답을 보고 끝냈어요. 휴게실 <b>재도전 게시판</b>에 붙여 둘게요. 나중에 정답을 안 보고 다시 풀면 떼어져요.',
+                          'You finished after seeing the answer, so it goes on the <b>Retry board</b> in the break room. Solve it again later without the answer to take it off.',
+                      )
+        }</p>
         <button class="btn go" style="font-size:17px;padding:10px 22px">${tr('센터로 돌아가기', 'Back to the center')}</button></div>`;
-            right.querySelector('.btn.go').addEventListener('click', () => close({ stars }));
+            right.querySelector('.btn.go').addEventListener('click', () => close({ stars, peeked: st.solutionShown }));
         }
 
         /** 지금 단계(st.step)에 맞는 화면을 그린다. 단계가 바뀔 때마다 부른다. */
