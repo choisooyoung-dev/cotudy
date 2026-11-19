@@ -1613,8 +1613,8 @@ export const QUESTS = [
             {
                 title: t('딕셔너리로 개수 세기', 'Counting with a dict'),
                 body: t(
-                    '없으면 0 에서 시작해서 1 씩 더해요. <code>d[k] = d.get(k, 0) + 1</code> 이 흔한 모양이에요.',
-                    'Start at 0 if missing and add 1. <code>d[k] = d.get(k, 0) + 1</code> is the usual pattern.',
+                    '딕셔너리에 "이름: 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄 <code>count[p] = count.get(p, 0) + 1</code> 은 오른쪽부터 세 가지 일을 해요.<br>① <code>count.get(p, 0)</code>: 지금까지 센 개수를 꺼내요. 처음 나온 이름이라 딕셔너리에 없으면 대신 0 을 줘요. (<code>count[p]</code> 로 바로 꺼내면 없는 키라서 <code>KeyError</code> 가 나요.)<br>② <code>+ 1</code>: 거기에 하나 더해요.<br>③ <code>count[p] = …</code>: 더한 값을 같은 키에 다시 넣어요. 이미 있는 키면 예전 값이 새 값으로 바뀌어요.<br>아래 예제에서 "A" 는 나올 때마다 1 → 2 → 3, "B" 는 1 이 돼요.',
+                    'Keep "name: count so far" in a dict, and add 1 each time a name shows up. The one line in the loop, <code>count[p] = count.get(p, 0) + 1</code>, does three things, starting from the right.<br>① <code>count.get(p, 0)</code>: takes out the count so far. If the name is new and not in the dict yet, it gives 0 instead. (Reading <code>count[p]</code> directly would raise <code>KeyError</code> for a missing key.)<br>② <code>+ 1</code>: adds one to it.<br>③ <code>count[p] = …</code>: puts the new number back under the same key. An existing key gets its old value replaced.<br>In the example below, "A" goes 1 → 2 → 3 each time it appears, and "B" becomes 1.',
                 ),
                 code: 'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])\nprint(count["B"])',
             },
