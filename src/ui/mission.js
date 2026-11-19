@@ -2,6 +2,7 @@
 // 본사 코딩테스트도 이 창을 쓰는데, 그때는 "직접 쓰기" 단계만 있다 (opts.test).
 import { codeView, codeEditor } from './code.js';
 import { tr } from '../i18n.js';
+import { goalOf } from '../content/goals.js';
 
 // 오른쪽 위의 단계 칸 5개 이름: 퀘스트의 단계마다 하나. 지금 단계 이름만 글자로 보인다.
 const STEP_NAMES = tr(
@@ -196,6 +197,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         /** 개념 공부 화면. */
         function renderConcept() {
             const cs = quest.concepts;
+            const goal = goalOf(quest.id, rt.name); // 「이번에 배우는 개념」 { name, what } (content/goals.js)
             const c = cs[st.ci];
             const reviewing = !!st.reviewFrom;
             left.innerHTML =
@@ -207,6 +209,9 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
                             tr('<br>먼저 이것부터 같이 봐요!', "<br>Let's look at this together first!")
                           : tr('천천히 봐도 괜찮아요~', 'Take your time!'),
                 ) +
+                (goal
+                    ? `<div class="card side-card learn-goal"><h4>${tr('🎯 이번에 배우는 개념', '🎯 Concept you learn')}</h4><p class="learn-name">${goal.name}</p><p>${goal.what}</p></div>`
+                    : '') +
                 `<div class="card side-card"><h4>${tr('이번 퀘스트에 필요한 개념', 'Concepts for this quest')}</h4><div class="clist">${cs.map((x, i) => `<div class="ci ${i === st.ci ? 'cur' : st.seen.has(i) ? 'done' : ''}" data-i="${i}">${st.seen.has(i) && i !== st.ci ? '✓ ' : i === st.ci ? '▶ ' : ''}${i + 1}. ${x.title}</div>`).join('')}</div></div>` +
                 `<div class="card side-card" style="font-size:13px">${tr('각 예제는 <b>▶ 실행해 보기</b>로 진짜 실행 결과를 볼 수 있어요. 개념을 다 보면 <b>문제 풀기</b>로 넘어가요.', "Press <b>▶ Try it</b> on each example to see the real output. When you've seen all the concepts, go on to <b>Solve</b>.")}</div>`;
             left.querySelectorAll('.ci').forEach((el) =>
