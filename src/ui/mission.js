@@ -169,9 +169,24 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             reactEl?.remove();
             reactEl = document.createElement('div');
             reactEl.className = 'react' + (ok ? '' : ' err');
-            reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div>`;
+            reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div><button class="rclose" aria-label="${tr('닫기', 'Close')}">✕</button>`;
             win.appendChild(reactEl);
-            if (!ok) setTimeout(() => reactEl?.classList.contains('err') && reactEl.remove(), 6000);
+            // 누르면 닫힌다 (휴대폰에서 아래쪽 「다음」 버튼을 가리던 문제, 2026-11-19)
+            const el = reactEl;
+            el.addEventListener('click', () => {
+                el.remove();
+                if (reactEl === el) reactEl = null;
+            });
+            // 틀렸을 때는 6초, 휴대폰에서는 맞았을 때도 4초 뒤에 저절로 사라진다
+            const phone = matchMedia('(max-width: 700px)').matches;
+            if (!ok || phone)
+                setTimeout(
+                    () => {
+                        el.remove();
+                        if (reactEl === el) reactEl = null;
+                    },
+                    ok ? 4000 : 6000,
+                );
         }
         /** 반응 말풍선을 지운다. */
         const clearReact = () => {
