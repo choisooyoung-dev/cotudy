@@ -478,7 +478,7 @@ kbd {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 22px;
+    padding: 0; /* 미션 창은 화면 전체를 쓴다 (코드가 길어도 한눈에 보이게, 2026-11-19) */
     animation: fadein 0.25s;
 }
 @keyframes fadein {
@@ -490,12 +490,11 @@ kbd {
     }
 }
 .win {
-    width: min(1240px, 100%);
-    height: min(780px, 100%);
+    width: 100%;
+    height: 100%;
     background: var(--paper);
-    border: 4px solid var(--line);
-    border-radius: 22px;
-    box-shadow: 0 6px 0 var(--line);
+    border: 0;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -565,9 +564,27 @@ kbd {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    padding: 16px 18px 16px 16px;
+    padding: 16px 18px 0 16px;
     gap: 12px;
     overflow: auto;
+}
+/* 오른쪽은 한 페이지처럼 스크롤된다: 코드 칸을 줄여서 안에서 스크롤시키지 않고 코드 전체를 보여 준다 */
+.win .right > * {
+    flex-shrink: 0;
+}
+.win .right .concept {
+    flex: 1 0 auto;
+}
+.win .right .editor.grow {
+    flex: 1 0 auto;
+    min-height: 320px;
+}
+.win .right .nav {
+    position: sticky;
+    bottom: 0;
+    background: var(--paper);
+    padding: 10px 0 14px;
+    z-index: 2;
 }
 .npc {
     display: flex;

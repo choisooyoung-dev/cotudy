@@ -94,11 +94,94 @@ export function codeView(code, { title = 'Main.java', blanks = null, badge, badg
     };
 }
 
+/**
+ * 중괄호 언어(Java, JavaScript)의 들여쓰기를 { } 깊이에 맞춰 다시 맞춘다. 한 단계는 공백 4칸.
+ * 문자열·글자·주석 안의 괄호는 세지 않고, switch 의 case 아래 줄은 한 칸 더 들여쓴다.
+ * 여러 줄에 걸친 JS 템플릿 문자열(`…`) 안의 줄은 건드리지 않는다.
+ */
+export function reindentBraces(src) {
+    const out = [];
+    let depth = 0;
+    let inBlock = false; // /* … */ 안
+    let inTpl = false; // ` … ` 안 (여러 줄)
+    const caseAt = []; // caseAt[d] = 이 깊이에서 case 를 만났는지
+    for (const raw of src.split('\n')) {
+        const startedInTpl = inTpl;
+        const t = raw.trim();
+        // 이 줄의 괄호 세기 (문자열·주석 제외)
+        let opens = 0,
+            closes = 0,
+            leading = 0,
+            seenCode = false;
+        for (let i = 0; i < t.length; i++) {
+            const ch = t[i];
+            if (inBlock) {
+                if (ch === '*' && t[i + 1] === '/') {
+                    inBlock = false;
+                    i++;
+                }
+                continue;
+            }
+            if (inTpl) {
+                if (ch === '\\') i++;
+                else if (ch === '`') inTpl = false;
+                continue;
+            }
+            if (ch === '/' && t[i + 1] === '/') break;
+            if (ch === '/' && t[i + 1] === '*') {
+                inBlock = true;
+                i++;
+                continue;
+            }
+            if (ch === '"' || ch === "'") {
+                for (i++; i < t.length && t[i] !== ch; i++) if (t[i] === '\\') i++;
+                seenCode = true;
+                continue;
+            }
+            if (ch === '`') {
+                inTpl = true;
+                seenCode = true;
+                continue;
+            }
+            if (ch === '{') opens++;
+            else if (ch === '}') {
+                if (!seenCode && opens === 0) leading++;
+                else if (opens > 0) opens--;
+                else closes++;
+            } else if (ch !== ' ') seenCode = true;
+        }
+        if (startedInTpl) {
+            out.push(raw); // 템플릿 문자열 안: 그대로
+            depth = Math.max(0, depth - leading - closes + opens);
+            continue;
+        }
+        // 맨 앞의 } 들은 이 줄부터 한 단계씩 내린다
+        for (let k = 0; k < leading; k++) {
+            caseAt[depth] = false;
+            depth = Math.max(0, depth - 1);
+        }
+        const isCase = /^(case\b.*|default\s*):/.test(t);
+        let level = depth + (caseAt[depth] && !isCase ? 1 : 0);
+        if (isCase) caseAt[depth] = true;
+        out.push(t ? ' '.repeat(level * 4) + t : '');
+        for (let k = 0; k < closes; k++) {
+            caseAt[depth] = false;
+            depth = Math.max(0, depth - 1);
+        }
+        for (let k = 0; k < opens; k++) caseAt[++depth] = false;
+    }
+    return out.join('\n');
+}
+
 /** Editable code box with highlight overlay, line numbers, Tab = 4 spaces. */
-export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor } = {}) {
+export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor, braces = true } = {}) {
+    // braces: 중괄호 언어(Java, JavaScript)면 true → 「정렬」 버튼과 } 자동 내어쓰기. Python 은 false.
     const el = document.createElement('div');
     el.className = 'editor grow';
-    el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="${tr('처음 코드로', 'Back to the starting code')}">${tr('처음으로', 'Reset')}</button>${badgeHTML(badge, badgeColor)}</div>
+    const fmtBtn = braces
+        ? `<button class="reset fmt" title="${tr('들여쓰기를 { } 에 맞춰 정렬 (Shift + Alt + F)', 'Line up the indentation with the { } (Shift + Alt + F)')}">${tr('정렬', 'Format')}</button>`
+        : '';
+    el.innerHTML = `<div class="tabbar"><span class="tab">${title}</span><button class="reset" title="${tr('처음 코드로', 'Back to the starting code')}">${tr('처음으로', 'Reset')}</button>${fmtBtn}${badgeHTML(badge, badgeColor)}</div>
   <div class="ed-wrap"><div class="ed-gutter"></div><div class="ed-area"><pre></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div></div>`;
     const ta = el.querySelector('textarea');
     const pre = el.querySelector('pre');
@@ -126,32 +209,92 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
         errLine = 0;
         render();
     });
+    const changed = () => ta.dispatchEvent(new Event('input')); // 화면 다시 그리기 + 미션 쪽 저장
+    /** [시작, 끝) 줄 범위: 선택 영역이 걸친 줄들의 맨 앞 위치와 끝 위치 */
+    const lineRange = () => {
+        const a = ta.value.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+        let b = ta.value.indexOf('\n', ta.selectionEnd - (ta.selectionEnd > ta.selectionStart ? 1 : 0));
+        if (b < 0) b = ta.value.length;
+        return [a, b];
+    };
+    const format = () => {
+        // 커서가 있던 줄과, 그 줄에서 들여쓰기 뒤 몇 번째 글자였는지를 기억해 두고 정렬 뒤에 되돌린다
+        const before = ta.value.slice(0, ta.selectionStart).split('\n');
+        const row = before.length - 1;
+        const oldLine = ta.value.split('\n')[row];
+        const col = Math.max(0, before[row].length - oldLine.match(/^ */)[0].length);
+        const next = reindentBraces(ta.value);
+        if (next === ta.value) return;
+        ta.value = next;
+        const lines = next.split('\n');
+        let pos = lines.slice(0, row).reduce((n, l) => n + l.length + 1, 0);
+        pos += Math.min(lines[row].match(/^ */)[0].length + col, lines[row].length);
+        ta.setSelectionRange(pos, pos);
+        changed();
+    };
     ta.addEventListener('keydown', (e) => {
         e.stopPropagation(); // don't move the character while typing
-        if (e.key === 'Tab') {
+        const s = ta.selectionStart,
+            en = ta.selectionEnd;
+        const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
+        const beforeCursor = ta.value.slice(lineStart, s);
+        if (e.key === 'Tab' && (e.shiftKey || ta.value.slice(s, en).includes('\n'))) {
+            // 여러 줄 선택 Tab → 한 칸씩 들여쓰기, Shift+Tab → 한 칸씩 내어쓰기
             e.preventDefault();
-            const s = ta.selectionStart,
-                en = ta.selectionEnd;
+            const [a, b] = lineRange();
+            const block = ta.value.slice(a, b);
+            const moved = block
+                .split('\n')
+                .map((l) => (e.shiftKey ? l.replace(/^ {1,4}/, '') : l ? '    ' + l : l))
+                .join('\n');
+            ta.setRangeText(moved, a, b, 'select');
+            if (s === en) {
+                const p = Math.max(a, s + (moved.length - block.length));
+                ta.setSelectionRange(p, p);
+            }
+            changed();
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
             ta.setRangeText('    ', s, en, 'end');
-            render();
+            changed();
         } else if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
-            // keep indentation
+            // 들여쓰기 유지, { 나 : 뒤면 한 칸 더, {|} 사이면 } 를 다음 줄로
             e.preventDefault();
-            const s = ta.selectionStart;
-            const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
-            const indent = ta.value.slice(lineStart).match(/^ */)[0];
-            const extra = ta.value[s - 1] === '{' || ta.value[s - 1] === ':' ? '    ' : '';
-            ta.setRangeText('\n' + indent + extra, s, ta.selectionEnd, 'end');
-            render();
+            const indent = beforeCursor.match(/^ */)[0];
+            const prev = ta.value.slice(lineStart, s).trimEnd();
+            const opens = prev.endsWith('{') || (!braces && prev.endsWith(':'));
+            if (braces && prev.endsWith('{') && ta.value.slice(en).match(/^ *\}/) && s === en) {
+                const after = ta.value.slice(en).match(/^ */)[0].length;
+                ta.setRangeText('\n' + indent + '    ' + '\n' + indent, s, en + after, 'start');
+                const p = s + 1 + indent.length + 4;
+                ta.setSelectionRange(p, p);
+            } else {
+                // Python: return·break·continue·pass·raise 다음 줄은 한 칸 내어 쓴다
+                const out = !braces && /^\s*(return|break|continue|pass|raise)\b/.test(prev);
+                const ind = out ? indent.slice(4) : indent + (opens ? '    ' : '');
+                ta.setRangeText('\n' + ind, s, en, 'end');
+            }
+            changed();
+        } else if (braces && e.key === '}' && /^ *$/.test(beforeCursor) && beforeCursor.length >= 4) {
+            // 빈 줄에서 } 를 치면 한 칸 내어 쓴다
+            e.preventDefault();
+            ta.setRangeText('}', s - 4, en, 'end');
+            changed();
+        } else if (braces && e.code === 'KeyF' && e.shiftKey && e.altKey) {
+            e.preventDefault();
+            format();
         } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
             e.preventDefault();
             onRun?.();
         }
     });
+    el.querySelector('.fmt')?.addEventListener('click', () => {
+        format();
+        ta.focus();
+    });
     el.querySelector('.reset').addEventListener('click', () => {
         ta.value = initial;
-        errLine = 0;
-        render();
+        changed();
         ta.focus();
     });
     requestAnimationFrame(render);
