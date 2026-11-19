@@ -571,7 +571,11 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
                 learnedCard();
             bindReview();
             right.innerHTML = '';
-            const ed = codeEditor(st.writeCode ?? w.starter, { ...look, onRun: () => run() });
+            const ed = codeEditor(st.writeCode ?? w.starter, {
+                ...look,
+                braces: rt.name !== 'Python',
+                onRun: () => run(),
+            });
             right.appendChild(ed.el);
             const bar = document.createElement('div');
             bar.className = 'runbar';
