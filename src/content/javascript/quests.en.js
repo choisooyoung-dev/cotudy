@@ -15,8 +15,9 @@ export const QUESTS = [
         concepts: [
             {
                 title: 'Print to the screen <code>console.log</code>',
-                body: '<code>console.log(…)</code> prints what is inside the parentheses and <b>moves to a new line</b>.<br>Text (a string) goes inside quotes. Double quotes <code>" "</code> and single quotes <code>\' \'</code> both work.',
-                code: 'console.log("Hello");\nconsole.log(\'I am Kim from logistics\');',
+                body: '<code>console.log(…)</code> prints what is inside the parentheses and <b>moves to a new line</b>. See the comments for how to wrap text.',
+                code: `console.log("Hello"); // text (a string) goes inside double quotes " "
+console.log('I am Kim from logistics'); // single quotes ' ' work too`,
                 note: 'Code runs <b>one line at a time, from the top</b>.',
             },
             {
@@ -148,8 +149,8 @@ export const QUESTS = [
             },
             {
                 title: 'Joining text and numbers with <code>+</code>',
-                body: 'Use <code>+</code> to attach a number or variable to a string, and they join into one line.<br>You can also wrap text in backticks <code>`</code> and use <code>${variable}</code> to put a value right inside the string.',
-                code: 'let boxCount = 12;\nconsole.log("Boxes: " + boxCount);\nconsole.log(`Boxes: ${boxCount}`);',
+                body: 'Two ways to print text together with numbers and variables on one line. See the comments.',
+                code: 'let boxCount = 12;\nconsole.log("Boxes: " + boxCount); // attach with + next to a string → Boxes: 12\nconsole.log(`Boxes: ${boxCount}`); // inside backticks `, the value goes into ${variable} → Boxes: 12',
             },
         ],
         predict: {
@@ -352,8 +353,10 @@ export const QUESTS = [
             },
             {
                 title: 'Turning strings into numbers and back',
-                body: 'If a value from the system comes in as the string <code>"12"</code>, + joins instead of adding. Turn it into a number with <code>Number("12")</code>. The other way is <code>String(12)</code>.',
-                code: 'let input = "12";\nconsole.log(input + 3);\nconsole.log(Number(input) + 3);',
+                body: 'If a value from the system is a string, <code>+</code> joins instead of adding. See the comments for how to convert it.',
+                code: `let input = "12"; // it has quotes, so it is a string, not a number
+console.log(input + 3); // string + number joins → 123
+console.log(Number(input) + 3); // Number(…): string to number → 15 (the other way is String(12))`,
             },
         ],
         predict: {

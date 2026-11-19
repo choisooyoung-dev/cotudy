@@ -43,22 +43,42 @@ export const QUESTS = [
             {
                 title: t('<code>private</code> 와 getter', '<code>private</code> and a getter'),
                 body: t(
-                    '필드 앞에 <code>private</code> 를 붙이면 <b>그 클래스 안에서만</b> 쓸 수 있어요. 밖에서 읽을 수 있게 <code>getQty()</code> 같은 메서드(getter)를 열어 둬요. 밖에서 <code>s.qty</code> 를 쓰면 컴파일 에러가 나요.',
-                    'Put <code>private</code> on a field and it can only be used <b>inside that class</b>. Open a method like <code>getQty()</code> (a getter) so others can read it. Writing <code>s.qty</code> outside is a compile error.',
+                    '필드를 <code>private</code> 으로 숨기고, 읽는 메서드(getter)만 열어 두는 방법이에요. 어디에 무엇을 쓰는지는 예제 주석을 보세요.',
+                    'Hide a field with <code>private</code> and open only a method that reads it (a getter). See the comments for what goes where.',
                 ),
-                code: prog(
-                    'Stock s = new Stock(12);\nSystem.out.println(s.getQty());',
-                    `class Stock {
-    private int qty;
+                code: t(
+                    prog(
+                        `Stock s = new Stock(12);
+// s.qty 를 쓰면 컴파일 에러 (private 이라서)
+System.out.println(s.getQty()); // getter 로 읽기 → 12`,
+                        `class Stock {
+    private int qty; // private: 이 클래스 안에서만 쓸 수 있어요
 
     Stock(int qty) {
         this.qty = qty;
     }
 
-    int getQty() {
+    int getQty() { // getter: 밖에서 읽을 수 있게 열어 둔 메서드
         return qty;
     }
 }`,
+                    ),
+                    prog(
+                        `Stock s = new Stock(12);
+// writing s.qty here is a compile error (it is private)
+System.out.println(s.getQty()); // read it through the getter → 12`,
+                        `class Stock {
+    private int qty; // private: only usable inside this class
+
+    Stock(int qty) {
+        this.qty = qty;
+    }
+
+    int getQty() { // getter: a method opened so others can read it
+        return qty;
+    }
+}`,
+                    ),
                 ),
             },
             {
@@ -437,21 +457,36 @@ class Driver extends Staff {
                     '<code>interface</code> and <code>implements</code>',
                 ),
                 body: t(
-                    '<code>interface</code> 는 "이런 메서드가 있다"는 <b>약속</b>만 적어요. <code>class … implements 인터페이스</code> 로 그 약속을 채워요. 인터페이스 메서드는 <code>public</code> 이라 채울 때도 <code>public</code> 을 붙여요.',
-                    'An <code>interface</code> only writes a <b>promise</b>: "these methods exist". A <code>class … implements Interface</code> fills in the promise. Interface methods are <code>public</code>, so the filled-in ones need <code>public</code> too.',
+                    '<code>interface</code> 는 "이런 메서드가 있다" 는 <b>약속</b>만 적어요. 약속을 채우는 법은 예제 주석을 보세요.',
+                    'An <code>interface</code> only writes a <b>promise</b>: "these methods exist". See the comments for how a class fills in the promise.',
                 ),
-                code: prog(
-                    `Packer p = new BubblePacker();
-System.out.println(p.pack("${t('유리병', 'Glass bottle')}"));`,
-                    `interface Packer {
-    String pack(String item);
+                code: t(
+                    prog(
+                        `Packer p = new BubblePacker(); // 인터페이스 타입 변수에 채운 클래스의 객체를 담아요
+System.out.println(p.pack("유리병"));`,
+                        `interface Packer {
+    String pack(String item); // 약속: { } 몸통 없이 메서드 모양만
 }
 
-class BubblePacker implements Packer {
-    public String pack(String item) {
-        return item + " → ${t('뽁뽁이', 'bubble wrap')}";
+class BubblePacker implements Packer { // implements: 이 약속을 채우겠다
+    public String pack(String item) { // 인터페이스 메서드는 public 이라 public 을 붙여요
+        return item + " → 뽁뽁이";
     }
 }`,
+                    ),
+                    prog(
+                        `Packer p = new BubblePacker(); // an interface-type variable holds an object of the class that fills it in
+System.out.println(p.pack("Glass bottle"));`,
+                        `interface Packer {
+    String pack(String item); // the promise: just the method shape, no { } body
+}
+
+class BubblePacker implements Packer { // implements: this class fills in the promise
+    public String pack(String item) { // interface methods are public, so add public
+        return item + " → bubble wrap";
+    }
+}`,
+                    ),
                 ),
             },
             {
@@ -658,16 +693,28 @@ System.out.println(a.mine + " " + b.mine + " " + Forklift.total);`,
                     '<code>static</code> methods: calling without an object',
                 ),
                 body: t(
-                    '<code>static</code> 메서드는 <code>new</code> 로 객체를 만들지 않고 <code>클래스이름.메서드()</code> 로 불러요. <code>Math.max</code>, <code>main</code> 도 static 이에요. static 메서드 안에서는 static 이 아닌 필드를 바로 못 써요.',
-                    "Call a <code>static</code> method as <code>ClassName.method()</code> without making an object with <code>new</code>. <code>Math.max</code> and <code>main</code> are static too. A static method can't use non-static fields directly.",
+                    '<code>static</code> 메서드는 객체를 만들지 않고 클래스 이름으로 불러요. static 메서드 안에서는 static 이 아닌 필드를 바로 못 써요.',
+                    'A <code>static</code> method is called through the class name, without making an object. A static method can not use non-static fields directly.',
                 ),
-                code: prog(
-                    'System.out.println(Calc.fee(10));\nSystem.out.println(Math.max(3, 7));',
-                    `class Calc {
-    static int fee(int kg) {
+                code: t(
+                    prog(
+                        `System.out.println(Calc.fee(10)); // 클래스이름.메서드(), new 없이 → 1500
+System.out.println(Math.max(3, 7)); // Math.max 도 static 메서드 (main 도 static) → 7`,
+                        `class Calc {
+    static int fee(int kg) { // static 메서드
         return kg * 150;
     }
 }`,
+                    ),
+                    prog(
+                        `System.out.println(Calc.fee(10)); // ClassName.method(), no new → 1500
+System.out.println(Math.max(3, 7)); // Math.max is a static method too (so is main) → 7`,
+                        `class Calc {
+    static int fee(int kg) { // a static method
+        return kg * 150;
+    }
+}`,
+                    ),
                 ),
             },
         ],
@@ -790,12 +837,24 @@ System.out.println("${t('출력: ', 'Printed: ')}" + Label.printed${t(' + "장"'
             {
                 title: t('<code>enum</code>: 정해진 값들', '<code>enum</code>: a fixed set of values'),
                 body: t(
-                    '<code>enum 이름 { A, B, C }</code> 는 쓸 수 있는 값을 정해 둔 타입이에요. 오타가 나면 컴파일 에러가 나요. 비교는 <code>==</code>, <code>ordinal()</code> 은 0 부터 시작하는 순서예요.',
-                    '<code>enum Name { A, B, C }</code> is a type with a fixed set of values. A typo is a compile error. Compare with <code>==</code>; <code>ordinal()</code> is the position, starting at 0.',
+                    '<code>enum</code> 은 쓸 수 있는 값을 정해 둔 타입이에요. 정해 두지 않은 값을 쓰면 컴파일 에러가 나요.',
+                    'An <code>enum</code> is a type with a fixed set of values. Using a value that is not in the set is a compile error.',
                 ),
-                code: prog(
-                    'Status s = Status.LOADING;\nSystem.out.println(s);\nSystem.out.println(s == Status.LOADING);\nSystem.out.println(s.ordinal());',
-                    'enum Status { READY, LOADING, DONE }',
+                code: t(
+                    prog(
+                        `Status s = Status.LOADING;
+System.out.println(s); // → LOADING
+System.out.println(s == Status.LOADING); // enum 비교는 == → true
+System.out.println(s.ordinal()); // ordinal(): 0 부터 센 순서 → 1`,
+                        'enum Status { READY, LOADING, DONE } // enum 이름 { 값, 값, 값 }',
+                    ),
+                    prog(
+                        `Status s = Status.LOADING;
+System.out.println(s); // → LOADING
+System.out.println(s == Status.LOADING); // compare enums with == → true
+System.out.println(s.ordinal()); // ordinal(): position counted from 0 → 1`,
+                        'enum Status { READY, LOADING, DONE } // enum Name { value, value, value }',
+                    ),
                 ),
             },
             {
@@ -804,23 +863,40 @@ System.out.println("${t('출력: ', 'Printed: ')}" + Label.printed${t(' + "장"'
                     '<code>values()</code> and <code>switch</code>',
                 ),
                 body: t(
-                    '<code>이름.values()</code> 는 모든 값을 순서대로 담은 배열이에요. <code>switch</code> 의 case 에는 <code>Status.</code> 없이 값 이름만 써요.',
-                    '<code>Name.values()</code> is an array of every value in order. In a <code>switch</code>, write case labels without <code>Status.</code>.',
+                    'enum 의 값을 모두 돌면서 <code>switch</code> 로 나눠요. 쓰는 법은 예제 주석을 보세요.',
+                    'Go through every value of an enum and branch with <code>switch</code>. See the comments for how.',
                 ),
-                code: prog(
-                    `for (Status s : Status.values()) {
+                code: t(
+                    prog(
+                        `for (Status s : Status.values()) { // values(): 모든 값을 순서대로 담은 배열
     switch (s) {
-        case READY:
-            System.out.println(s + ": ${t('대기', 'waiting')}");
+        case READY: // case 에는 Status. 없이 값 이름만
+            System.out.println(s + ": 대기");
             break;
         case LOADING:
-            System.out.println(s + ": ${t('싣는 중', 'loading')}");
+            System.out.println(s + ": 싣는 중");
             break;
         default:
-            System.out.println(s + ": ${t('끝', 'done')}");
+            System.out.println(s + ": 끝");
     }
 }`,
-                    'enum Status { READY, LOADING, DONE }',
+                        'enum Status { READY, LOADING, DONE }',
+                    ),
+                    prog(
+                        `for (Status s : Status.values()) { // values(): an array of every value in order
+    switch (s) {
+        case READY: // case labels use just the value name, no Status.
+            System.out.println(s + ": waiting");
+            break;
+        case LOADING:
+            System.out.println(s + ": loading");
+            break;
+        default:
+            System.out.println(s + ": done");
+    }
+}`,
+                        'enum Status { READY, LOADING, DONE }',
+                    ),
                 ),
             },
         ],
@@ -928,16 +1004,17 @@ System.out.println(Zone.{{1}}().length + "${t('개 구역', ' zones')}");`,
             {
                 title: t('제네릭 클래스 <code>Box&lt;T&gt;</code>', 'Generic class <code>Box&lt;T&gt;</code>'),
                 body: t(
-                    '<code>&lt;T&gt;</code> 는 "아직 정하지 않은 타입" 자리예요. 쓸 때 <code>Box&lt;String&gt;</code>, <code>Box&lt;Integer&gt;</code> 처럼 정해요. 숫자는 <code>int</code> 대신 <code>Integer</code> 로 써요. 뒤쪽 <code>&lt;&gt;</code> 는 비워도 돼요.',
-                    '<code>&lt;T&gt;</code> is a slot for "a type not decided yet". Decide it when you use it: <code>Box&lt;String&gt;</code>, <code>Box&lt;Integer&gt;</code>. Numbers use <code>Integer</code>, not <code>int</code>. The <code>&lt;&gt;</code> on the right can stay empty.',
+                    '<code>&lt;T&gt;</code> 는 "아직 정하지 않은 타입" 자리예요. 정하는 법은 예제 주석을 보세요.',
+                    '<code>&lt;T&gt;</code> is a slot for "a type not decided yet". See the comments for how to decide it.',
                 ),
-                code: prog(
-                    `Box<String> a = new Box<>();
-a.put("${t('립밤', 'Lip balm')}");
-Box<Integer> b = new Box<>();
+                code: t(
+                    prog(
+                        `Box<String> a = new Box<>(); // T 를 String 으로 정하기 (뒤쪽 <> 는 비워도 돼요)
+a.put("립밤");
+Box<Integer> b = new Box<>(); // 숫자는 int 대신 Integer
 b.put(12);
-System.out.println(a.get() + " " + (b.get() + 1));`,
-                    `class Box<T> {
+System.out.println(a.get() + " " + (b.get() + 1)); // → 립밤 13`,
+                        `class Box<T> { // T: 아직 정하지 않은 타입 자리
     private T item;
 
     void put(T item) {
@@ -948,17 +1025,38 @@ System.out.println(a.get() + " " + (b.get() + 1));`,
         return item;
     }
 }`,
+                    ),
+                    prog(
+                        `Box<String> a = new Box<>(); // T is String here (the <> on the right can stay empty)
+a.put("Lip balm");
+Box<Integer> b = new Box<>(); // numbers use Integer, not int
+b.put(12);
+System.out.println(a.get() + " " + (b.get() + 1)); // → Lip balm 13`,
+                        `class Box<T> { // T: a slot for a type not decided yet
+    private T item;
+
+    void put(T item) {
+        this.item = item;
+    }
+
+    T get() {
+        return item;
+    }
+}`,
+                    ),
                 ),
             },
             {
                 title: t('제네릭 메서드', 'Generic methods'),
                 body: t(
-                    '메서드에도 <code>&lt;T&gt;</code> 를 붙일 수 있어요. <code>static &lt;T&gt; T last(List&lt;T&gt; list)</code> 는 어떤 타입의 리스트든 받아서 그 타입으로 돌려줘요. <code>ArrayList&lt;String&gt;</code> 도 이렇게 만든 제네릭이에요.',
-                    'Methods can have <code>&lt;T&gt;</code> too. <code>static &lt;T&gt; T last(List&lt;T&gt; list)</code> takes a list of any type and returns that type. <code>ArrayList&lt;String&gt;</code> is a generic built the same way.',
+                    '메서드에도 <code>&lt;T&gt;</code> 를 붙일 수 있어요. <code>ArrayList&lt;String&gt;</code> 도 이렇게 만든 제네릭이에요.',
+                    'Methods can have <code>&lt;T&gt;</code> too. <code>ArrayList&lt;String&gt;</code> is a generic built the same way.',
                 ),
-                code: `${UTIL}
+                code: t(
+                    `${UTIL}
 
 public class Main {
+    // <T> T last(List<T> list): 어떤 타입의 리스트든 받아서, 그 타입으로 돌려줘요
     static <T> T last(List<T> list) {
         return list.get(list.size() - 1);
     }
@@ -968,9 +1066,26 @@ public class Main {
         names.add("A");
         names.add("B");
         List<Integer> kgs = Arrays.asList(3, 8, 5);
-        System.out.println(last(names) + " " + last(kgs));
+        System.out.println(last(names) + " " + last(kgs)); // T 가 String, Integer 로 정해져요 → B 5
     }
 }`,
+                    `${UTIL}
+
+public class Main {
+    // <T> T last(List<T> list): takes a list of any type and returns that type
+    static <T> T last(List<T> list) {
+        return list.get(list.size() - 1);
+    }
+
+    public static void main(String[] args) {
+        List<String> names = new ArrayList<>();
+        names.add("A");
+        names.add("B");
+        List<Integer> kgs = Arrays.asList(3, 8, 5);
+        System.out.println(last(names) + " " + last(kgs)); // T becomes String, then Integer → B 5
+    }
+}`,
+                ),
             },
         ],
         predict: {
@@ -1104,33 +1219,55 @@ class Shelf<{{0}}> {
             {
                 title: t('<code>Collections</code> 도우미', '<code>Collections</code> helpers'),
                 body: t(
-                    '<code>Collections.sort(리스트)</code> 는 작은 순으로 줄 세우고, <code>max</code> / <code>min</code> 은 가장 큰·작은 값, <code>reverse</code> 는 순서를 뒤집어요. <code>new ArrayList&lt;&gt;(Arrays.asList(…))</code> 로 값이 든 리스트를 바로 만들 수 있어요.',
-                    '<code>Collections.sort(list)</code> sorts smallest first, <code>max</code> / <code>min</code> give the largest/smallest, and <code>reverse</code> flips the order. <code>new ArrayList&lt;&gt;(Arrays.asList(…))</code> makes a list with values right away.',
+                    '<code>Collections</code> 는 리스트를 다루는 도우미 메서드를 모아 둔 클래스예요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    '<code>Collections</code> is a class full of helper methods for lists. What each one does is in the comments.',
                 ),
-                code: prog(
-                    `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8));
-Collections.sort(kgs);
-System.out.println(kgs);
-System.out.println(Collections.max(kgs) + " " + Collections.min(kgs));
-Collections.reverse(kgs);
-System.out.println(kgs);`,
-                    UTIL,
+                code: t(
+                    prog(
+                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8)); // 값이 든 리스트를 바로 만들기
+Collections.sort(kgs); // 작은 순으로 줄 세우기
+System.out.println(kgs); // → [3, 8, 12, 25]
+System.out.println(Collections.max(kgs) + " " + Collections.min(kgs)); // 가장 큰 값, 작은 값 → 25 3
+Collections.reverse(kgs); // 순서 뒤집기
+System.out.println(kgs); // → [25, 12, 8, 3]`,
+                        UTIL,
+                    ),
+                    prog(
+                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8)); // a list with values right away
+Collections.sort(kgs); // sort smallest first
+System.out.println(kgs); // → [3, 8, 12, 25]
+System.out.println(Collections.max(kgs) + " " + Collections.min(kgs)); // largest, smallest → 25 3
+Collections.reverse(kgs); // flip the order
+System.out.println(kgs); // → [25, 12, 8, 3]`,
+                        UTIL,
+                    ),
                 ),
             },
             {
                 title: t('<code>Set</code>: 중복 없는 모음', '<code>Set</code>: a collection without duplicates'),
                 body: t(
-                    '<code>Set</code> 은 같은 값을 두 번 넣어도 하나만 남아요. <code>TreeSet</code> 은 작은 순서로 정렬해서 보관해요. (<code>HashSet</code> 은 더 빠르지만 순서가 정해져 있지 않아요.)',
-                    'A <code>Set</code> keeps only one copy even if you add a value twice. A <code>TreeSet</code> keeps them sorted. (<code>HashSet</code> is faster but has no fixed order.)',
+                    '<code>Set</code> 은 같은 값을 두 번 넣어도 하나만 남는 모음이에요. (<code>HashSet</code> 은 더 빠르지만 순서가 정해져 있지 않아요.)',
+                    'A <code>Set</code> keeps only one copy even if you add a value twice. (<code>HashSet</code> is faster but has no fixed order.)',
                 ),
-                code: prog(
-                    `Set<String> zones = new TreeSet<>();
+                code: t(
+                    prog(
+                        `Set<String> zones = new TreeSet<>(); // TreeSet: 작은 순서로 정렬해서 보관
 zones.add("B");
 zones.add("A");
+zones.add("B"); // 이미 있는 값이라 안 늘어나요
+System.out.println(zones); // → [A, B]
+System.out.println(zones.size() + " " + zones.contains("C")); // → 2 false`,
+                        UTIL,
+                    ),
+                    prog(
+                        `Set<String> zones = new TreeSet<>(); // TreeSet: keeps values sorted
 zones.add("B");
-System.out.println(zones);
-System.out.println(zones.size() + " " + zones.contains("C"));`,
-                    UTIL,
+zones.add("A");
+zones.add("B"); // already there, so nothing is added
+System.out.println(zones); // → [A, B]
+System.out.println(zones.size() + " " + zones.contains("C")); // → 2 false`,
+                        UTIL,
+                    ),
                 ),
             },
         ],
@@ -1239,31 +1376,51 @@ System.out.println(${t('"택배사 " + uniq.size() + "곳: " + uniq', '"Couriers
             {
                 title: t('람다 <code>x -> …</code>', 'Lambdas <code>x -> …</code>'),
                 body: t(
-                    '<code>(매개변수) -> 결과</code> 는 이름 없는 짧은 메서드예요. <code>forEach</code> 는 칸마다 람다를 부르고, <code>removeIf</code> 는 람다가 <code>true</code> 인 칸을 빼요.',
-                    "<code>(params) -> result</code> is a short method with no name. <code>forEach</code> calls the lambda for each item, and <code>removeIf</code> removes the items where it's <code>true</code>.",
+                    '람다 <code>(매개변수) -> 결과</code> 는 이름 없는 짧은 메서드예요. 어디에 쓰는지는 예제 주석을 보세요.',
+                    'A lambda <code>(params) -> result</code> is a short method with no name. See the comments for where it is used.',
                 ),
-                code: prog(
-                    `List<String> items = new ArrayList<>(Arrays.asList(${t('"토너", "립밤", "쿠션팩트"', '"Toner", "Balm", "Cushion"')}));
-items.forEach(x -> System.out.println("- " + x));
-items.removeIf(x -> x.length() > ${t('2', '5')});
-System.out.println(items);`,
-                    UTIL,
+                code: t(
+                    prog(
+                        `List<String> items = new ArrayList<>(Arrays.asList("토너", "립밤", "쿠션팩트"));
+items.forEach(x -> System.out.println("- " + x)); // forEach: 칸마다 람다 부르기
+items.removeIf(x -> x.length() > 2); // removeIf: 람다가 true 인 칸 빼기 (3글자 이상)
+System.out.println(items); // → [토너, 립밤]`,
+                        UTIL,
+                    ),
+                    prog(
+                        `List<String> items = new ArrayList<>(Arrays.asList("Toner", "Balm", "Cushion"));
+items.forEach(x -> System.out.println("- " + x)); // forEach: calls the lambda for each item
+items.removeIf(x -> x.length() > 5); // removeIf: removes items where the lambda is true (over 5 letters)
+System.out.println(items); // → [Toner, Balm]`,
+                        UTIL,
+                    ),
                 ),
             },
             {
                 title: t('정렬 규칙을 람다로', 'A sorting rule as a lambda'),
                 body: t(
-                    '<code>리스트.sort((a, b) -> …)</code> 의 람다는 a 가 앞이면 음수, 뒤면 양수를 돌려줘요. 숫자 큰 순은 <code>b - a</code>, 글자 수 순은 <code>a.length() - b.length()</code>.',
-                    'In <code>list.sort((a, b) -> …)</code>, the lambda returns a negative number if a goes first, positive if after. Largest first is <code>b - a</code>; by length is <code>a.length() - b.length()</code>.',
+                    '<code>sort</code> 에 넘기는 람다는 두 값 a, b 를 받아서, a 가 앞이면 음수, 뒤면 양수를 돌려줘요.',
+                    'The lambda given to <code>sort</code> takes two values a and b, and returns a negative number if a goes first, positive if after.',
                 ),
-                code: prog(
-                    `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25));
-kgs.sort((a, b) -> b - a);
-System.out.println(kgs);
-List<String> names = new ArrayList<>(Arrays.asList(${t('"한빛로지스", "번개", "새벽배송"', '"Lightning", "Dawn", "Hanbit"')}));
-names.sort((a, b) -> a.length() - b.length());
-System.out.println(names);`,
-                    UTIL,
+                code: t(
+                    prog(
+                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25));
+kgs.sort((a, b) -> b - a); // b - a: 숫자 큰 순
+System.out.println(kgs); // → [25, 12, 3]
+List<String> names = new ArrayList<>(Arrays.asList("한빛로지스", "번개", "새벽배송"));
+names.sort((a, b) -> a.length() - b.length()); // 글자 수 적은 순
+System.out.println(names); // → [번개, 새벽배송, 한빛로지스]`,
+                        UTIL,
+                    ),
+                    prog(
+                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25));
+kgs.sort((a, b) -> b - a); // b - a: largest first
+System.out.println(kgs); // → [25, 12, 3]
+List<String> names = new ArrayList<>(Arrays.asList("Lightning", "Dawn", "Hanbit"));
+names.sort((a, b) -> a.length() - b.length()); // shortest name first
+System.out.println(names); // → [Dawn, Hanbit, Lightning]`,
+                        UTIL,
+                    ),
                 ),
             },
         ],
@@ -1364,29 +1521,53 @@ System.out.println(kgs);`,
                     'Streams: <code>filter</code> · <code>count</code> · <code>sum</code>',
                 ),
                 body: t(
-                    '<code>리스트.stream()</code> 으로 값을 흘려보내며 처리해요. <code>filter(람다)</code> 는 조건에 맞는 것만 통과, <code>count()</code> 는 개수(long), <code>mapToInt(…).sum()</code> 은 합계예요. 원래 리스트는 바뀌지 않아요.',
-                    "<code>list.stream()</code> processes values as they flow. <code>filter(lambda)</code> lets matching ones through, <code>count()</code> gives the count (a long), and <code>mapToInt(…).sum()</code> the total. The original list doesn't change.",
+                    '스트림은 리스트의 값을 흘려보내며 차례로 처리해요. 원래 리스트는 바뀌지 않아요.',
+                    'A stream processes a list by letting its values flow through steps. The original list does not change.',
                 ),
-                code: prog(
-                    `List<Integer> kgs = Arrays.asList(4, 18, 7, 25);
-long heavy = kgs.stream().filter(k -> k >= 10).count();
-int total = kgs.stream().mapToInt(k -> k).sum();
-System.out.println(heavy + " " + total);`,
-                    UTIL,
+                code: t(
+                    prog(
+                        `List<Integer> kgs = Arrays.asList(4, 18, 7, 25);
+// stream(): 흘려보내기, filter: 조건에 맞는 것만 통과, count(): 개수 (long)
+long heavy = kgs.stream().filter(k -> k >= 10).count(); // 18, 25 → 2
+// mapToInt(…).sum(): 합계
+int total = kgs.stream().mapToInt(k -> k).sum(); // 4 + 18 + 7 + 25 → 54
+System.out.println(heavy + " " + total); // → 2 54`,
+                        UTIL,
+                    ),
+                    prog(
+                        `List<Integer> kgs = Arrays.asList(4, 18, 7, 25);
+// stream(): let values flow, filter: only matching ones pass, count(): how many (a long)
+long heavy = kgs.stream().filter(k -> k >= 10).count(); // 18, 25 → 2
+// mapToInt(…).sum(): the total
+int total = kgs.stream().mapToInt(k -> k).sum(); // 4 + 18 + 7 + 25 → 54
+System.out.println(heavy + " " + total); // → 2 54`,
+                        UTIL,
+                    ),
                 ),
             },
             {
                 title: t('<code>map</code> 과 <code>collect</code>', '<code>map</code> and <code>collect</code>'),
                 body: t(
-                    '<code>map(람다)</code> 은 값을 바꿔서 흘려보내요. 끝에서 <code>collect(Collectors.toList())</code> 로 다시 리스트에 모아요. <code>import java.util.stream.*;</code> 이 필요해요.',
-                    '<code>map(lambda)</code> changes each value as it flows. At the end, <code>collect(Collectors.toList())</code> gathers them back into a list. It needs <code>import java.util.stream.*;</code>.',
+                    '스트림에서 값을 바꾸고 다시 리스트로 모으는 법이에요. <code>import java.util.stream.*;</code> 이 필요해요.',
+                    'Changing values in a stream and gathering them back into a list. It needs <code>import java.util.stream.*;</code>.',
                 ),
-                code: prog(
-                    `List<String> ids = Arrays.asList("a1", "b2", "c3");
+                code: t(
+                    prog(
+                        `List<String> ids = Arrays.asList("a1", "b2", "c3");
+// map: 값을 바꿔서 흘려보내기, collect(Collectors.toList()): 다시 리스트로 모으기
 List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
-System.out.println(big);
-System.out.println(String.join(", ", big));`,
-                    STREAM,
+System.out.println(big); // → [A1, B2, C3]
+System.out.println(String.join(", ", big)); // String.join: 사이에 ", " 를 넣어 붙이기 → A1, B2, C3`,
+                        STREAM,
+                    ),
+                    prog(
+                        `List<String> ids = Arrays.asList("a1", "b2", "c3");
+// map: change each value as it flows, collect(Collectors.toList()): gather back into a list
+List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
+System.out.println(big); // → [A1, B2, C3]
+System.out.println(String.join(", ", big)); // String.join: joins with ", " in between → A1, B2, C3`,
+                        STREAM,
+                    ),
                 ),
             },
         ],
@@ -1494,31 +1675,57 @@ System.out.println(${t('"1만 원 이상: " + n + "건, " + sum + "원"', '"1000
                     'Making an exception class, <code>throw</code> · <code>throws</code>',
                 ),
                 body: t(
-                    '<code>class 이름 extends Exception</code> 으로 우리만의 예외를 만들어요. <code>throw new 예외(메시지)</code> 로 던지고, 던질 수 있는 메서드는 이름 뒤에 <code>throws 예외</code> 를 적어요. 부르는 쪽은 <code>try</code> / <code>catch</code> 로 받아요.',
-                    'Make your own exception with <code>class Name extends Exception</code>. Throw it with <code>throw new Name(message)</code>, and a method that may throw it says <code>throws Name</code> after its name. The caller catches it with <code>try</code> / <code>catch</code>.',
+                    '<code>Exception</code> 을 상속해서 우리만의 예외를 만들어요. 던지고 받는 법은 예제 주석을 보세요.',
+                    'Extend <code>Exception</code> to make your own exception. See the comments for how to throw and catch it.',
                 ),
-                code: `class OverloadException extends Exception {
+                code: t(
+                    `class OverloadException extends Exception { // extends Exception: 우리만의 예외
     OverloadException(String msg) {
         super(msg);
     }
 }
 
 public class Main {
+    // throws: 이 메서드가 이 예외를 던질 수 있다고 적기
     static void load(int kg) throws OverloadException {
-        if (kg > 1000) throw new OverloadException(kg + "${t('kg 은 너무 무거워요', 'kg is too heavy')}");
-        System.out.println(kg + "${t('kg 실음', 'kg loaded')}");
+        if (kg > 1000) throw new OverloadException(kg + "kg 은 너무 무거워요"); // throw: 예외 던지기
+        System.out.println(kg + "kg 실음");
     }
 
     public static void main(String[] args) {
         try {
             load(800);
-            load(1200);
+            load(1200); // 여기서 예외 → 바로 catch 로 가서 load(500) 은 실행 안 돼요
             load(500);
-        } catch (OverloadException e) {
-            System.out.println("${t('멈춤: ', 'Stopped: ')}" + e.getMessage());
+        } catch (OverloadException e) { // 던진 예외 받기
+            System.out.println("멈춤: " + e.getMessage());
         }
     }
 }`,
+                    `class OverloadException extends Exception { // extends Exception: our own exception
+    OverloadException(String msg) {
+        super(msg);
+    }
+}
+
+public class Main {
+    // throws: says this method may throw this exception
+    static void load(int kg) throws OverloadException {
+        if (kg > 1000) throw new OverloadException(kg + "kg is too heavy"); // throw: throw the exception
+        System.out.println(kg + "kg loaded");
+    }
+
+    public static void main(String[] args) {
+        try {
+            load(800);
+            load(1200); // exception here → jumps straight to catch, so load(500) never runs
+            load(500);
+        } catch (OverloadException e) { // catch the thrown exception
+            System.out.println("Stopped: " + e.getMessage());
+        }
+    }
+}`,
+                ),
             },
             {
                 title: t('<code>finally</code>: 무슨 일이 있어도', '<code>finally</code>: no matter what'),

@@ -24,18 +24,40 @@ export const QUESTS = [
             {
                 title: t('사칙연산과 나머지 <code>%</code>', 'Math and remainder <code>%</code>'),
                 body: t(
-                    '<code>+ - * /</code> 로 계산해요. <code>/</code> 는 소수점까지 나와요. <code>%</code> 는 나눈 <b>나머지</b>, 몫만 필요하면 <code>Math.floor(a / b)</code>. 곱하기·나누기가 먼저, 괄호가 있으면 괄호부터예요.',
-                    'Use <code>+ - * /</code>. <code>/</code> keeps decimals. <code>%</code> gives the <b>remainder</b>; for the whole part use <code>Math.floor(a / b)</code>. Multiply/divide first, parentheses before that.',
+                    '사칙연산과 나머지 계산이에요. 곱하기·나누기가 먼저, 괄호가 있으면 괄호부터예요. 줄마다 결과는 예제 주석에 있어요.',
+                    'The four operations and the remainder. Multiply and divide first, and parentheses before that. The result of each line is in the comments.',
                 ),
-                code: 'console.log(10 + 3 * 2);\nconsole.log((10 + 3) * 2);\nconsole.log(23 / 5);\nconsole.log(Math.floor(23 / 5));\nconsole.log(23 % 5);',
+                code: t(
+                    `console.log(10 + 3 * 2); // 곱하기 먼저: 10 + 6 → 16
+console.log((10 + 3) * 2); // 괄호 먼저: 13 * 2 → 26
+console.log(23 / 5); // / 는 소수점까지 → 4.6
+console.log(Math.floor(23 / 5)); // Math.floor: 소수점 버리기, 몫만 → 4
+console.log(23 % 5); // % 는 나눈 나머지 → 3`,
+                    `console.log(10 + 3 * 2); // multiply first: 10 + 6 → 16
+console.log((10 + 3) * 2); // parentheses first: 13 * 2 → 26
+console.log(23 / 5); // / keeps decimals → 4.6
+console.log(Math.floor(23 / 5)); // Math.floor: drops decimals, the whole part → 4
+console.log(23 % 5); // % is the remainder → 3`,
+                ),
             },
             {
                 title: t('줄여 쓰기 <code>+=</code> <code>++</code>', 'Shortcuts <code>+=</code> <code>++</code>'),
                 body: t(
-                    '<code>a += 3</code> 은 <code>a = a + 3</code> 과 같아요. <code>a++</code> 는 1 더하기, <code>a--</code> 는 1 빼기예요.',
-                    '<code>a += 3</code> is the same as <code>a = a + 3</code>. <code>a++</code> adds 1, <code>a--</code> subtracts 1.',
+                    '<code>+=</code> 같은 줄여 쓰기는 "자기 값에 계산해서 다시 넣기" 를 짧게 쓴 거예요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'Shortcuts like <code>+=</code> are a short way to write "work it out with its own value and put it back". What each line does is in the comments.',
                 ),
-                code: 'let count = 10;\ncount += 5;\ncount++;\ncount -= 2;\nconsole.log(count);',
+                code: t(
+                    `let count = 10;
+count += 5; // count = count + 5 와 같아요 → 15
+count++; // 1 더하기 → 16 (count-- 는 1 빼기)
+count -= 2; // count = count - 2 → 14
+console.log(count);`,
+                    `let count = 10;
+count += 5; // same as count = count + 5 → 15
+count++; // add 1 → 16 (count-- subtracts 1)
+count -= 2; // count = count - 2 → 14
+console.log(count);`,
+                ),
             },
         ],
         predict: {
@@ -114,10 +136,23 @@ export const QUESTS = [
             {
                 title: t('비교 연산자', 'Comparison operators'),
                 body: t(
-                    '<code>&gt; &lt; &gt;= &lt;=</code> 로 비교하면 결과는 <code>true</code> 아니면 <code>false</code> 예요. 같다는 <code>===</code> (등호 세 개), 다르다는 <code>!==</code> 를 써요. 등호 두 개 <code>==</code> 는 타입을 멋대로 바꿔 비교해서 헷갈리기 쉬워요.',
-                    'Comparing with <code>&gt; &lt; &gt;= &lt;=</code> gives <code>true</code> or <code>false</code>. Use <code>===</code> (three signs) for equal and <code>!==</code> for not equal. The two-sign <code>==</code> converts types on its own and is easy to get wrong.',
+                    '비교 연산자로 두 값을 비교하면 결과는 <code>true</code> 아니면 <code>false</code> 예요. 같다·다르다는 <code>===</code> · <code>!==</code> 를 써요. 기호마다 뜻은 예제 주석에 있어요.',
+                    'Comparing two values gives <code>true</code> or <code>false</code>. Use <code>===</code> and <code>!==</code> for equal and not equal. What each symbol means is in the comments.',
                 ),
-                code: 'const price = 35000;\nconsole.log(price >= 30000);\nconsole.log(price === 30000);\nconsole.log(price !== 30000);\nconsole.log(5 == "5", 5 === "5");',
+                code: t(
+                    `// 비교 연산자: >  <  >=  <=  ===  !==
+const price = 35000;
+console.log(price >= 30000); // >= 크거나 같다 → true
+console.log(price === 30000); // === 같다 (등호 세 개) → false
+console.log(price !== 30000); // !== 다르다 → true
+console.log(5 == "5", 5 === "5"); // == 는 타입을 멋대로 바꿔서 true, === 는 false`,
+                    `// Comparison operators: >  <  >=  <=  ===  !==
+const price = 35000;
+console.log(price >= 30000); // >= greater than or equal → true
+console.log(price === 30000); // === equal (three signs) → false
+console.log(price !== 30000); // !== not equal → true
+console.log(5 == "5", 5 === "5"); // == converts types on its own, so true; === gives false`,
+                ),
             },
             {
                 title: t(
@@ -125,10 +160,21 @@ export const QUESTS = [
                     'and <code>&&</code>, or <code>||</code>, not <code>!</code>',
                 ),
                 body: t(
-                    '<code>&&</code> 는 둘 다 참일 때만 참, <code>||</code> 는 하나만 참이어도 참, <code>!</code> 는 반대로 바꿔요.',
-                    '<code>&&</code> is true only when both are true, <code>||</code> is true when either is, and <code>!</code> flips it.',
+                    '논리 연산자로 <code>true</code> / <code>false</code> 를 합치거나 뒤집어요. 기호마다 뜻은 예제 주석에 있어요.',
+                    'Logical operators combine or flip <code>true</code> / <code>false</code>. What each symbol means is in the comments.',
                 ),
-                code: 'const fragile = true;\nconst heavy = false;\nconsole.log(fragile && heavy);\nconsole.log(fragile || heavy);\nconsole.log(!heavy);',
+                code: t(
+                    `const fragile = true;
+const heavy = false;
+console.log(fragile && heavy); // && 그리고: 둘 다 참일 때만 참 → false
+console.log(fragile || heavy); // || 또는: 하나만 참이어도 참 → true
+console.log(!heavy); // ! 아니다: 반대로 바꾸기 → true`,
+                    `const fragile = true;
+const heavy = false;
+console.log(fragile && heavy); // && and: true only when both are true → false
+console.log(fragile || heavy); // || or: true when either is true → true
+console.log(!heavy); // ! not: flips it → true`,
+                ),
             },
         ],
         predict: {
@@ -379,10 +425,33 @@ export const QUESTS = [
             {
                 title: '<code>switch</code>',
                 body: t(
-                    '값 하나를 여러 경우와 비교할 때 써요. 맞는 <code>case</code> 부터 실행하고, <code>break</code> 에서 멈춰요. 맞는 게 없으면 <code>default</code>.',
-                    'Use it to compare one value against many cases. It runs from the matching <code>case</code> and stops at <code>break</code>. If nothing matches, <code>default</code> runs.',
+                    '값 하나를 여러 경우와 비교할 때 써요. 어떤 순서로 실행되는지는 예제 주석을 보세요.',
+                    'Use it to compare one value against many cases. See the comments for the order it runs in.',
                 ),
-                code: `const zone = "B";\nswitch (zone) {\n  case "A":\n    console.log("${t('1층', '1st floor')}");\n    break;\n  case "B":\n    console.log("${t('2층', '2nd floor')}");\n    break;\n  default:\n    console.log("${t('모르는 구역', 'Unknown zone')}");\n}`,
+                code: t(
+                    `const zone = "B";
+switch (zone) { // zone 과 같은 case 를 찾아요
+  case "A":
+    console.log("1층");
+    break;
+  case "B": // "B" 와 같아서 여기부터 실행
+    console.log("2층");
+    break; // break 에서 switch 를 빠져나가요
+  default: // 맞는 case 가 없을 때
+    console.log("모르는 구역");
+}`,
+                    `const zone = "B";
+switch (zone) { // looks for the case equal to zone
+  case "A":
+    console.log("1st floor");
+    break;
+  case "B": // equal to "B", so it runs from here
+    console.log("2nd floor");
+    break; // break leaves the switch
+  default: // when no case matches
+    console.log("Unknown zone");
+}`,
+                ),
             },
             {
                 title: t('<code>break</code> 를 빼면?', 'What if you leave out <code>break</code>?'),
@@ -704,10 +773,19 @@ export const QUESTS = [
             {
                 title: t('배열 만들기와 번호(인덱스)', 'Arrays and index numbers'),
                 body: t(
-                    '<code>[값, 값, …]</code> 으로 여러 값을 한 번에 담아요. 꺼낼 때는 <code>이름[번호]</code>, 번호는 <b>0 부터</b> 시작해요. 개수는 <code>.length</code>.',
-                    '<code>[value, value, …]</code> holds many values at once. Get one with <code>name[index]</code>; indexes start at <b>0</b>. The count is <code>.length</code>.',
+                    '배열은 여러 값을 한 번에 담아요. 만들고 꺼내는 법은 예제 주석을 보세요.',
+                    'An array holds many values at once. See the comments for how to make one and get values out.',
                 ),
-                code: `const couriers = ["${t('번개택배', 'Lightning')}", "${t('하늘택배', 'Sky')}", "${t('바다택배', 'Ocean')}"];\nconsole.log(couriers[0]);\nconsole.log(couriers[2]);\nconsole.log(couriers.length);`,
+                code: t(
+                    `const couriers = ["번개택배", "하늘택배", "바다택배"]; // [값, 값, …]
+console.log(couriers[0]); // 이름[번호], 번호는 0 부터 → 번개택배
+console.log(couriers[2]); // → 바다택배
+console.log(couriers.length); // .length: 개수 → 3`,
+                    `const couriers = ["Lightning", "Sky", "Ocean"]; // [value, value, …]
+console.log(couriers[0]); // name[index], indexes start at 0 → Lightning
+console.log(couriers[2]); // → Ocean
+console.log(couriers.length); // .length: how many → 3`,
+                ),
             },
             {
                 title: t('반복문으로 하나씩 보기', 'Going through with a loop'),
@@ -869,18 +947,48 @@ export const QUESTS = [
             {
                 title: t('넣고 빼기', 'Adding and removing'),
                 body: t(
-                    '<code>push(값)</code> 은 맨 뒤에 넣고, <code>pop()</code> 은 맨 뒤를 빼요. 맨 앞을 빼려면 <code>shift()</code>. 배열은 크기가 알아서 늘고 줄어요.',
-                    '<code>push(value)</code> adds to the end, <code>pop()</code> removes the last. To remove the first, use <code>shift()</code>. Arrays grow and shrink on their own.',
+                    '배열은 크기가 알아서 늘고 줄어요. 넣고 빼는 메서드는 예제 주석을 보세요.',
+                    'Arrays grow and shrink on their own. See the comments for the methods that add and remove.',
                 ),
-                code: `const list = [];\nlist.push("${t('토너', 'Toner')}");\nlist.push("${t('립밤', 'Lip balm')}");\nlist.push("${t('쿠션', 'Cushion')}");\nconsole.log(list.length);\nlist.pop();\nconsole.log(list);\nlist.shift();\nconsole.log(list);`,
+                code: t(
+                    `const list = [];
+list.push("토너"); // push(값): 맨 뒤에 넣기
+list.push("립밤");
+list.push("쿠션");
+console.log(list.length); // → 3
+list.pop(); // pop(): 맨 뒤 "쿠션" 빼기
+console.log(list);
+list.shift(); // shift(): 맨 앞 "토너" 빼기
+console.log(list);`,
+                    `const list = [];
+list.push("Toner"); // push(value): add to the end
+list.push("Lip balm");
+list.push("Cushion");
+console.log(list.length); // → 3
+list.pop(); // pop(): removes the last, "Cushion"
+console.log(list);
+list.shift(); // shift(): removes the first, "Toner"
+console.log(list);`,
+                ),
             },
             {
                 title: t('찾기와 중간 빼기', 'Finding and removing from the middle'),
                 body: t(
-                    '<code>includes(값)</code> 은 들어 있는지, <code>indexOf(값)</code> 은 몇 번째인지(없으면 -1). <code>splice(번호, 1)</code> 은 그 번호에서 하나를 빼요.',
-                    "<code>includes(value)</code> tells whether it's there, <code>indexOf(value)</code> where (-1 if not). <code>splice(index, 1)</code> removes one item at that index.",
+                    '배열에서 찾고 중간을 빼는 메서드예요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    'Methods for finding things in an array and removing from the middle. What each one does is in the comments.',
                 ),
-                code: 'const list = ["A", "B", "C"];\nconsole.log(list.includes("C"));\nconsole.log(list.indexOf("B"));\nlist.splice(1, 1);\nconsole.log(list);',
+                code: t(
+                    `const list = ["A", "B", "C"];
+console.log(list.includes("C")); // includes(값): 들어 있나? → true
+console.log(list.indexOf("B")); // indexOf(값): 몇 번째인가 (없으면 -1) → 1
+list.splice(1, 1); // splice(번호, 1): 1번에서 하나 빼기 ("B")
+console.log(list);`,
+                    `const list = ["A", "B", "C"];
+console.log(list.includes("C")); // includes(value): is it there? → true
+console.log(list.indexOf("B")); // indexOf(value): which index (-1 if missing) → 1
+list.splice(1, 1); // splice(index, 1): remove one item at index 1 ("B")
+console.log(list);`,
+                ),
             },
         ],
         predict: {
@@ -961,18 +1069,40 @@ export const QUESTS = [
             {
                 title: t('길이와 글자 하나', 'Length and one character'),
                 body: t(
-                    '<code>s.length</code> 는 글자 수, <code>s[번호]</code> 는 그 위치의 글자 하나예요. 번호는 0 부터. 맨 끝 글자는 <code>s.at(-1)</code>.',
-                    '<code>s.length</code> is the number of characters, <code>s[index]</code> is one character. Indexes start at 0. The last one is <code>s.at(-1)</code>.',
+                    '문자열의 글자 수와, 번호로 글자 하나를 꺼내는 법이에요. 번호는 0 부터예요.',
+                    'The length of a string, and getting one character by its index. Indexes start at 0.',
                 ),
-                code: 'const code = "KR20261112";\nconsole.log(code.length);\nconsole.log(code[0]);\nconsole.log(code.at(-1));',
+                code: t(
+                    `const code = "KR20261112";
+console.log(code.length); // .length: 글자 수 → 10
+console.log(code[0]); // s[번호]: 그 위치의 글자 하나 → K
+console.log(code.at(-1)); // at(-1): 맨 끝 글자 → 2`,
+                    `const code = "KR20261112";
+console.log(code.length); // .length: number of characters → 10
+console.log(code[0]); // s[index]: the character at that spot → K
+console.log(code.at(-1)); // at(-1): the last character → 2`,
+                ),
             },
             {
                 title: t('자르기와 대소문자', 'Cutting and case'),
                 body: t(
-                    '<code>slice(시작, 끝)</code> 은 시작부터 끝 <b>바로 앞</b>까지 잘라요. <code>toUpperCase()</code> 대문자, <code>toLowerCase()</code> 소문자, <code>trim()</code> 앞뒤 공백 지우기.',
-                    '<code>slice(start, end)</code> cuts from start up to <b>just before</b> end. <code>toUpperCase()</code>, <code>toLowerCase()</code>, and <code>trim()</code> removes spaces at both ends.',
+                    '문자열을 자르고 모양을 바꾸는 메서드들이에요. 원래 문자열은 그대로이고 새 문자열을 돌려줘요.',
+                    'Methods that cut a string or change how it looks. The original stays the same; you get a new string back.',
                 ),
-                code: 'const code = "  kr-778  ";\nconst clean = code.trim().toUpperCase();\nconsole.log(clean);\nconsole.log(clean.slice(0, 2));\nconsole.log(clean.slice(3));',
+                code: t(
+                    `const code = "  kr-778  ";
+// trim(): 앞뒤 공백 지우기, toUpperCase(): 대문자로 (toLowerCase() 는 소문자로)
+const clean = code.trim().toUpperCase();
+console.log(clean); // → KR-778
+console.log(clean.slice(0, 2)); // slice(시작, 끝): 0번부터 2번 바로 앞까지 → KR
+console.log(clean.slice(3)); // slice(시작): 3번부터 끝까지 → 778`,
+                    `const code = "  kr-778  ";
+// trim(): remove spaces at both ends, toUpperCase(): upper case (toLowerCase() for lower case)
+const clean = code.trim().toUpperCase();
+console.log(clean); // → KR-778
+console.log(clean.slice(0, 2)); // slice(start, end): from 0 up to just before 2 → KR
+console.log(clean.slice(3)); // slice(start): from 3 to the end → 778`,
+                ),
             },
         ],
         predict: {
@@ -1060,10 +1190,21 @@ export const QUESTS = [
             {
                 title: t('찾기와 바꾸기', 'Finding and replacing'),
                 body: t(
-                    '<code>includes(글자)</code> 는 들어 있는지, <code>indexOf(글자)</code> 는 몇 번째인지(없으면 -1). <code>replace(옛것, 새것)</code> 은 처음 하나만, <code>replaceAll</code> 은 전부 바꿔요.',
-                    "<code>includes(text)</code> tells whether it's there, <code>indexOf(text)</code> where (-1 if not). <code>replace(old, new)</code> changes the first one, <code>replaceAll</code> changes all.",
+                    '문자열 안에서 찾고 바꾸는 메서드들이에요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    'Methods for finding and replacing inside a string. What each one does is in the comments.',
                 ),
-                code: `const addr = "${t('서울시 강남구 테헤란로', 'Teheran-ro, Gangnam, Seoul')}";\nconsole.log(addr.includes("${t('강남', 'Gangnam')}"));\nconsole.log(addr.indexOf("${t('강남', 'Gangnam')}"));\nconsole.log("A-B-C".replace("-", "/"));\nconsole.log("A-B-C".replaceAll("-", "/"));`,
+                code: t(
+                    `const addr = "서울시 강남구 테헤란로";
+console.log(addr.includes("강남")); // includes(글자): 들어 있나? → true
+console.log(addr.indexOf("강남")); // indexOf(글자): 몇 번째에 있나 (없으면 -1) → 4
+console.log("A-B-C".replace("-", "/")); // replace(옛것, 새것): 처음 하나만 → A/B-C
+console.log("A-B-C".replaceAll("-", "/")); // replaceAll: 전부 → A/B/C`,
+                    `const addr = "Teheran-ro, Gangnam, Seoul";
+console.log(addr.includes("Gangnam")); // includes(text): is it there? → true
+console.log(addr.indexOf("Gangnam")); // indexOf(text): where it starts (-1 if missing) → 12
+console.log("A-B-C".replace("-", "/")); // replace(old, new): only the first one → A/B-C
+console.log("A-B-C".replaceAll("-", "/")); // replaceAll: every one → A/B/C`,
+                ),
             },
             {
                 title: t('나누기 <code>split</code>', 'Splitting with <code>split</code>'),
@@ -1155,10 +1296,17 @@ export const QUESTS = [
             {
                 title: t('숫자 서식', 'Number formatting'),
                 body: t(
-                    '<code>n.toLocaleString("en-US")</code> 는 천 단위 쉼표, <code>String(n).padStart(5, "0")</code> 은 5자리로 앞을 0 으로 채워요. <code>toFixed(1)</code> 은 소수 한 자리.',
-                    '<code>n.toLocaleString("en-US")</code> adds thousands commas, <code>String(n).padStart(5, "0")</code> pads to 5 digits with zeros. <code>toFixed(1)</code> gives one decimal place.',
+                    '숫자를 정해진 모양의 문자열로 바꾸는 메서드들이에요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    'Methods that turn a number into a string with a set shape. What each one does is in the comments.',
                 ),
-                code: 'console.log((1250000).toLocaleString("en-US"));\nconsole.log(String(42).padStart(5, "0"));\nconsole.log((2.345).toFixed(1));',
+                code: t(
+                    `console.log((1250000).toLocaleString("en-US")); // 천 단위 쉼표 → 1,250,000
+console.log(String(42).padStart(5, "0")); // padStart(5, "0"): 5자리로, 앞을 0 으로 채우기 → 00042
+console.log((2.345).toFixed(1)); // toFixed(1): 소수 한 자리 → 2.3`,
+                    `console.log((1250000).toLocaleString("en-US")); // thousands commas → 1,250,000
+console.log(String(42).padStart(5, "0")); // padStart(5, "0"): 5 digits, padded with 0 → 00042
+console.log((2.345).toFixed(1)); // toFixed(1): one decimal place → 2.3`,
+                ),
             },
         ],
         predict: {
@@ -1510,18 +1658,40 @@ export const QUESTS = [
             {
                 title: t('객체: 키로 값 찾기', 'Objects: find values by key'),
                 body: t(
-                    '<code>{ 키: 값, … }</code> 으로 키-값 짝을 담아요. <code>obj[키]</code> 나 <code>obj.키</code> 로 꺼내고, 같은 방법으로 넣거나 바꿔요.',
-                    '<code>{ key: value, … }</code> holds key-value pairs. Read with <code>obj[key]</code> or <code>obj.key</code>, and add or change the same way.',
+                    '객체는 키-값 짝을 담아요. 꺼내고 넣는 법은 예제 주석을 보세요.',
+                    'An object holds key-value pairs. See the comments for how to read and add values.',
                 ),
-                code: 'const stock = { toner: 12, lipbalm: 30 };\nconsole.log(stock["toner"]);\nconsole.log(stock.lipbalm);\nstock.toner = 10;\nstock["cushion"] = 8;\nconsole.log(stock);',
+                code: t(
+                    `const stock = { toner: 12, lipbalm: 30 }; // { 키: 값, … }
+console.log(stock["toner"]); // obj[키] 로 꺼내기 → 12
+console.log(stock.lipbalm); // obj.키 도 돼요 → 30
+stock.toner = 10; // 같은 방법으로 값 바꾸기
+stock["cushion"] = 8; // 없는 키면 새로 넣기
+console.log(stock);`,
+                    `const stock = { toner: 12, lipbalm: 30 }; // { key: value, … }
+console.log(stock["toner"]); // read with obj[key] → 12
+console.log(stock.lipbalm); // obj.key works too → 30
+stock.toner = 10; // change a value the same way
+stock["cushion"] = 8; // a new key gets added
+console.log(stock);`,
+                ),
             },
             {
                 title: t('있는지 확인하기', 'Checking a key'),
                 body: t(
-                    '<code>"키" in obj</code> 로 그 키가 있는지 봐요. 없는 키를 꺼내면 <code>undefined</code> 예요. 개수는 <code>Object.keys(obj).length</code>.',
-                    'Check with <code>"key" in obj</code>. A missing key gives <code>undefined</code>. The count is <code>Object.keys(obj).length</code>.',
+                    '없을 수도 있는 키를 다루는 법이에요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'How to deal with keys that may not be there. What each line does is in the comments.',
                 ),
-                code: 'const stock = { toner: 12 };\nconsole.log("cushion" in stock);\nconsole.log(stock.cushion);\nconsole.log(Object.keys(stock).length);',
+                code: t(
+                    `const stock = { toner: 12 };
+console.log("cushion" in stock); // "키" in obj: 그 키가 있나? → false
+console.log(stock.cushion); // 없는 키를 꺼내면 → undefined
+console.log(Object.keys(stock).length); // Object.keys(obj).length: 키 개수 → 1`,
+                    `const stock = { toner: 12 };
+console.log("cushion" in stock); // "key" in obj: is the key there? → false
+console.log(stock.cushion); // a missing key gives → undefined
+console.log(Object.keys(stock).length); // Object.keys(obj).length: number of keys → 1`,
+                ),
             },
         ],
         predict: {
@@ -1606,10 +1776,13 @@ export const QUESTS = [
             {
                 title: t('객체로 개수 세기', 'Counting with an object'),
                 body: t(
-                    '객체에 "이름: 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄 <code>count[p] = (count[p] || 0) + 1;</code> 은 오른쪽부터 세 가지 일을 해요.<br>① <code>count[p] || 0</code>: 지금까지 센 개수를 꺼내요. 처음 나온 이름이면 <code>count[p]</code> 가 <code>undefined</code> 라서 <code>|| 0</code> 이 0 으로 바꿔 줘요. (<code>undefined + 1</code> 은 <code>NaN</code> 이 돼요.)<br>② <code>+ 1</code>: 거기에 하나 더해요.<br>③ <code>count[p] = …</code>: 더한 값을 같은 키에 다시 넣어요. 이미 있는 키면 예전 값이 새 값으로 바뀌어요.<br>아래 예제에서 "A" 는 나올 때마다 1 → 2 → 3, "B" 는 1 이 돼요.',
-                    'Keep "name: count so far" in an object, and add 1 each time a name shows up. The one line in the loop, <code>count[p] = (count[p] || 0) + 1;</code>, does three things, starting from the right.<br>① <code>count[p] || 0</code>: takes out the count so far. For a new name <code>count[p]</code> is <code>undefined</code>, and <code>|| 0</code> turns it into 0. (<code>undefined + 1</code> would be <code>NaN</code>.)<br>② <code>+ 1</code>: adds one to it.<br>③ <code>count[p] = …</code>: puts the new number back under the same key. An existing key gets its old value replaced.<br>In the example below, "A" goes 1 → 2 → 3 each time it appears, and "B" becomes 1.',
+                    '객체에 "이름: 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄이 하는 일은 예제 주석 ①②③ 에 적어 두었어요(오른쪽부터 계산해요).<br>처음 나온 이름이면 <code>count[p]</code> 가 <code>undefined</code> 이고, <code>undefined + 1</code> 은 <code>NaN</code> 이 돼요. 그래서 <code>|| 0</code> 을 붙여요.',
+                    'Keep "name: count so far" in an object, and add 1 each time a name shows up. What the one line in the loop does is written in the example\'s comments ①②③ (it works from the right).<br>For a new name <code>count[p]</code> is <code>undefined</code>, and <code>undefined + 1</code> is <code>NaN</code>. That is why we add <code>|| 0</code>.',
                 ),
-                code: 'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  count[p] = (count[p] || 0) + 1;\n}\nconsole.log(count.A);\nconsole.log(count.B);',
+                code: t(
+                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: 지금까지 센 개수 (처음 나온 이름이면 0)\n  // ② + 1: 하나 더하기\n  // ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n  count[p] = (count[p] || 0) + 1;\n}\nconsole.log(count.A); // A 는 1 → 2 → 3\nconsole.log(count.B); // B 는 1',
+                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: the count so far (0 for a new name)\n  // ② + 1: add one\n  // ③ count[p] = …: put it back under the same key (replaces the old value)\n  count[p] = (count[p] || 0) + 1;\n}\nconsole.log(count.A); // A goes 1 → 2 → 3\nconsole.log(count.B); // B is 1',
+                ),
             },
             {
                 title: t('객체 전체 돌기', 'Going through a whole object'),
@@ -1798,10 +1971,43 @@ export const QUESTS = [
             {
                 title: t('객체의 메서드', 'Object methods'),
                 body: t(
-                    '클래스 안에 <code>이름() { … }</code> 으로 메서드를 만들면, <code>this</code> 로 그 객체의 값을 쓰고 바꿀 수 있어요. <code>객체.메서드()</code> 로 불러요.',
-                    "Write <code>name() { … }</code> inside the class to make a method; it can use and change the object's values through <code>this</code>. Call it with <code>object.method()</code>.",
+                    '클래스 안에 만든 함수를 메서드라고 해요. 만들고 부르는 법은 예제 주석을 보세요.',
+                    'A function written inside a class is called a method. See the comments for how to make and call one.',
                 ),
-                code: `class Item {\n  constructor(name, stock) {\n    this.name = name;\n    this.stock = stock;\n  }\n  sell(n) {\n    this.stock -= n;\n  }\n  label() {\n    return this.name + " (" + this.stock + ")";\n  }\n}\n\nconst t = new Item("${t('토너', 'Toner')}", 12);\nt.sell(3);\nconsole.log(t.label());`,
+                code: t(
+                    `class Item {
+  constructor(name, stock) {
+    this.name = name;
+    this.stock = stock;
+  }
+  sell(n) { // 메서드: 이름() { … }
+    this.stock -= n; // this: 이 메서드를 부른 객체 자신
+  }
+  label() {
+    return this.name + " (" + this.stock + ")";
+  }
+}
+
+const t = new Item("토너", 12);
+t.sell(3); // 객체.메서드() 로 부르기 → stock 이 12 에서 9 로
+console.log(t.label()); // → 토너 (9)`,
+                    `class Item {
+  constructor(name, stock) {
+    this.name = name;
+    this.stock = stock;
+  }
+  sell(n) { // a method: name() { … }
+    this.stock -= n; // this: the object the method was called on
+  }
+  label() {
+    return this.name + " (" + this.stock + ")";
+  }
+}
+
+const t = new Item("Toner", 12);
+t.sell(3); // call it with object.method() → stock goes from 12 to 9
+console.log(t.label()); // → Toner (9)`,
+                ),
             },
             {
                 title: t('객체 여러 개를 배열에', 'Many objects in an array'),
@@ -1899,10 +2105,39 @@ export const QUESTS = [
             {
                 title: t('직접 에러 던지기 <code>throw</code>', 'Throwing your own error'),
                 body: t(
-                    '<code>Number("abc")</code> 는 에러 대신 <code>NaN</code> (숫자 아님)을 줘요. 이럴 땐 <code>Number.isNaN</code> 으로 확인하고 <code>throw new Error("메시지")</code> 로 직접 에러를 던져요. <code>e.message</code> 로 메시지를 읽어요.',
-                    '<code>Number("abc")</code> gives <code>NaN</code> (not a number) instead of an error. Check with <code>Number.isNaN</code> and throw your own with <code>throw new Error("message")</code>. Read it with <code>e.message</code>.',
+                    '<code>Number("abc")</code> 는 에러 대신 <code>NaN</code> (숫자 아님)을 줘요. 그래서 직접 확인하고 에러를 던져요. 쓰는 법은 예제 주석을 보세요.',
+                    '<code>Number("abc")</code> gives <code>NaN</code> (not a number) instead of an error, so you check it and throw your own. See the comments for how.',
                 ),
-                code: `function toQty(s) {\n  const n = Number(s);\n  if (Number.isNaN(n)) throw new Error("${t('숫자 아님', 'not a number')}: " + s);\n  return n;\n}\n\ntry {\n  console.log(toQty("12"));\n  console.log(toQty("ab"));\n} catch (e) {\n  console.log(e.message);\n} finally {\n  console.log("${t('확인 끝', 'Check done')}");\n}`,
+                code: t(
+                    `function toQty(s) {
+  const n = Number(s);
+  if (Number.isNaN(n)) throw new Error("숫자 아님: " + s); // Number.isNaN 으로 확인, throw new Error(…) 로 던지기
+  return n;
+}
+
+try {
+  console.log(toQty("12")); // → 12
+  console.log(toQty("ab")); // 여기서 에러 → catch 로
+} catch (e) {
+  console.log(e.message); // e.message: 에러 메시지 → 숫자 아님: ab
+} finally { // finally: 에러가 나든 안 나든 마지막에 실행
+  console.log("확인 끝");
+}`,
+                    `function toQty(s) {
+  const n = Number(s);
+  if (Number.isNaN(n)) throw new Error("not a number: " + s); // check with Number.isNaN, throw with throw new Error(…)
+  return n;
+}
+
+try {
+  console.log(toQty("12")); // → 12
+  console.log(toQty("ab")); // error here → goes to catch
+} catch (e) {
+  console.log(e.message); // e.message: the error message → not a number: ab
+} finally { // finally: runs at the end, error or not
+  console.log("Check done");
+}`,
+                ),
             },
         ],
         predict: {

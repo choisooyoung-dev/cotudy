@@ -239,8 +239,11 @@ export const QUESTS = [
         concepts: [
             {
                 title: 'Big integers <code>long</code>',
-                body: '<code>int</code> only holds numbers up to about <b>2.1 billion</b>. The barcode <code>8801234567890</code> is bigger than that.<br>Put bigger integers in a <code>long</code>, and add <code>L</code> to the end of the number.',
-                code: main('long barcode = 8801234567890L;\nSystem.out.println(barcode);'),
+                body: '<code>int</code> only holds numbers up to about <b>2.1 billion</b>, so bigger whole numbers go in a <code>long</code>. See the comments in the example for how.',
+                code: main(`// 8801234567890 is bigger than 2.1 billion, so it does not fit in an int
+// Put it in a long, and add L to the end of the number
+long barcode = 8801234567890L;
+System.out.println(barcode);`),
                 note: 'Without the <code>L</code> you get an "integer number too large" error, because Java first tries to read the number as an int.',
             },
             {
@@ -314,10 +317,12 @@ export const QUESTS = [
             },
             {
                 title: 'Text <code>String</code>',
-                body: 'A <code>String</code> holds many characters. The <code>S</code> is uppercase.<br><code>+</code> works from left to right. So if numbers come first they are added, and once text comes first everything is joined.',
-                code: main(
-                    'String name = "Cushion compact";\nSystem.out.println(name + " arrived");\nSystem.out.println(1 + 2 + " boxes");\nSystem.out.println("Box" + 1 + 2);',
-                ),
+                body: 'A <code>String</code> holds many characters (text). See the comments in the example for how <code>+</code> is worked out.',
+                code: main(`String name = "Cushion compact"; // the S in String is uppercase
+System.out.println(name + " arrived");
+// + works from left to right
+System.out.println(1 + 2 + " boxes"); // 1 + 2 = 3 first, then " boxes" is joined → 3 boxes
+System.out.println("Box" + 1 + 2); // "Box" + 1 → "Box1", then + 2 → Box12`),
             },
         ],
         predict: {

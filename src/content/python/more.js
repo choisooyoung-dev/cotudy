@@ -27,18 +27,42 @@ export const QUESTS = [
                     'Math, floor division <code>//</code>, remainder <code>%</code>',
                 ),
                 body: t(
-                    '<code>+ - * /</code> 로 계산해요. <code>/</code> 는 소수점까지, <code>//</code> 는 몫만, <code>%</code> 는 <b>나머지</b>예요. <code>**</code> 는 거듭제곱. 곱하기·나누기가 먼저, 괄호가 있으면 괄호부터예요.',
-                    'Use <code>+ - * /</code>. <code>/</code> keeps decimals, <code>//</code> gives the whole part, <code>%</code> the <b>remainder</b>. <code>**</code> is a power. Multiply/divide first, parentheses before that.',
+                    '사칙연산과 몫·나머지·거듭제곱 계산이에요. 곱하기·나누기가 먼저, 괄호가 있으면 괄호부터예요. 줄마다 결과는 예제 주석에 있어요.',
+                    'The four operations, plus whole-part division, remainder and power. Multiply and divide first, and parentheses before that. The result of each line is in the comments.',
                 ),
-                code: 'print(10 + 3 * 2)\nprint((10 + 3) * 2)\nprint(23 / 5)\nprint(23 // 5)\nprint(23 % 5)\nprint(2 ** 3)',
+                code: t(
+                    `print(10 + 3 * 2)  # 곱하기 먼저: 10 + 6 → 16
+print((10 + 3) * 2)  # 괄호 먼저: 13 * 2 → 26
+print(23 / 5)  # / 는 소수점까지 → 4.6
+print(23 // 5)  # // 는 몫만 → 4
+print(23 % 5)  # % 는 나눈 나머지 → 3
+print(2 ** 3)  # ** 는 거듭제곱: 2 × 2 × 2 → 8`,
+                    `print(10 + 3 * 2)  # multiply first: 10 + 6 → 16
+print((10 + 3) * 2)  # parentheses first: 13 * 2 → 26
+print(23 / 5)  # / keeps decimals → 4.6
+print(23 // 5)  # // gives only the whole part → 4
+print(23 % 5)  # % is the remainder → 3
+print(2 ** 3)  # ** is a power: 2 × 2 × 2 → 8`,
+                ),
             },
             {
                 title: t('줄여 쓰기 <code>+=</code>', 'Shortcut <code>+=</code>'),
                 body: t(
-                    '<code>a += 3</code> 은 <code>a = a + 3</code> 과 같아요. <code>-=</code>, <code>*=</code> 도 있어요. 1 씩 늘릴 때도 <code>a += 1</code> 이라고 써요.',
-                    "<code>a += 3</code> is the same as <code>a = a + 3</code>. There's also <code>-=</code> and <code>*=</code>. To add 1, write <code>a += 1</code>.",
+                    '<code>+=</code> 같은 줄여 쓰기는 "자기 값에 계산해서 다시 넣기" 를 짧게 쓴 거예요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'Shortcuts like <code>+=</code> are a short way to write "work it out with its own value and put it back". What each line does is in the comments.',
                 ),
-                code: 'count = 10\ncount += 5\ncount += 1\ncount -= 2\nprint(count)',
+                code: t(
+                    `count = 10
+count += 5  # count = count + 5 와 같아요 → 15
+count += 1  # 1 씩 늘릴 때도 += 1 → 16
+count -= 2  # count = count - 2 → 14 (*= 도 있어요)
+print(count)`,
+                    `count = 10
+count += 5  # same as count = count + 5 → 15
+count += 1  # adding 1 is also += 1 → 16
+count -= 2  # count = count - 2 → 14 (there is *= too)
+print(count)`,
+                ),
             },
         ],
         predict: {
@@ -114,10 +138,21 @@ export const QUESTS = [
             {
                 title: t('비교 연산자', 'Comparison operators'),
                 body: t(
-                    '<code>&gt; &lt; &gt;= &lt;= == !=</code> 로 비교하면 결과는 <code>True</code> 아니면 <code>False</code> 예요. 같다는 <code>==</code> (등호 두 개), 다르다는 <code>!=</code>.',
-                    'Comparing with <code>&gt; &lt; &gt;= &lt;= == !=</code> gives <code>True</code> or <code>False</code>. Equal is <code>==</code> (two signs), not equal is <code>!=</code>.',
+                    '비교 연산자로 두 값을 비교하면 결과는 <code>True</code> 아니면 <code>False</code> 예요. 기호마다 뜻은 예제 주석에 있어요.',
+                    'Comparing two values with a comparison operator gives <code>True</code> or <code>False</code>. What each symbol means is in the comments.',
                 ),
-                code: 'price = 35000\nprint(price >= 30000)\nprint(price == 30000)\nprint(price != 30000)',
+                code: t(
+                    `# 비교 연산자: >  <  >=  <=  ==  !=
+price = 35000
+print(price >= 30000)  # >= 크거나 같다 → True
+print(price == 30000)  # == 같다 (등호 두 개) → False
+print(price != 30000)  # != 다르다 → True`,
+                    `# Comparison operators: >  <  >=  <=  ==  !=
+price = 35000
+print(price >= 30000)  # >= greater than or equal → True
+print(price == 30000)  # == equal (two signs) → False
+print(price != 30000)  # != not equal → True`,
+                ),
             },
             {
                 title: t(
@@ -125,10 +160,21 @@ export const QUESTS = [
                     '<code>and</code>, <code>or</code>, <code>not</code>',
                 ),
                 body: t(
-                    '<code>and</code> 는 둘 다 참일 때만 참, <code>or</code> 는 하나만 참이어도 참, <code>not</code> 은 반대로 바꿔요. 파이썬은 기호 대신 영어 단어를 써요.',
-                    '<code>and</code> is true only when both are, <code>or</code> when either is, and <code>not</code> flips it. Python uses English words for these.',
+                    '논리 연산자로 <code>True</code> / <code>False</code> 를 합치거나 뒤집어요. 기호 대신 영어 단어를 써요. 뜻은 예제 주석에 있어요.',
+                    'Logical operators combine or flip <code>True</code> / <code>False</code>, using English words instead of symbols. What each means is in the comments.',
                 ),
-                code: 'fragile = True\nheavy = False\nprint(fragile and heavy)\nprint(fragile or heavy)\nprint(not heavy)',
+                code: t(
+                    `fragile = True
+heavy = False
+print(fragile and heavy)  # and: 둘 다 참일 때만 참 → False
+print(fragile or heavy)  # or: 하나만 참이어도 참 → True
+print(not heavy)  # not: 반대로 바꾸기 → True`,
+                    `fragile = True
+heavy = False
+print(fragile and heavy)  # and: true only when both are true → False
+print(fragile or heavy)  # or: true when either is true → True
+print(not heavy)  # not: flips it → True`,
+                ),
             },
         ],
         predict: {
@@ -218,10 +264,23 @@ export const QUESTS = [
                     '<code>if</code>, <code>else</code>, and indentation',
                 ),
                 body: t(
-                    '<code>if 조건:</code> 다음 줄들은 <b>앞에 띄어쓰기 4칸</b>을 넣어요(들여쓰기). 들여쓴 줄만 조건이 True 일 때 실행돼요. <code>else:</code> 는 False 일 때예요. 콜론 <code>:</code> 을 잊지 마세요.',
-                    "Lines after <code>if condition:</code> start with <b>4 spaces</b> (indentation). Only the indented lines run when it's True. <code>else:</code> is for False. Don't forget the colon <code>:</code>.",
+                    '조건이 <code>True</code> 일 때와 <code>False</code> 일 때 다른 줄을 실행해요. 어느 줄이 조건에 속하는지는 들여쓰기로 정해요. 예제 주석을 보세요.',
+                    'Run different lines when the condition is <code>True</code> and when it is <code>False</code>. Indentation decides which lines belong to it. See the comments.',
                 ),
-                code: `stock = 3\norder = 5\nif stock >= order:\n    print("${t('피킹 가능', 'Ready to pick')}")\nelse:\n    print("${t('재고 부족', 'Not enough stock')}")`,
+                code: t(
+                    `stock = 3
+order = 5
+if stock >= order:  # if 조건: (콜론 : 을 잊지 마세요)
+    print("피킹 가능")  # 앞에 띄어쓰기 4칸(들여쓰기): 조건이 True 일 때만 실행
+else:  # else: 조건이 False 일 때
+    print("재고 부족")  # 3 >= 5 는 False 라서 이 줄이 실행돼요`,
+                    `stock = 3
+order = 5
+if stock >= order:  # if condition: (do not forget the colon :)
+    print("Ready to pick")  # 4 spaces in front (indentation): runs only when True
+else:  # else: when the condition is False
+    print("Not enough stock")  # 3 >= 5 is False, so this line runs`,
+                ),
             },
             {
                 title: t('여러 갈래 <code>elif</code>', 'Many branches <code>elif</code>'),
@@ -290,10 +349,21 @@ export const QUESTS = [
             {
                 title: t('문자열 비교', 'Comparing strings'),
                 body: t(
-                    '문자열도 <code>==</code> 로 같은지 비교해요. 대소문자가 다르면 다른 글자예요. 무시하고 싶으면 <code>lower()</code> 로 바꿔서 비교해요. <code>in</code> 으로 여러 값 중 하나인지도 볼 수 있어요.',
-                    "Compare strings with <code>==</code>. Different case means different text; to ignore case, use <code>lower()</code> first. <code>in</code> checks whether it's one of several values.",
+                    '문자열도 <code>==</code> 로 같은지 비교해요. 대소문자가 다르면 다른 글자예요. 다른 방법들은 예제 주석을 보세요.',
+                    'Compare strings with <code>==</code> too. Different case means different text. See the comments for other ways.',
                 ),
-                code: 'zone = "A"\nprint(zone == "A")\nprint(zone == "a")\nprint(zone.lower() == "a")\nprint(zone in ["A", "B"])',
+                code: t(
+                    `zone = "A"
+print(zone == "A")  # 글자가 같아요 → True
+print(zone == "a")  # 대소문자가 달라서 → False
+print(zone.lower() == "a")  # lower(): 소문자로 바꿔서 비교 → True
+print(zone in ["A", "B"])  # in: 여러 값 중 하나인가? → True`,
+                    `zone = "A"
+print(zone == "A")  # same text → True
+print(zone == "a")  # different case → False
+print(zone.lower() == "a")  # lower(): compare after making it lower case → True
+print(zone in ["A", "B"])  # in: is it one of these values? → True`,
+                ),
             },
             {
                 title: t('조건 합치기', 'Combining conditions'),
@@ -463,10 +533,17 @@ export const QUESTS = [
             {
                 title: t('<code>for</code> 와 <code>range</code>', '<code>for</code> and <code>range</code>'),
                 body: t(
-                    '<code>for i in range(1, 4):</code> 는 i 가 1, 2, 3 일 때 반복해요. <code>range(시작, 끝)</code> 은 끝 <b>바로 앞</b>까지예요. <code>range(3)</code> 은 0, 1, 2.',
-                    '<code>for i in range(1, 4):</code> repeats with i = 1, 2, 3. <code>range(start, end)</code> stops <b>just before</b> end. <code>range(3)</code> is 0, 1, 2.',
+                    '<code>for</code> 와 <code>range</code> 로 정해진 횟수만큼 반복해요. <code>range</code> 가 어떤 수를 내주는지는 예제 주석을 보세요.',
+                    'Repeat a set number of times with <code>for</code> and <code>range</code>. See the comments for which numbers <code>range</code> hands out.',
                 ),
-                code: `for i in range(1, 4):\n    print("${t('박스', 'Box')}", i)`,
+                code: t(
+                    `# range(시작, 끝): 끝 바로 앞까지 → 1, 2, 3 (range(3) 은 0, 1, 2)
+for i in range(1, 4):
+    print("박스", i)  # i 가 1, 2, 3 일 때 한 번씩`,
+                    `# range(start, end): stops just before end → 1, 2, 3 (range(3) is 0, 1, 2)
+for i in range(1, 4):
+    print("Box", i)  # once each for i = 1, 2, 3`,
+                ),
             },
             {
                 title: t('반복하면서 더하기 (누적)', 'Adding up in a loop'),
@@ -637,10 +714,21 @@ export const QUESTS = [
             {
                 title: t('한 줄에 이어 찍기', 'Printing on one line'),
                 body: t(
-                    '<code>print(…, end="")</code> 는 줄을 바꾸지 않아요. 줄 끝에서 <code>print()</code> 로 줄을 바꿔요. 같은 글자 반복은 <code>"■" * 4</code> 처럼 곱하기로도 돼요.',
-                    '<code>print(…, end="")</code> doesn\'t start a new line. Call <code>print()</code> at the end to move on. You can also repeat a string with <code>"■" * 4</code>.',
+                    '여러 번 찍은 것을 한 줄로 잇는 법이에요. 예제 주석을 보세요.',
+                    'How to put several prints on one line. See the comments.',
                 ),
-                code: 'for row in range(3):\n    for col in range(4):\n        print("■", end="")\n    print()\nprint("■" * 4)',
+                code: t(
+                    `for row in range(3):
+    for col in range(4):
+        print("■", end="")  # end="": 찍고 줄을 바꾸지 않아요
+    print()  # 줄 끝에서 줄 바꾸기
+print("■" * 4)  # 같은 글자 반복은 곱하기로도 돼요 → ■■■■`,
+                    `for row in range(3):
+    for col in range(4):
+        print("■", end="")  # end="": prints without a new line
+    print()  # new line at the end of each row
+print("■" * 4)  # repeating a string with * works too → ■■■■`,
+                ),
             },
         ],
         predict: {
@@ -711,10 +799,19 @@ export const QUESTS = [
             {
                 title: t('리스트 만들기와 번호(인덱스)', 'Lists and index numbers'),
                 body: t(
-                    '<code>[값, 값, …]</code> 으로 여러 값을 한 번에 담아요. 꺼낼 때는 <code>이름[번호]</code>, 번호는 <b>0 부터</b>. 맨 끝은 <code>[-1]</code>. 개수는 <code>len(리스트)</code>.',
-                    '<code>[value, value, …]</code> holds many values at once. Get one with <code>name[index]</code>; indexes start at <b>0</b>. The last is <code>[-1]</code>. The count is <code>len(list)</code>.',
+                    '리스트는 여러 값을 한 번에 담아요. 만들고 꺼내는 법은 예제 주석을 보세요.',
+                    'A list holds many values at once. See the comments for how to make one and get values out.',
                 ),
-                code: `couriers = ["${t('번개택배', 'Lightning')}", "${t('하늘택배', 'Sky')}", "${t('바다택배', 'Ocean')}"]\nprint(couriers[0])\nprint(couriers[-1])\nprint(len(couriers))`,
+                code: t(
+                    `couriers = ["번개택배", "하늘택배", "바다택배"]  # [값, 값, …]
+print(couriers[0])  # 이름[번호], 번호는 0 부터 → 번개택배
+print(couriers[-1])  # [-1]: 맨 끝 → 바다택배
+print(len(couriers))  # len(리스트): 개수 → 3`,
+                    `couriers = ["Lightning", "Sky", "Ocean"]  # [value, value, …]
+print(couriers[0])  # name[index], indexes start at 0 → Lightning
+print(couriers[-1])  # [-1]: the last one → Ocean
+print(len(couriers))  # len(list): how many → 3`,
+                ),
             },
             {
                 title: t('반복문으로 하나씩 보기', 'Going through with a loop'),
@@ -798,10 +895,19 @@ export const QUESTS = [
             {
                 title: t('값 바꾸기, 기본 함수', 'Changing values, built-in functions'),
                 body: t(
-                    '<code>리스트[번호] = 새 값</code> 으로 그 칸의 값을 바꿔요. <code>sum()</code>, <code>max()</code>, <code>min()</code> 으로 합계·최댓값·최솟값을 바로 구할 수도 있어요.',
-                    '<code>list[index] = newValue</code> changes that slot. <code>sum()</code>, <code>max()</code> and <code>min()</code> give the total, max and min right away.',
+                    '리스트 칸의 값을 바꾸고, 기본 함수로 합계·최댓값·최솟값을 바로 구해요.',
+                    'Change the value in a slot, and get the total, max and min right away with built-in functions.',
                 ),
-                code: 'w = [4, 9, 2]\nw[2] = 6\nprint(w)\nprint(sum(w), max(w), min(w))',
+                code: t(
+                    `w = [4, 9, 2]
+w[2] = 6  # 리스트[번호] = 새 값: 2번 칸을 6 으로
+print(w)  # → [4, 9, 6]
+print(sum(w), max(w), min(w))  # sum 합계, max 최댓값, min 최솟값 → 19 9 4`,
+                    `w = [4, 9, 2]
+w[2] = 6  # list[index] = new value: slot 2 becomes 6
+print(w)  # → [4, 9, 6]
+print(sum(w), max(w), min(w))  # sum total, max largest, min smallest → 19 9 4`,
+                ),
             },
             {
                 title: t('직접 찾기, 개수 세기', 'Finding and counting yourself'),
@@ -879,18 +985,48 @@ export const QUESTS = [
             {
                 title: t('넣고 빼기', 'Adding and removing'),
                 body: t(
-                    '<code>append(값)</code> 은 맨 뒤에 넣고, <code>pop()</code> 은 맨 뒤를 빼요. <code>pop(0)</code> 은 맨 앞을 빼요. 리스트는 크기가 알아서 늘고 줄어요.',
-                    '<code>append(value)</code> adds to the end, <code>pop()</code> removes the last, and <code>pop(0)</code> removes the first. Lists grow and shrink on their own.',
+                    '리스트는 크기가 알아서 늘고 줄어요. 넣고 빼는 메서드는 예제 주석을 보세요.',
+                    'Lists grow and shrink on their own. See the comments for the methods that add and remove.',
                 ),
-                code: `items = []\nitems.append("${t('토너', 'Toner')}")\nitems.append("${t('립밤', 'Lip balm')}")\nitems.append("${t('쿠션', 'Cushion')}")\nprint(len(items))\nitems.pop()\nprint(items)\nitems.pop(0)\nprint(items)`,
+                code: t(
+                    `items = []
+items.append("토너")  # append(값): 맨 뒤에 넣기
+items.append("립밤")
+items.append("쿠션")
+print(len(items))  # → 3
+items.pop()  # pop(): 맨 뒤 "쿠션" 빼기
+print(items)  # → ['토너', '립밤']
+items.pop(0)  # pop(0): 맨 앞 "토너" 빼기
+print(items)  # → ['립밤']`,
+                    `items = []
+items.append("Toner")  # append(value): add to the end
+items.append("Lip balm")
+items.append("Cushion")
+print(len(items))  # → 3
+items.pop()  # pop(): removes the last, "Cushion"
+print(items)  # → ['Toner', 'Lip balm']
+items.pop(0)  # pop(0): removes the first, "Toner"
+print(items)  # → ['Lip balm']`,
+                ),
             },
             {
                 title: t('찾기와 값으로 빼기', 'Finding and removing by value'),
                 body: t(
-                    '<code>값 in 리스트</code> 는 들어 있는지, <code>index(값)</code> 은 몇 번째인지, <code>remove(값)</code> 은 그 값을 빼요.',
-                    "<code>value in list</code> tells whether it's there, <code>index(value)</code> where, and <code>remove(value)</code> removes it.",
+                    '리스트에서 찾고 값으로 빼는 법이에요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'Finding in a list and removing by value. What each line does is in the comments.',
                 ),
-                code: 'items = ["A", "B", "C"]\nprint("C" in items)\nprint(items.index("B"))\nitems.remove("B")\nprint(items)',
+                code: t(
+                    `items = ["A", "B", "C"]
+print("C" in items)  # 값 in 리스트: 들어 있나? → True
+print(items.index("B"))  # index(값): 몇 번째인가 → 1
+items.remove("B")  # remove(값): 그 값을 빼기
+print(items)  # → ['A', 'C']`,
+                    `items = ["A", "B", "C"]
+print("C" in items)  # value in list: is it there? → True
+print(items.index("B"))  # index(value): which index → 1
+items.remove("B")  # remove(value): remove that value
+print(items)  # → ['A', 'C']`,
+                ),
             },
         ],
         predict: {
@@ -977,18 +1113,40 @@ export const QUESTS = [
             {
                 title: t('길이와 글자 하나', 'Length and one character'),
                 body: t(
-                    '<code>len(s)</code> 는 글자 수, <code>s[번호]</code> 는 그 위치의 글자 하나예요. 번호는 0 부터, 맨 끝은 <code>s[-1]</code>.',
-                    '<code>len(s)</code> is the number of characters, <code>s[index]</code> is one character. Indexes start at 0, the last is <code>s[-1]</code>.',
+                    '문자열의 글자 수와, 번호로 글자 하나를 꺼내는 법이에요. 번호는 0 부터예요.',
+                    'The length of a string, and getting one character by its index. Indexes start at 0.',
                 ),
-                code: 'code = "KR20261112"\nprint(len(code))\nprint(code[0])\nprint(code[-1])',
+                code: t(
+                    `code = "KR20261112"
+print(len(code))  # len(s): 글자 수 → 10
+print(code[0])  # s[번호]: 그 위치의 글자 하나 → K
+print(code[-1])  # s[-1]: 맨 끝 글자 → 2`,
+                    `code = "KR20261112"
+print(len(code))  # len(s): number of characters → 10
+print(code[0])  # s[index]: the character at that spot → K
+print(code[-1])  # s[-1]: the last character → 2`,
+                ),
             },
             {
                 title: t('자르기(슬라이스)와 대소문자', 'Slicing and case'),
                 body: t(
-                    '<code>s[시작:끝]</code> 은 시작부터 끝 <b>바로 앞</b>까지 잘라요. <code>s[3:]</code> 은 3번부터 끝까지. <code>upper()</code> 대문자, <code>lower()</code> 소문자, <code>strip()</code> 앞뒤 공백 지우기.',
-                    '<code>s[start:end]</code> cuts from start up to <b>just before</b> end. <code>s[3:]</code> goes from 3 to the end. <code>upper()</code>, <code>lower()</code>, and <code>strip()</code> removes spaces at both ends.',
+                    '문자열을 자르고 모양을 바꾸는 법이에요. 원래 문자열은 그대로이고 새 문자열을 돌려줘요.',
+                    'Cutting a string and changing how it looks. The original stays the same; you get a new string back.',
                 ),
-                code: 'code = "  kr-778  "\nclean = code.strip().upper()\nprint(clean)\nprint(clean[0:2])\nprint(clean[3:])',
+                code: t(
+                    `code = "  kr-778  "
+# strip(): 앞뒤 공백 지우기, upper(): 대문자로 (lower() 는 소문자로)
+clean = code.strip().upper()
+print(clean)  # → KR-778
+print(clean[0:2])  # s[시작:끝]: 0번부터 2번 바로 앞까지 → KR
+print(clean[3:])  # s[3:]: 3번부터 끝까지 → 778`,
+                    `code = "  kr-778  "
+# strip(): remove spaces at both ends, upper(): upper case (lower() for lower case)
+clean = code.strip().upper()
+print(clean)  # → KR-778
+print(clean[0:2])  # s[start:end]: from 0 up to just before 2 → KR
+print(clean[3:])  # s[3:]: from 3 to the end → 778`,
+                ),
             },
         ],
         predict: {
@@ -1076,10 +1234,19 @@ export const QUESTS = [
             {
                 title: t('찾기와 바꾸기', 'Finding and replacing'),
                 body: t(
-                    '<code>"글자" in s</code> 는 들어 있는지, <code>s.find(글자)</code> 는 몇 번째인지(없으면 -1), <code>s.replace(옛것, 새것)</code> 은 전부 바꾼 문자열을 줘요.',
-                    '<code>"text" in s</code> tells whether it\'s there, <code>s.find(text)</code> where (-1 if not), and <code>s.replace(old, new)</code> gives a string with all of them replaced.',
+                    '문자열 안에서 찾고 바꾸는 법이에요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'Finding and replacing inside a string. What each line does is in the comments.',
                 ),
-                code: `addr = "${t('서울시 강남구 테헤란로', 'Teheran-ro, Gangnam, Seoul')}"\nprint("${t('강남', 'Gangnam')}" in addr)\nprint(addr.find("${t('강남', 'Gangnam')}"))\nprint("A-B-C".replace("-", "/"))`,
+                code: t(
+                    `addr = "서울시 강남구 테헤란로"
+print("강남" in addr)  # "글자" in s: 들어 있나? → True
+print(addr.find("강남"))  # find(글자): 몇 번째에 있나 (없으면 -1) → 4
+print("A-B-C".replace("-", "/"))  # replace(옛것, 새것): 전부 바꾼 문자열 → A/B/C`,
+                    `addr = "Teheran-ro, Gangnam, Seoul"
+print("Gangnam" in addr)  # "text" in s: is it there? → True
+print(addr.find("Gangnam"))  # find(text): where it starts (-1 if missing) → 12
+print("A-B-C".replace("-", "/"))  # replace(old, new): every one replaced → A/B/C`,
+                ),
             },
             {
                 title: t(
@@ -1166,10 +1333,17 @@ export const QUESTS = [
             {
                 title: t('f-문자열 서식', 'f-string formatting'),
                 body: t(
-                    '<code>{값:서식}</code> 으로 모양을 정해요. <code>{n:,}</code> 는 천 단위 쉼표, <code>{n:05}</code> 는 5자리로 앞을 0 으로 채우기, <code>{x:.1f}</code> 는 소수 한 자리.',
-                    'Shape values with <code>{value:format}</code>. <code>{n:,}</code> adds thousands commas, <code>{n:05}</code> pads to 5 digits with zeros, <code>{x:.1f}</code> gives one decimal place.',
+                    'f-문자열 안의 <code>{값:서식}</code> 으로 값의 모양을 정해요. 서식마다 뜻은 예제 주석에 있어요.',
+                    'Shape a value with <code>{value:format}</code> inside an f-string. What each format means is in the comments.',
                 ),
-                code: 'print(f"{1250000:,}")\nprint(f"{42:05}")\nprint(f"{2.345:.1f}")',
+                code: t(
+                    `print(f"{1250000:,}")  # {n:,} 천 단위 쉼표 → 1,250,000
+print(f"{42:05}")  # {n:05} 5자리, 앞을 0 으로 채우기 → 00042
+print(f"{2.345:.1f}")  # {x:.1f} 소수 한 자리 → 2.3`,
+                    `print(f"{1250000:,}")  # {n:,} thousands commas → 1,250,000
+print(f"{42:05}")  # {n:05} 5 digits, padded with 0 → 00042
+print(f"{2.345:.1f}")  # {x:.1f} one decimal place → 2.3`,
+                ),
             },
             {
                 title: t('칸 맞추기', 'Lining up columns'),
@@ -1526,18 +1700,38 @@ export const QUESTS = [
             {
                 title: t('딕셔너리: 키로 값 찾기', 'Dictionaries: find values by key'),
                 body: t(
-                    '<code>{키: 값, …}</code> 으로 키-값 짝을 담아요. <code>d[키]</code> 로 꺼내고, <code>d[키] = 값</code> 으로 넣거나 바꿔요. 개수는 <code>len(d)</code>.',
-                    '<code>{key: value, …}</code> holds key-value pairs. Read with <code>d[key]</code>, add or change with <code>d[key] = value</code>. The count is <code>len(d)</code>.',
+                    '딕셔너리는 키-값 짝을 담아요. 꺼내고 넣는 법은 예제 주석을 보세요.',
+                    'A dict holds key-value pairs. See the comments for how to read and add values.',
                 ),
-                code: `stock = {"${t('토너', 'toner')}": 12, "${t('립밤', 'lipbalm')}": 30}\nprint(stock["${t('토너', 'toner')}"])\nstock["${t('토너', 'toner')}"] = 10\nstock["${t('쿠션', 'cushion')}"] = 8\nprint(stock)\nprint(len(stock))`,
+                code: t(
+                    `stock = {"토너": 12, "립밤": 30}  # {키: 값, …}
+print(stock["토너"])  # d[키]: 꺼내기 → 12
+stock["토너"] = 10  # d[키] = 값: 있는 키면 값 바꾸기
+stock["쿠션"] = 8  # 없는 키면 새로 넣기
+print(stock)  # → {'토너': 10, '립밤': 30, '쿠션': 8}
+print(len(stock))  # len(d): 짝의 개수 → 3`,
+                    `stock = {"toner": 12, "lipbalm": 30}  # {key: value, …}
+print(stock["toner"])  # d[key]: read → 12
+stock["toner"] = 10  # d[key] = value: changes an existing key
+stock["cushion"] = 8  # adds a new key
+print(stock)  # → {'toner': 10, 'lipbalm': 30, 'cushion': 8}
+print(len(stock))  # len(d): number of pairs → 3`,
+                ),
             },
             {
                 title: t('있는지 확인하기', 'Checking a key'),
                 body: t(
-                    '<code>키 in d</code> 로 그 키가 있는지 봐요. 없는 키를 <code>d[키]</code> 로 꺼내면 에러(KeyError)가 나요. <code>d.get(키, 기본값)</code> 은 없을 때 기본값을 줘요.',
-                    'Check with <code>key in d</code>. Reading a missing key with <code>d[key]</code> is an error (KeyError). <code>d.get(key, default)</code> gives the default instead.',
+                    '없을 수도 있는 키를 다루는 법이에요. 없는 키를 <code>d[키]</code> 로 바로 꺼내면 <code>KeyError</code> 가 나요.',
+                    'How to deal with keys that may not be there. Reading a missing key directly with <code>d[key]</code> raises <code>KeyError</code>.',
                 ),
-                code: `stock = {"${t('토너', 'toner')}": 12}\nprint("${t('쿠션', 'cushion')}" in stock)\nprint(stock.get("${t('쿠션', 'cushion')}", 0))`,
+                code: t(
+                    `stock = {"토너": 12}
+print("쿠션" in stock)  # 키 in d: 그 키가 있나? → False
+print(stock.get("쿠션", 0))  # d.get(키, 기본값): 없으면 기본값 → 0`,
+                    `stock = {"toner": 12}
+print("cushion" in stock)  # key in d: is the key there? → False
+print(stock.get("cushion", 0))  # d.get(key, default): the default when missing → 0`,
+                ),
             },
         ],
         predict: {
@@ -1613,10 +1807,13 @@ export const QUESTS = [
             {
                 title: t('딕셔너리로 개수 세기', 'Counting with a dict'),
                 body: t(
-                    '딕셔너리에 "이름: 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄 <code>count[p] = count.get(p, 0) + 1</code> 은 오른쪽부터 세 가지 일을 해요.<br>① <code>count.get(p, 0)</code>: 지금까지 센 개수를 꺼내요. 처음 나온 이름이라 딕셔너리에 없으면 대신 0 을 줘요. (<code>count[p]</code> 로 바로 꺼내면 없는 키라서 <code>KeyError</code> 가 나요.)<br>② <code>+ 1</code>: 거기에 하나 더해요.<br>③ <code>count[p] = …</code>: 더한 값을 같은 키에 다시 넣어요. 이미 있는 키면 예전 값이 새 값으로 바뀌어요.<br>아래 예제에서 "A" 는 나올 때마다 1 → 2 → 3, "B" 는 1 이 돼요.',
-                    'Keep "name: count so far" in a dict, and add 1 each time a name shows up. The one line in the loop, <code>count[p] = count.get(p, 0) + 1</code>, does three things, starting from the right.<br>① <code>count.get(p, 0)</code>: takes out the count so far. If the name is new and not in the dict yet, it gives 0 instead. (Reading <code>count[p]</code> directly would raise <code>KeyError</code> for a missing key.)<br>② <code>+ 1</code>: adds one to it.<br>③ <code>count[p] = …</code>: puts the new number back under the same key. An existing key gets its old value replaced.<br>In the example below, "A" goes 1 → 2 → 3 each time it appears, and "B" becomes 1.',
+                    '딕셔너리에 "이름: 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄이 하는 일은 예제 주석 ①②③ 에 적어 두었어요(오른쪽부터 계산해요).<br>없는 키를 <code>count[p]</code> 로 바로 꺼내면 <code>KeyError</code> 가 나요. 그래서 <code>get(p, 0)</code> 을 써요.',
+                    'Keep "name: count so far" in a dict, and add 1 each time a name shows up. What the one line in the loop does is written in the example\'s comments ①②③ (it works from the right).<br>Reading a missing key directly with <code>count[p]</code> raises <code>KeyError</code>. That is why we use <code>get(p, 0)</code>.',
                 ),
-                code: 'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])\nprint(count["B"])',
+                code: t(
+                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    # ② + 1: 하나 더하기\n    # ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])  # A 는 1 → 2 → 3\nprint(count["B"])  # B 는 1',
+                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): the count so far (0 for a new name)\n    # ② + 1: add one\n    # ③ count[p] = …: put it back under the same key (replaces the old value)\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])  # A goes 1 → 2 → 3\nprint(count["B"])  # B is 1',
+                ),
             },
             {
                 title: t('딕셔너리 전체 돌기', 'Going through a whole dict'),
@@ -1702,10 +1899,25 @@ export const QUESTS = [
             {
                 title: t('클래스와 객체', 'Classes and objects'),
                 body: t(
-                    '<b>클래스</b>는 설계도, <b>객체</b>는 설계도로 만든 물건이에요. <code>class 이름:</code> 안에 <code>def __init__(self, …):</code> 를 만들고 <code>self.필드 = 값</code> 으로 값을 담아요. <code>이름(…)</code> 으로 객체를 만들어요.',
-                    'A <b>class</b> is a blueprint; an <b>object</b> is built from it. Inside <code>class Name:</code>, write <code>def __init__(self, …):</code> and store values with <code>self.field = value</code>. Make objects with <code>Name(…)</code>.',
+                    '<b>클래스</b>는 설계도, <b>객체</b>는 설계도로 만든 물건이에요. 만드는 법은 예제 주석을 보세요.',
+                    'A <b>class</b> is a blueprint; an <b>object</b> is built from it. See the comments for how to make them.',
                 ),
-                code: `class Product:\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n\np = Product("${t('토너', 'Toner')}", 15000)\nprint(p.name, p.price)`,
+                code: t(
+                    `class Product:  # class 이름:
+    def __init__(self, name, price):  # __init__: 객체를 만들 때 실행
+        self.name = name  # self.필드 = 값: 객체에 값 담기
+        self.price = price
+
+p = Product("토너", 15000)  # 이름(…): 객체 만들기
+print(p.name, p.price)  # → 토너 15000`,
+                    `class Product:  # class Name:
+    def __init__(self, name, price):  # __init__: runs when an object is made
+        self.name = name  # self.field = value: store a value in the object
+        self.price = price
+
+p = Product("Toner", 15000)  # Name(…): make an object
+print(p.name, p.price)  # → Toner 15000`,
+                ),
             },
             {
                 title: t('객체마다 따로', 'Each object is separate'),
@@ -1808,10 +2020,39 @@ export const QUESTS = [
             {
                 title: t('객체의 메서드', 'Object methods'),
                 body: t(
-                    '클래스 안에 <code>def 이름(self, …):</code> 로 메서드를 만들면, <code>self</code> 로 그 객체의 값을 쓰고 바꿀 수 있어요. <code>객체.메서드()</code> 로 불러요. 첫 매개변수 <code>self</code> 는 부를 때 넘기지 않아요.',
-                    "Write <code>def name(self, …):</code> inside the class to make a method; it uses and changes the object's values through <code>self</code>. Call it with <code>object.method()</code>; you don't pass <code>self</code> yourself.",
+                    '클래스 안에 만든 함수를 메서드라고 해요. 만들고 부르는 법은 예제 주석을 보세요.',
+                    'A function written inside a class is called a method. See the comments for how to make and call one.',
                 ),
-                code: `class Item:\n    def __init__(self, name, stock):\n        self.name = name\n        self.stock = stock\n\n    def sell(self, n):\n        self.stock -= n\n\n    def label(self):\n        return f"{self.name} ({self.stock})"\n\nt = Item("${t('토너', 'Toner')}", 12)\nt.sell(3)\nprint(t.label())`,
+                code: t(
+                    `class Item:
+    def __init__(self, name, stock):
+        self.name = name
+        self.stock = stock
+
+    def sell(self, n):  # 메서드: def 이름(self, …):
+        self.stock -= n  # self: 이 메서드를 부른 객체 자신
+
+    def label(self):
+        return f"{self.name} ({self.stock})"
+
+t = Item("토너", 12)
+t.sell(3)  # 객체.메서드(), self 는 넘기지 않아요 → stock 이 12 에서 9 로
+print(t.label())  # → 토너 (9)`,
+                    `class Item:
+    def __init__(self, name, stock):
+        self.name = name
+        self.stock = stock
+
+    def sell(self, n):  # a method: def name(self, …):
+        self.stock -= n  # self: the object the method was called on
+
+    def label(self):
+        return f"{self.name} ({self.stock})"
+
+t = Item("Toner", 12)
+t.sell(3)  # object.method(), you do not pass self → stock goes from 12 to 9
+print(t.label())  # → Toner (9)`,
+                ),
             },
             {
                 title: t('객체 여러 개를 리스트에', 'Many objects in a list'),
@@ -1909,10 +2150,25 @@ export const QUESTS = [
             {
                 title: t('자주 보는 에러들', 'Common errors'),
                 body: t(
-                    '<code>ValueError</code> (숫자로 못 바꿈), <code>ZeroDivisionError</code> (0 으로 나누기), <code>IndexError</code> (없는 번호), <code>KeyError</code> (없는 키). <code>finally:</code> 는 에러가 나든 안 나든 마지막에 실행돼요.',
-                    "<code>ValueError</code> (can't make a number), <code>ZeroDivisionError</code> (divide by 0), <code>IndexError</code> (no such index), <code>KeyError</code> (no such key). <code>finally:</code> runs at the end either way.",
+                    '자주 보는 에러들: <code>ValueError</code> (숫자로 못 바꿈), <code>ZeroDivisionError</code> (0 으로 나누기), <code>IndexError</code> (없는 번호), <code>KeyError</code> (없는 키). <code>finally</code> 는 예제 주석을 보세요.',
+                    'Common errors: <code>ValueError</code> (can not make a number), <code>ZeroDivisionError</code> (divide by 0), <code>IndexError</code> (no such index), <code>KeyError</code> (no such key). See the comments for <code>finally</code>.',
                 ),
-                code: `a = [1, 2, 3]\ntry:\n    print(a[5])\nexcept IndexError:\n    print("${t('없는 번호예요', 'No such index')}")\nfinally:\n    print("${t('확인 끝', 'Check done')}")`,
+                code: t(
+                    `a = [1, 2, 3]
+try:
+    print(a[5])  # 5번이 없어서 IndexError
+except IndexError:
+    print("없는 번호예요")
+finally:  # finally: 에러가 나든 안 나든 마지막에 실행
+    print("확인 끝")`,
+                    `a = [1, 2, 3]
+try:
+    print(a[5])  # there is no index 5, so IndexError
+except IndexError:
+    print("No such index")
+finally:  # finally: runs at the end, error or not
+    print("Check done")`,
+                ),
             },
         ],
         predict: {
