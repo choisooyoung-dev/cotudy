@@ -34,12 +34,20 @@ export const QUESTS = [
                     '<code>let</code>·<code>const</code> 로 만든 변수는 만든 <code>{ }</code> 블록 안에서만 보여요. 블록 안에서 같은 이름을 새로 만들면 바깥 변수와는 <b>다른 변수</b>예요.',
                     'A variable made with <code>let</code> or <code>const</code> only exists inside the <code>{ }</code> block it was made in. Making the same name inside a block makes a <b>different variable</b> from the outer one.',
                 ),
-                code: `const zone = "A";
+                code: t(
+                    `const zone = "A";
 if (true) {
-  const zone = "B";
-  console.log("${t('안', 'in')}:", zone);
+  const zone = "B"; // 블록 { } 안에서 새로 만든 다른 변수
+  console.log("안:", zone); // → 안: B
 }
-console.log("${t('밖', 'out')}:", zone);`,
+console.log("밖:", zone); // 블록 밖에서는 바깥 zone → 밖: A`,
+                    `const zone = "A";
+if (true) {
+  const zone = "B"; // a different variable made inside the { } block
+  console.log("in:", zone); // → in: B
+}
+console.log("out:", zone); // outside the block it is the outer zone → out: A`,
+                ),
             },
             {
                 title: t('함수 안의 변수, 밖의 변수', 'Variables inside and outside a function'),
@@ -181,10 +189,11 @@ console.log(hi());`,
                     '안쪽 함수는 자기가 만들어진 곳의 변수(<code>count</code>)를 계속 쓸 수 있어요. 이걸 <b>클로저</b>라고 해요. <code>makeCounter()</code> 를 부를 때마다 <code>count</code> 가 새로 생겨서, 카운터마다 숫자가 따로예요. 밖에서는 <code>count</code> 를 직접 못 건드려요.',
                     'The inner function keeps using the variables (<code>count</code>) of the place it was made. This is a <b>closure</b>. Each call to <code>makeCounter()</code> makes a new <code>count</code>, so every counter has its own number, and nothing outside can touch <code>count</code> directly.',
                 ),
-                code: `function makeCounter() {
-  let count = 0;
+                code: t(
+                    `function makeCounter() {
+  let count = 0; // 부를 때마다 새 count 가 생겨요
   return () => {
-    count++;
+    count++; // 안쪽 함수가 바깥 count 를 계속 써요 (클로저)
     return count;
   };
 }
@@ -192,8 +201,22 @@ const truck1 = makeCounter();
 const truck2 = makeCounter();
 truck1();
 truck1();
-console.log(truck1());
-console.log(truck2());`,
+console.log(truck1()); // truck1 의 count 는 세 번째 → 3
+console.log(truck2()); // truck2 는 자기 count 를 따로 → 1`,
+                    `function makeCounter() {
+  let count = 0; // a new count is made on every call
+  return () => {
+    count++; // the inner function keeps using the outer count (closure)
+    return count;
+  };
+}
+const truck1 = makeCounter();
+const truck2 = makeCounter();
+truck1();
+truck1();
+console.log(truck1()); // third time for truck1's count → 3
+console.log(truck2()); // truck2 has its own count → 1`,
+                ),
             },
         ],
         predict: {
@@ -449,13 +472,19 @@ console.log(kgs);`,
             {
                 title: t('<code>filter</code>: 조건에 맞는 칸만', '<code>filter</code>: only the items that match'),
                 body: t(
-                    '<code>배열.filter(콜백)</code> 은 콜백이 <code>true</code> 를 돌려준 칸만 모은 새 배열이에요. <code>map</code> 과 이어 쓸 수 있어요.',
-                    '<code>array.filter(callback)</code> is a new array of the items where the callback returned <code>true</code>. You can chain it with <code>map</code>.',
+                    '<code>filter</code> 는 조건에 맞는 칸만 모은 새 배열을 돌려줘요. <code>map</code> 과 이어 쓸 수 있어요.',
+                    '<code>filter</code> returns a new array of only the items that match. You can chain it with <code>map</code>.',
                 ),
-                code: `const kgs = [2, 15, 3, 22];
-const heavy = kgs.filter((kg) => kg >= 10);
+                code: t(
+                    `const kgs = [2, 15, 3, 22];
+const heavy = kgs.filter((kg) => kg >= 10); // 콜백이 true 를 돌려준 칸만 모으기 (15, 22)
 console.log(heavy);
-console.log(heavy.length + "${t('개', ' boxes')}");`,
+console.log(heavy.length + "개"); // → 2개`,
+                    `const kgs = [2, 15, 3, 22];
+const heavy = kgs.filter((kg) => kg >= 10); // keeps the items where the callback returns true (15, 22)
+console.log(heavy);
+console.log(heavy.length + " boxes"); // → 2 boxes`,
+                ),
             },
         ],
         predict: {
@@ -549,13 +578,19 @@ console.log(total);`,
             {
                 title: t('<code>sort</code> 와 비교 함수', '<code>sort</code> and a compare function'),
                 body: t(
-                    '<code>sort</code> 는 배열 자체를 바꿔요. 아무것도 안 넘기면 <b>글자 순서</b>로 줄 세워서 <code>100</code> 이 <code>9</code> 보다 앞에 와요. 숫자는 <code>(a, b) => a - b</code> (작은 순), <code>b - a</code> (큰 순) 를 넘겨요.',
-                    '<code>sort</code> changes the array itself. With nothing passed it sorts as <b>text</b>, so <code>100</code> comes before <code>9</code>. For numbers pass <code>(a, b) => a - b</code> (smallest first) or <code>b - a</code> (largest first).',
+                    '<code>sort</code> 는 배열 자체를 바꿔요. 숫자는 비교 함수를 꼭 넘겨야 해요. 이유는 예제 주석을 보세요.',
+                    '<code>sort</code> changes the array itself. For numbers you must pass a compare function. See the comments for why.',
                 ),
-                code: `const kgs = [12, 3, 25, 8];
-kgs.sort((a, b) => a - b);
+                code: t(
+                    `const kgs = [12, 3, 25, 8];
+kgs.sort((a, b) => a - b); // a - b: 작은 순 (b - a 는 큰 순) → 3, 8, 12, 25
 console.log(kgs);
-console.log([10, 9, 100].sort());`,
+console.log([10, 9, 100].sort()); // 아무것도 안 넘기면 글자 순서라 10, 100, 9`,
+                    `const kgs = [12, 3, 25, 8];
+kgs.sort((a, b) => a - b); // a - b: smallest first (b - a is largest first) → 3, 8, 12, 25
+console.log(kgs);
+console.log([10, 9, 100].sort()); // with nothing passed it sorts as text: 10, 100, 9`,
+                ),
             },
         ],
         predict: {
@@ -1063,18 +1098,29 @@ console.log("${t('기다리는 중', 'Waiting')}");`,
             {
                 title: t('<code>Promise</code> 와 <code>then</code>', '<code>Promise</code> and <code>then</code>'),
                 body: t(
-                    '<code>Promise</code> 는 "나중에 결과를 주겠다"는 약속이에요. 결과가 나오면 <code>resolve(값)</code> 을 부르고, 받는 쪽은 <code>.then(값 => …)</code> 으로 그 값을 받아요.',
-                    'A <code>Promise</code> is a promise to give a result later. When the result is ready it calls <code>resolve(value)</code>, and the receiver gets it with <code>.then(value => …)</code>.',
+                    '<code>Promise</code> 는 "나중에 결과를 주겠다" 는 약속이에요. 결과를 주고받는 법은 예제 주석을 보세요.',
+                    'A <code>Promise</code> is a promise to give a result later. See the comments for how the result is given and received.',
                 ),
-                code: `function arrive(truck) {
+                code: t(
+                    `function arrive(truck) {
   return new Promise((resolve) => {
-    setTimeout(() => resolve(truck + "${t(' 도착', ' arrived')}"), 100);
+    setTimeout(() => resolve(truck + " 도착"), 100); // 0.1초 뒤 resolve(값): 결과 주기
   });
 }
-arrive("${t('1호차', 'Truck 1')}").then((msg) => {
-  console.log(msg);
+arrive("1호차").then((msg) => { // .then(값 => …): 결과가 나오면 받기
+  console.log(msg); // → 1호차 도착 (두 번째로 찍혀요)
 });
-console.log("${t('먼저 찍혀요', 'Printed first')}");`,
+console.log("먼저 찍혀요"); // 기다리지 않고 바로 실행`,
+                    `function arrive(truck) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(truck + " arrived"), 100); // after 0.1 s, resolve(value): give the result
+  });
+}
+arrive("Truck 1").then((msg) => { // .then(value => …): receive the result when it is ready
+  console.log(msg); // → Truck 1 arrived (printed second)
+});
+console.log("Printed first"); // runs right away, without waiting`,
+                ),
             },
         ],
         predict: {
@@ -1193,24 +1239,43 @@ loadTruck();`,
                     'The value of <code>await</code>, and <code>try</code> / <code>catch</code>',
                 ),
                 body: t(
-                    '<code>await</code> 는 Promise 가 준 값을 돌려줘요. Promise 가 <code>reject(에러)</code> 로 실패하면 그 줄에서 에러가 나니까 <code>try</code> / <code>catch</code> 로 잡아요.',
-                    '<code>await</code> gives back the value the Promise produced. If the Promise fails with <code>reject(error)</code>, that line throws, so catch it with <code>try</code> / <code>catch</code>.',
+                    '<code>await</code> 로 Promise 의 결과를 받고, 실패는 <code>try</code> / <code>catch</code> 로 잡아요. 흐름은 예제 주석을 보세요.',
+                    'Get a Promise result with <code>await</code>, and catch failures with <code>try</code> / <code>catch</code>. See the comments for the flow.',
                 ),
-                code: `function checkTruck(ok) {
+                code: t(
+                    `function checkTruck(ok) {
   return new Promise((resolve, reject) => {
-    setTimeout(() => (ok ? resolve("${t('통과', 'passed')}") : reject(new Error("${t('타이어 점검 필요', 'tires need a check')}"))), 50);
+    // ok 면 resolve(값), 아니면 reject(에러) 로 실패
+    setTimeout(() => (ok ? resolve("통과") : reject(new Error("타이어 점검 필요"))), 50);
   });
 }
 
 async function inspect() {
   try {
-    console.log(await checkTruck(true));
-    console.log(await checkTruck(false));
+    console.log(await checkTruck(true)); // await: Promise 가 준 값을 돌려줘요 → 통과
+    console.log(await checkTruck(false)); // reject 되면 이 줄에서 에러 → catch 로
   } catch (e) {
-    console.log("${t('멈춤: ', 'Stopped: ')}" + e.message);
+    console.log("멈춤: " + e.message); // → 멈춤: 타이어 점검 필요
   }
 }
 inspect();`,
+                    `function checkTruck(ok) {
+  return new Promise((resolve, reject) => {
+    // resolve(value) if ok, otherwise fail with reject(error)
+    setTimeout(() => (ok ? resolve("passed") : reject(new Error("tires need a check"))), 50);
+  });
+}
+
+async function inspect() {
+  try {
+    console.log(await checkTruck(true)); // await: gives back the value the Promise produced → passed
+    console.log(await checkTruck(false)); // if it is rejected, this line throws → goes to catch
+  } catch (e) {
+    console.log("Stopped: " + e.message); // → Stopped: tires need a check
+  }
+}
+inspect();`,
+                ),
             },
         ],
         predict: {

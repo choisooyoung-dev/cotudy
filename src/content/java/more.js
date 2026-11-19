@@ -43,10 +43,21 @@ export const QUESTS = [
             {
                 title: t('줄여 쓰기 <code>+=</code> <code>++</code>', 'Shortcuts <code>+=</code> <code>++</code>'),
                 body: t(
-                    '<code>a += 3</code> 은 <code>a = a + 3</code> 과 같아요. <code>a++</code> 는 1 더하기, <code>a--</code> 는 1 빼기예요.',
-                    '<code>a += 3</code> is the same as <code>a = a + 3</code>. <code>a++</code> adds 1, <code>a--</code> subtracts 1.',
+                    '<code>+=</code> 같은 줄여 쓰기는 "자기 값에 계산해서 다시 넣기" 를 짧게 쓴 거예요. 줄마다 하는 일은 예제 주석에 있어요.',
+                    'Shortcuts like <code>+=</code> are a short way to write "work it out with its own value and put it back". What each line does is in the comments.',
                 ),
-                code: main('int count = 10;\ncount += 5;\ncount++;\ncount -= 2;\nSystem.out.println(count);'),
+                code: t(
+                    main(`int count = 10;
+count += 5; // count = count + 5 와 같아요 → 15
+count++; // 1 더하기 → 16 (count-- 는 1 빼기)
+count -= 2; // count = count - 2 → 14
+System.out.println(count);`),
+                    main(`int count = 10;
+count += 5; // same as count = count + 5 → 15
+count++; // add 1 → 16 (count-- subtracts 1)
+count -= 2; // count = count - 2 → 14
+System.out.println(count);`),
+                ),
             },
         ],
         predict: {
@@ -126,11 +137,20 @@ export const QUESTS = [
             {
                 title: t('비교 연산자', 'Comparison operators'),
                 body: t(
-                    '<code>&gt; &lt; &gt;= &lt;= == !=</code> 로 비교하면 결과는 <code>true</code> 아니면 <code>false</code> 예요. 같다는 <code>==</code> (등호 두 개), 다르다는 <code>!=</code>.',
-                    'Comparing with <code>&gt; &lt; &gt;= &lt;= == !=</code> gives <code>true</code> or <code>false</code>. Equal is <code>==</code> (two signs), not equal is <code>!=</code>.',
+                    '비교 연산자로 두 값을 비교하면 결과는 <code>true</code> 아니면 <code>false</code> 예요. 기호마다 뜻은 예제 주석에 있어요.',
+                    'Comparing two values with a comparison operator gives <code>true</code> or <code>false</code>. What each symbol means is in the comments.',
                 ),
-                code: main(
-                    'int price = 35000;\nSystem.out.println(price >= 30000);\nSystem.out.println(price == 30000);\nSystem.out.println(price != 30000);',
+                code: t(
+                    main(`// 비교 연산자: >  <  >=  <=  ==  !=
+int price = 35000;
+System.out.println(price >= 30000); // >= 크거나 같다 → true
+System.out.println(price == 30000); // == 같다 (등호 두 개) → false
+System.out.println(price != 30000); // != 다르다 → true`),
+                    main(`// Comparison operators: >  <  >=  <=  ==  !=
+int price = 35000;
+System.out.println(price >= 30000); // >= greater than or equal → true
+System.out.println(price == 30000); // == equal (two signs) → false
+System.out.println(price != 30000); // != not equal → true`),
                 ),
             },
             {
@@ -139,11 +159,20 @@ export const QUESTS = [
                     'and <code>&&</code>, or <code>||</code>, not <code>!</code>',
                 ),
                 body: t(
-                    '<code>&&</code> 는 둘 다 참일 때만 참, <code>||</code> 는 하나만 참이어도 참, <code>!</code> 는 반대로 바꿔요.',
-                    '<code>&&</code> is true only when both are true, <code>||</code> is true when either is, and <code>!</code> flips it.',
+                    '논리 연산자로 <code>true</code> / <code>false</code> 를 합치거나 뒤집어요. 기호마다 뜻은 예제 주석에 있어요.',
+                    'Logical operators combine or flip <code>true</code> / <code>false</code>. What each symbol means is in the comments.',
                 ),
-                code: main(
-                    'boolean fragile = true;\nboolean heavy = false;\nSystem.out.println(fragile && heavy);\nSystem.out.println(fragile || heavy);\nSystem.out.println(!heavy);',
+                code: t(
+                    main(`boolean fragile = true;
+boolean heavy = false;
+System.out.println(fragile && heavy); // && 그리고: 둘 다 참일 때만 참 → false
+System.out.println(fragile || heavy); // || 또는: 하나만 참이어도 참 → true
+System.out.println(!heavy); // ! 아니다: 반대로 바꾸기 → true`),
+                    main(`boolean fragile = true;
+boolean heavy = false;
+System.out.println(fragile && heavy); // && and: true only when both are true → false
+System.out.println(fragile || heavy); // || or: true when either is true → true
+System.out.println(!heavy); // ! not: flips it → true`),
                 ),
             },
         ],
@@ -328,11 +357,18 @@ export const QUESTS = [
             {
                 title: t('문자열 비교는 <code>equals</code>', 'Compare strings with <code>equals</code>'),
                 body: t(
-                    '문자열이 같은지는 <code>==</code> 가 아니라 <code>a.equals(b)</code> 로 비교해요. <code>==</code> 는 "같은 물건인지"를 봐서 글자가 같아도 false 가 나올 수 있어요.',
-                    'Check whether strings match with <code>a.equals(b)</code>, not <code>==</code>. <code>==</code> checks "the same object", so it can be false even when the text matches.',
+                    '문자열이 같은지는 <code>==</code> 가 아니라 <code>equals</code> 로 비교해요. <code>==</code> 는 "같은 물건인지"를 봐서 글자가 같아도 false 가 나올 수 있어요.',
+                    'Check whether strings match with <code>equals</code>, not <code>==</code>. <code>==</code> checks "the same object", so it can be false even when the text matches.',
                 ),
-                code: main(
-                    'String zone = "A";\nSystem.out.println(zone.equals("A"));\nSystem.out.println(zone.equals("B"));\nSystem.out.println("a".equalsIgnoreCase("A"));',
+                code: t(
+                    main(`String zone = "A";
+System.out.println(zone.equals("A")); // 글자가 같아요 → true
+System.out.println(zone.equals("B")); // 글자가 달라요 → false
+System.out.println("a".equalsIgnoreCase("A")); // equalsIgnoreCase: 대소문자 무시하고 비교 → true`),
+                    main(`String zone = "A";
+System.out.println(zone.equals("A")); // same text → true
+System.out.println(zone.equals("B")); // different text → false
+System.out.println("a".equalsIgnoreCase("A")); // equalsIgnoreCase: ignores upper/lower case → true`),
                 ),
             },
             {
@@ -424,11 +460,32 @@ export const QUESTS = [
             {
                 title: t('<code>switch</code>', '<code>switch</code>'),
                 body: t(
-                    '값 하나를 여러 경우와 비교할 때 써요. 맞는 <code>case</code> 부터 실행하고, <code>break</code> 에서 멈춰요. 맞는 게 없으면 <code>default</code>.',
-                    'Use it to compare one value against many cases. It runs from the matching <code>case</code> and stops at <code>break</code>. If nothing matches, <code>default</code> runs.',
+                    '값 하나를 여러 경우와 비교할 때 써요. 어떤 순서로 실행되는지는 예제 주석을 보세요.',
+                    'Use it to compare one value against many cases. See the comments for the order it runs in.',
                 ),
-                code: main(
-                    `String zone = "B";\nswitch (zone) {\n    case "A":\n        System.out.println("${t('1층', '1st floor')}");\n        break;\n    case "B":\n        System.out.println("${t('2층', '2nd floor')}");\n        break;\n    default:\n        System.out.println("${t('모르는 구역', 'Unknown zone')}");\n}`,
+                code: t(
+                    main(`String zone = "B";
+switch (zone) { // zone 과 같은 case 를 찾아요
+    case "A":
+        System.out.println("1층");
+        break;
+    case "B": // "B" 와 같아서 여기부터 실행
+        System.out.println("2층");
+        break; // break 에서 switch 를 빠져나가요
+    default: // 맞는 case 가 없을 때
+        System.out.println("모르는 구역");
+}`),
+                    main(`String zone = "B";
+switch (zone) { // looks for the case equal to zone
+    case "A":
+        System.out.println("1st floor");
+        break;
+    case "B": // equal to "B", so it runs from here
+        System.out.println("2nd floor");
+        break; // break leaves the switch
+    default: // when no case matches
+        System.out.println("Unknown zone");
+}`),
                 ),
             },
             {
@@ -788,11 +845,20 @@ export const QUESTS = [
             {
                 title: t('배열 만들기와 번호(인덱스)', 'Arrays and index numbers'),
                 body: t(
-                    '<code>타입[] 이름 = {값, 값, …};</code> 으로 여러 값을 한 번에 담아요. 꺼낼 때는 <code>이름[번호]</code>, 번호는 <b>0 부터</b> 시작해요. 개수는 <code>.length</code>.',
-                    '<code>type[] name = {value, value, …};</code> holds many values at once. Get one with <code>name[index]</code>; indexes start at <b>0</b>. The count is <code>.length</code>.',
+                    '배열은 같은 타입의 값 여러 개를 한 번에 담아요. 만들고 꺼내는 법은 예제 주석을 보세요.',
+                    'An array holds many values of one type at once. See the comments for how to make one and get values out.',
                 ),
-                code: main(
-                    `String[] couriers = {"${t('번개택배', 'Lightning')}", "${t('하늘택배', 'Sky')}", "${t('바다택배', 'Ocean')}"};\nSystem.out.println(couriers[0]);\nSystem.out.println(couriers[2]);\nSystem.out.println(couriers.length);`,
+                code: t(
+                    main(`// 타입[] 이름 = {값, 값, …};
+String[] couriers = {"번개택배", "하늘택배", "바다택배"};
+System.out.println(couriers[0]); // 이름[번호], 번호는 0 부터 → 번개택배
+System.out.println(couriers[2]); // → 바다택배
+System.out.println(couriers.length); // .length: 개수 → 3`),
+                    main(`// type[] name = {value, value, …};
+String[] couriers = {"Lightning", "Sky", "Ocean"};
+System.out.println(couriers[0]); // name[index], indexes start at 0 → Lightning
+System.out.println(couriers[2]); // → Ocean
+System.out.println(couriers.length); // .length: how many → 3`),
                 ),
             },
             {
@@ -976,23 +1042,57 @@ export const QUESTS = [
             {
                 title: t('<code>ArrayList</code> 만들고 넣기', 'Making an <code>ArrayList</code> and adding'),
                 body: t(
-                    '<code>ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</code> 로 만들고 <code>add</code> 로 넣어요. 개수는 <code>size()</code>, 꺼내기는 <code>get(번호)</code>. 맨 위에 <code>import java.util.*;</code> 가 필요해요.',
-                    'Create it with <code>ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</code> and add with <code>add</code>. Count with <code>size()</code>, get with <code>get(index)</code>. You need <code>import java.util.*;</code> at the top.',
+                    '<code>ArrayList</code> 는 크기가 늘고 줄어드는 리스트예요. 맨 위에 <code>import java.util.*;</code> 가 필요해요.',
+                    'An <code>ArrayList</code> is a list that grows and shrinks. You need <code>import java.util.*;</code> at the top.',
                 ),
-                code: main(
-                    `ArrayList<String> list = new ArrayList<>();\nlist.add("${t('토너', 'Toner')}");\nlist.add("${t('립밤', 'Lip balm')}");\nSystem.out.println(list.size());\nSystem.out.println(list.get(1));\nSystem.out.println(list);`,
-                    UTIL,
+                code: t(
+                    main(
+                        `ArrayList<String> list = new ArrayList<>(); // 빈 리스트 만들기
+list.add("토너"); // add: 맨 뒤에 넣기
+list.add("립밤");
+System.out.println(list.size()); // size(): 개수 → 2
+System.out.println(list.get(1)); // get(번호): 번호는 0 부터 → 립밤
+System.out.println(list); // → [토너, 립밤]`,
+                        UTIL,
+                    ),
+                    main(
+                        `ArrayList<String> list = new ArrayList<>(); // make an empty list
+list.add("Toner"); // add: put at the end
+list.add("Lip balm");
+System.out.println(list.size()); // size(): how many → 2
+System.out.println(list.get(1)); // get(index): indexes start at 0 → Lip balm
+System.out.println(list); // → [Toner, Lip balm]`,
+                        UTIL,
+                    ),
                 ),
             },
             {
                 title: t('빼기와 찾기', 'Removing and finding'),
                 body: t(
-                    '<code>remove(번호)</code> 로 빼고, <code>contains(값)</code> 으로 들어 있는지 봐요. 숫자를 담을 때는 <code>ArrayList&lt;Integer&gt;</code>.',
-                    'Remove with <code>remove(index)</code>, check with <code>contains(value)</code>. For numbers use <code>ArrayList&lt;Integer&gt;</code>.',
+                    '리스트에서 빼고 찾는 메서드예요. 숫자를 담을 때는 <code>ArrayList&lt;Integer&gt;</code> 처럼 <code>Integer</code> 를 써요.',
+                    'Methods for removing and finding. For numbers, use <code>Integer</code>, as in <code>ArrayList&lt;Integer&gt;</code>.',
                 ),
-                code: main(
-                    `ArrayList<String> list = new ArrayList<>();\nlist.add("A");\nlist.add("B");\nlist.add("C");\nlist.remove(0);\nSystem.out.println(list);\nSystem.out.println(list.contains("C"));`,
-                    UTIL,
+                code: t(
+                    main(
+                        `ArrayList<String> list = new ArrayList<>();
+list.add("A");
+list.add("B");
+list.add("C");
+list.remove(0); // remove(번호): 0번 "A" 빼기
+System.out.println(list); // → [B, C]
+System.out.println(list.contains("C")); // contains(값): 들어 있나? → true`,
+                        UTIL,
+                    ),
+                    main(
+                        `ArrayList<String> list = new ArrayList<>();
+list.add("A");
+list.add("B");
+list.add("C");
+list.remove(0); // remove(index): removes "A" at index 0
+System.out.println(list); // → [B, C]
+System.out.println(list.contains("C")); // contains(value): is it there? → true`,
+                        UTIL,
+                    ),
                 ),
             },
         ],
@@ -1084,11 +1184,22 @@ export const QUESTS = [
             {
                 title: t('자르기와 대소문자', 'Cutting and case'),
                 body: t(
-                    '<code>substring(시작, 끝)</code> 은 시작부터 끝 <b>바로 앞</b>까지 잘라요. <code>toUpperCase()</code> 대문자, <code>toLowerCase()</code> 소문자, <code>trim()</code> 앞뒤 공백 지우기.',
-                    '<code>substring(start, end)</code> cuts from start up to <b>just before</b> end. <code>toUpperCase()</code>, <code>toLowerCase()</code>, and <code>trim()</code> removes spaces at both ends.',
+                    '문자열을 자르고 모양을 바꾸는 메서드들이에요. 원래 문자열은 그대로이고 새 문자열을 돌려줘요.',
+                    'Methods that cut a string or change how it looks. The original stays the same; you get a new string back.',
                 ),
-                code: main(
-                    'String code = "  kr-778  ";\nString clean = code.trim().toUpperCase();\nSystem.out.println(clean);\nSystem.out.println(clean.substring(0, 2));\nSystem.out.println(clean.substring(3));',
+                code: t(
+                    main(`String code = "  kr-778  ";
+// trim(): 앞뒤 공백 지우기, toUpperCase(): 대문자로 (toLowerCase() 는 소문자로)
+String clean = code.trim().toUpperCase();
+System.out.println(clean); // → KR-778
+System.out.println(clean.substring(0, 2)); // substring(시작, 끝): 0번부터 2번 바로 앞까지 → KR
+System.out.println(clean.substring(3)); // substring(시작): 3번부터 끝까지 → 778`),
+                    main(`String code = "  kr-778  ";
+// trim(): remove spaces at both ends, toUpperCase(): upper case (toLowerCase() for lower case)
+String clean = code.trim().toUpperCase();
+System.out.println(clean); // → KR-778
+System.out.println(clean.substring(0, 2)); // substring(start, end): from 0 up to just before 2 → KR
+System.out.println(clean.substring(3)); // substring(start): from 3 to the end → 778`),
                 ),
             },
         ],
@@ -1181,11 +1292,18 @@ export const QUESTS = [
             {
                 title: t('찾기와 바꾸기', 'Finding and replacing'),
                 body: t(
-                    '<code>contains(글자)</code> 는 들어 있는지(true/false), <code>indexOf(글자)</code> 는 몇 번째에 있는지(없으면 -1), <code>replace(옛것, 새것)</code> 는 바꾼 문자열을 줘요.',
-                    "<code>contains(text)</code> tells whether it's there (true/false), <code>indexOf(text)</code> where it is (-1 if not), and <code>replace(old, new)</code> gives a new string.",
+                    '문자열 안에서 찾고 바꾸는 메서드들이에요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    'Methods for finding and replacing inside a string. What each one does is in the comments.',
                 ),
-                code: main(
-                    `String addr = "${t('서울시 강남구 테헤란로', 'Teheran-ro, Gangnam, Seoul')}";\nSystem.out.println(addr.contains("${t('강남', 'Gangnam')}"));\nSystem.out.println(addr.indexOf("${t('강남', 'Gangnam')}"));\nSystem.out.println(addr.replace("${t('서울시', 'Seoul')}", "${t('서울특별시', 'Seoul City')}"));`,
+                code: t(
+                    main(`String addr = "서울시 강남구 테헤란로";
+System.out.println(addr.contains("강남")); // contains(글자): 들어 있나? → true
+System.out.println(addr.indexOf("강남")); // indexOf(글자): 몇 번째에 있나 (없으면 -1) → 4
+System.out.println(addr.replace("서울시", "서울특별시")); // replace(옛것, 새것): 바꾼 새 문자열`),
+                    main(`String addr = "Teheran-ro, Gangnam, Seoul";
+System.out.println(addr.contains("Gangnam")); // contains(text): is it there? → true
+System.out.println(addr.indexOf("Gangnam")); // indexOf(text): where it starts (-1 if missing) → 12
+System.out.println(addr.replace("Seoul", "Seoul City")); // replace(old, new): a new, changed string`),
                 ),
             },
             {
@@ -1270,21 +1388,37 @@ export const QUESTS = [
             {
                 title: t('<code>String.format</code>', '<code>String.format</code>'),
                 body: t(
-                    '<code>%s</code> 자리에 문자열, <code>%d</code> 자리에 정수가 들어가요. <code>%,d</code> 는 천 단위 쉼표, <code>%05d</code> 는 5자리로 앞을 0 으로 채워요. <code>%.1f</code> 는 소수 한 자리.',
-                    '<code>%s</code> is replaced by a string, <code>%d</code> by an integer. <code>%,d</code> adds thousands commas, <code>%05d</code> pads to 5 digits with zeros. <code>%.1f</code> is one decimal place.',
+                    '<code>String.format</code> 은 서식 기호 자리에 값을 넣은 문자열을 만들어요. 기호마다 뜻은 예제 주석에 있어요.',
+                    '<code>String.format</code> builds a string by putting values into format codes. What each code means is in the comments.',
                 ),
-                code: main(
-                    'System.out.println(String.format("%s: %d", "box", 3));\nSystem.out.println(String.format("%,d", 1250000));\nSystem.out.println(String.format("%05d", 42));\nSystem.out.println(String.format("%.1f", 2.345));',
+                code: t(
+                    main(`System.out.println(String.format("%s: %d", "box", 3)); // %s 문자열, %d 정수 → box: 3
+System.out.println(String.format("%,d", 1250000)); // %,d 천 단위 쉼표 → 1,250,000
+System.out.println(String.format("%05d", 42)); // %05d 5자리, 앞을 0 으로 채우기 → 00042
+System.out.println(String.format("%.1f", 2.345)); // %.1f 소수 한 자리 → 2.3`),
+                    main(`System.out.println(String.format("%s: %d", "box", 3)); // %s string, %d whole number → box: 3
+System.out.println(String.format("%,d", 1250000)); // %,d thousands commas → 1,250,000
+System.out.println(String.format("%05d", 42)); // %05d 5 digits, padded with 0 → 00042
+System.out.println(String.format("%.1f", 2.345)); // %.1f one decimal place → 2.3`),
                 ),
             },
             {
                 title: t('<code>StringBuilder</code> 로 이어 붙이기', 'Joining with <code>StringBuilder</code>'),
                 body: t(
-                    '반복하면서 문자열을 계속 붙일 때는 <code>StringBuilder</code> 의 <code>append</code> 가 빠르고 편해요. 다 붙이면 <code>toString()</code>.',
-                    "When you keep adding to a string in a loop, <code>StringBuilder</code>'s <code>append</code> is fast and handy. Call <code>toString()</code> at the end.",
+                    '반복하면서 문자열을 계속 붙일 때는 <code>StringBuilder</code> 가 빠르고 편해요.',
+                    'When you keep adding to a string in a loop, <code>StringBuilder</code> is fast and handy.',
                 ),
-                code: main(
-                    'StringBuilder sb = new StringBuilder();\nfor (int i = 1; i <= 3; i++) {\n    sb.append(i).append(">");\n}\nSystem.out.println(sb.toString());',
+                code: t(
+                    main(`StringBuilder sb = new StringBuilder(); // 빈 StringBuilder
+for (int i = 1; i <= 3; i++) {
+    sb.append(i).append(">"); // append: 뒤에 이어 붙이기
+}
+System.out.println(sb.toString()); // toString(): 다 붙인 걸 String 으로 → 1>2>3>`),
+                    main(`StringBuilder sb = new StringBuilder(); // an empty StringBuilder
+for (int i = 1; i <= 3; i++) {
+    sb.append(i).append(">"); // append: add to the end
+}
+System.out.println(sb.toString()); // toString(): turn it into a String → 1>2>3>`),
                 ),
             },
         ],
@@ -1373,10 +1507,33 @@ export const QUESTS = [
             {
                 title: t('메서드 만들고 부르기', 'Making and calling a method'),
                 body: t(
-                    '자주 쓰는 코드를 <b>메서드</b>로 묶어 이름을 붙여요. <code>main</code> 밖, <code>class</code> 안에 <code>static void 이름() { … }</code> 로 만들고, <code>이름();</code> 으로 불러요.',
-                    'Bundle code you use often into a <b>method</b> with a name. Write <code>static void name() { … }</code> inside the class but outside <code>main</code>, and call it with <code>name();</code>.',
+                    '자주 쓰는 코드를 <b>메서드</b>로 묶어 이름을 붙여요. 만드는 곳과 부르는 법은 예제 주석을 보세요.',
+                    'Bundle code you use often into a <b>method</b> with a name. See the comments for where to write it and how to call it.',
                 ),
-                code: `public class Main {\n    static void warn() {\n        System.out.println("${t('지게차 지나갑니다!', 'Forklift coming through!')}");\n    }\n\n    public static void main(String[] args) {\n        warn();\n        warn();\n    }\n}`,
+                code: t(
+                    `public class Main {
+    // 메서드 만들기: main 밖, class 안에 static void 이름() { … }
+    static void warn() {
+        System.out.println("지게차 지나갑니다!");
+    }
+
+    public static void main(String[] args) {
+        warn(); // 이름(); 으로 부르기
+        warn(); // 부를 때마다 다시 실행돼요
+    }
+}`,
+                    `public class Main {
+    // Making a method: static void name() { … } inside the class, outside main
+    static void warn() {
+        System.out.println("Forklift coming through!");
+    }
+
+    public static void main(String[] args) {
+        warn(); // call it with name();
+        warn(); // it runs again on every call
+    }
+}`,
+                ),
             },
             {
                 title: t('매개변수: 값 넘겨주기', 'Parameters: passing values in'),
@@ -1653,23 +1810,55 @@ export const QUESTS = [
             {
                 title: t('<code>HashMap</code>: 키로 값 찾기', '<code>HashMap</code>: find values by key'),
                 body: t(
-                    '<code>HashMap&lt;키타입, 값타입&gt;</code> 은 키-값 짝을 담아요. <code>put(키, 값)</code> 으로 넣고 <code>get(키)</code> 로 꺼내요. 같은 키로 다시 넣으면 값이 바뀌어요.',
-                    '<code>HashMap&lt;KeyType, ValueType&gt;</code> holds key-value pairs. Add with <code>put(key, value)</code>, read with <code>get(key)</code>. Putting the same key again replaces the value.',
+                    '<code>HashMap</code> 은 키-값 짝을 담는 자료구조예요. 넣고 꺼내는 법은 예제 주석을 보세요.',
+                    'A <code>HashMap</code> is a data structure that holds key-value pairs. See the comments for how to put values in and get them out.',
                 ),
-                code: main(
-                    `HashMap<String, Integer> stock = new HashMap<>();\nstock.put("${t('토너', 'toner')}", 12);\nstock.put("${t('립밤', 'lipbalm')}", 30);\nSystem.out.println(stock.get("${t('토너', 'toner')}"));\nstock.put("${t('토너', 'toner')}", 10);\nSystem.out.println(stock.get("${t('토너', 'toner')}"));\nSystem.out.println(stock.size());`,
-                    UTIL,
+                code: t(
+                    main(
+                        `HashMap<String, Integer> stock = new HashMap<>(); // HashMap<키타입, 값타입>
+stock.put("토너", 12); // put(키, 값): 넣기
+stock.put("립밤", 30);
+System.out.println(stock.get("토너")); // get(키): 꺼내기 → 12
+stock.put("토너", 10); // 같은 키로 다시 넣으면 값이 바뀌어요
+System.out.println(stock.get("토너")); // → 10
+System.out.println(stock.size()); // size(): 짝의 개수 → 2`,
+                        UTIL,
+                    ),
+                    main(
+                        `HashMap<String, Integer> stock = new HashMap<>(); // HashMap<KeyType, ValueType>
+stock.put("toner", 12); // put(key, value): add
+stock.put("lipbalm", 30);
+System.out.println(stock.get("toner")); // get(key): read → 12
+stock.put("toner", 10); // putting the same key again replaces the value
+System.out.println(stock.get("toner")); // → 10
+System.out.println(stock.size()); // size(): number of pairs → 2`,
+                        UTIL,
+                    ),
                 ),
             },
             {
                 title: t('있는지 확인하기', 'Checking a key'),
                 body: t(
-                    '<code>containsKey(키)</code> 로 그 키가 있는지 봐요. 없는 키를 <code>get</code> 하면 <code>null</code> 이에요. <code>getOrDefault(키, 기본값)</code> 은 없을 때 기본값을 줘요.',
-                    'Check with <code>containsKey(key)</code>. <code>get</code> on a missing key gives <code>null</code>. <code>getOrDefault(key, default)</code> gives the default instead.',
+                    '없을 수도 있는 키를 다룰 때 쓰는 메서드들이에요. 메서드마다 하는 일은 예제 주석에 있어요.',
+                    'Methods for keys that may not be there. What each one does is in the comments.',
                 ),
-                code: main(
-                    `HashMap<String, Integer> stock = new HashMap<>();\nstock.put("${t('토너', 'toner')}", 12);\nSystem.out.println(stock.containsKey("${t('쿠션', 'cushion')}"));\nSystem.out.println(stock.get("${t('쿠션', 'cushion')}"));\nSystem.out.println(stock.getOrDefault("${t('쿠션', 'cushion')}", 0));`,
-                    UTIL,
+                code: t(
+                    main(
+                        `HashMap<String, Integer> stock = new HashMap<>();
+stock.put("토너", 12);
+System.out.println(stock.containsKey("쿠션")); // containsKey(키): 그 키가 있나? → false
+System.out.println(stock.get("쿠션")); // 없는 키를 get 하면 → null
+System.out.println(stock.getOrDefault("쿠션", 0)); // getOrDefault(키, 기본값): 없으면 기본값 → 0`,
+                        UTIL,
+                    ),
+                    main(
+                        `HashMap<String, Integer> stock = new HashMap<>();
+stock.put("toner", 12);
+System.out.println(stock.containsKey("cushion")); // containsKey(key): is the key there? → false
+System.out.println(stock.get("cushion")); // get on a missing key → null
+System.out.println(stock.getOrDefault("cushion", 0)); // getOrDefault(key, default): the default when missing → 0`,
+                        UTIL,
+                    ),
                 ),
             },
         ],
@@ -1743,12 +1932,18 @@ export const QUESTS = [
             {
                 title: t('맵으로 개수 세기', 'Counting with a map'),
                 body: t(
-                    '맵에 "이름 → 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄 <code>count.put(p, count.getOrDefault(p, 0) + 1);</code> 이 세 가지 일을 해요.<br>① <code>count.getOrDefault(p, 0)</code>: 지금까지 센 개수를 꺼내요. 처음 나온 이름이라 맵에 없으면 대신 0 을 줘요. (<code>get</code> 은 없으면 <code>null</code> 을 줘서 <code>+ 1</code> 하면 에러가 나요.)<br>② <code>+ 1</code>: 거기에 하나 더해요.<br>③ <code>count.put(p, …)</code>: 더한 값을 같은 키로 다시 넣어요. 같은 키에 <code>put</code> 하면 예전 값이 새 값으로 바뀌어요.<br>아래 예제에서 "A" 는 나올 때마다 1 → 2 → 3, "B" 는 1 이 돼요.',
-                    'Keep "name → count so far" in the map, and add 1 each time a name shows up. The one line in the loop, <code>count.put(p, count.getOrDefault(p, 0) + 1);</code>, does three things.<br>① <code>count.getOrDefault(p, 0)</code>: takes out the count so far. If the name is new and not in the map yet, it gives 0 instead. (<code>get</code> gives <code>null</code> when missing, and <code>+ 1</code> on it is an error.)<br>② <code>+ 1</code>: adds one to it.<br>③ <code>count.put(p, …)</code>: puts the new number back under the same key. A <code>put</code> to an existing key replaces the old value.<br>In the example below, "A" goes 1 → 2 → 3 each time it appears, and "B" becomes 1.',
+                    '맵에 "이름 → 지금까지 센 개수" 를 적어 두고, 이름이 나올 때마다 그 개수를 1 올려요. 반복문 안의 한 줄이 하는 일은 예제 주석 ①②③ 에 적어 두었어요.<br>없는 키를 <code>get</code> 으로 꺼내면 <code>null</code> 이라서 <code>+ 1</code> 하면 에러가 나요. 그래서 <code>getOrDefault</code> 를 써요.',
+                    'Keep "name → count so far" in the map, and add 1 each time a name shows up. What the one line in the loop does is written in the example\'s comments ①②③.<br><code>get</code> on a missing key gives <code>null</code>, and <code>+ 1</code> on it is an error. That is why we use <code>getOrDefault</code>.',
                 ),
-                code: main(
-                    'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A"));\nSystem.out.println(count.get("B"));',
-                    UTIL,
+                code: t(
+                    main(
+                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    // ② + 1: 하나 더하기\n    // ③ put(p, …): 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A")); // A 는 1 → 2 → 3\nSystem.out.println(count.get("B")); // B 는 1',
+                        UTIL,
+                    ),
+                    main(
+                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): the count so far (0 for a new name)\n    // ② + 1: add one\n    // ③ put(p, …): put it back under the same key (replaces the old value)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A")); // A goes 1 → 2 → 3\nSystem.out.println(count.get("B")); // B is 1',
+                        UTIL,
+                    ),
                 ),
             },
             {
@@ -2053,11 +2248,26 @@ export const QUESTS = [
             {
                 title: t('자주 보는 예외들', 'Common exceptions'),
                 body: t(
-                    '<code>ArithmeticException</code> (0 으로 나누기), <code>ArrayIndexOutOfBoundsException</code> (없는 칸), <code>NumberFormatException</code> (숫자로 못 바꿈). <code>finally { }</code> 는 에러가 나든 안 나든 마지막에 실행돼요.',
-                    "<code>ArithmeticException</code> (divide by 0), <code>ArrayIndexOutOfBoundsException</code> (no such slot), <code>NumberFormatException</code> (can't make a number). <code>finally { }</code> runs at the end either way.",
+                    '자주 보는 예외들: <code>ArithmeticException</code> (0 으로 나누기), <code>ArrayIndexOutOfBoundsException</code> (없는 칸), <code>NumberFormatException</code> (숫자로 못 바꿈). <code>finally</code> 는 예제 주석을 보세요.',
+                    'Common exceptions: <code>ArithmeticException</code> (divide by 0), <code>ArrayIndexOutOfBoundsException</code> (no such slot), <code>NumberFormatException</code> (can not make a number). See the comments for <code>finally</code>.',
                 ),
-                code: main(
-                    `int[] a = {1, 2, 3};\ntry {\n    System.out.println(a[5]);\n} catch (ArrayIndexOutOfBoundsException e) {\n    System.out.println("${t('없는 칸이에요', 'No such slot')}");\n} finally {\n    System.out.println("${t('확인 끝', 'Check done')}");\n}`,
+                code: t(
+                    main(`int[] a = {1, 2, 3};
+try {
+    System.out.println(a[5]); // 5번 칸이 없어서 ArrayIndexOutOfBoundsException
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("없는 칸이에요");
+} finally { // finally: 에러가 나든 안 나든 마지막에 실행
+    System.out.println("확인 끝");
+}`),
+                    main(`int[] a = {1, 2, 3};
+try {
+    System.out.println(a[5]); // there is no slot 5, so ArrayIndexOutOfBoundsException
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("No such slot");
+} finally { // finally: runs at the end, error or not
+    System.out.println("Check done");
+}`),
                 ),
             },
         ],

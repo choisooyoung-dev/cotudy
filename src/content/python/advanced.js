@@ -111,14 +111,21 @@ print(lens)`,
             {
                 title: t('<code>sorted</code> 와 <code>key</code>', '<code>sorted</code> and <code>key</code>'),
                 body: t(
-                    '<code>sorted(목록)</code> 은 정렬된 <b>새 리스트</b>예요. <code>reverse=True</code> 면 큰 순, <code>key=함수</code> 를 주면 그 함수가 돌려준 값을 기준으로 정렬해요.',
-                    '<code>sorted(list)</code> is a sorted <b>new list</b>. <code>reverse=True</code> gives largest first, and <code>key=function</code> sorts by what that function returns.',
+                    '<code>sorted</code> 는 정렬된 <b>새 리스트</b>를 돌려줘요. 정렬 기준을 바꾸는 법은 예제 주석을 보세요.',
+                    '<code>sorted</code> returns a sorted <b>new list</b>. See the comments for how to change the sort rule.',
                 ),
-                code: `kgs = [12, 3, 25, 8]
-print(sorted(kgs))
-print(sorted(kgs, reverse=True))
-names = [${t('"한빛로지스", "번개", "새벽배송"', '"Lightning", "Dawn", "Hanbit"')}]
-print(sorted(names, key=len))`,
+                code: t(
+                    `kgs = [12, 3, 25, 8]
+print(sorted(kgs))  # 작은 순 → [3, 8, 12, 25]
+print(sorted(kgs, reverse=True))  # reverse=True: 큰 순 → [25, 12, 8, 3]
+names = ["한빛로지스", "번개", "새벽배송"]
+print(sorted(names, key=len))  # key=함수: 그 함수가 돌려준 값(글자 수)으로 정렬 → ['번개', '새벽배송', '한빛로지스']`,
+                    `kgs = [12, 3, 25, 8]
+print(sorted(kgs))  # smallest first → [3, 8, 12, 25]
+print(sorted(kgs, reverse=True))  # reverse=True: largest first → [25, 12, 8, 3]
+names = ["Lightning", "Dawn", "Hanbit"]
+print(sorted(names, key=len))  # key=function: sorts by what it returns (length) → ['Dawn', 'Hanbit', 'Lightning']`,
+                ),
             },
             {
                 title: t(
@@ -126,16 +133,25 @@ print(sorted(names, key=len))`,
                     '<code>lambda</code>: a short function with no name',
                 ),
                 body: t(
-                    '<code>lambda 매개변수: 결과</code> 는 한 줄짜리 함수예요. <code>key=lambda t: t[1]</code> 처럼 정렬 기준을 바로 적을 때 써요. <code>max</code> / <code>min</code> 에도 <code>key</code> 를 줄 수 있어요.',
-                    '<code>lambda params: result</code> is a one-line function. Use it to write a sort rule on the spot, like <code>key=lambda t: t[1]</code>. <code>max</code> / <code>min</code> take <code>key</code> too.',
+                    '<code>lambda</code> 는 한 줄짜리 이름 없는 함수예요. 정렬 기준을 바로 적을 때 써요.',
+                    '<code>lambda</code> is a one-line function with no name. Use it to write a sort rule on the spot.',
                 ),
-                code: `trucks = [("${t('1호차', 'Truck1')}", 800), ("${t('2호차', 'Truck2')}", 300), ("${t('3호차', 'Truck3')}", 500)]
-light = sorted(trucks, key=lambda t: t[1])
-print(light[0])
-heavy = max(trucks, key=lambda t: t[1])
-print(heavy[0])
-double = lambda n: n * 2
-print(double(21))`,
+                code: t(
+                    `trucks = [("1호차", 800), ("2호차", 300), ("3호차", 500)]
+light = sorted(trucks, key=lambda t: t[1])  # lambda 매개변수: 결과, t[1] 무게로 정렬
+print(light[0])  # → ('2호차', 300)
+heavy = max(trucks, key=lambda t: t[1])  # max / min 에도 key 를 줄 수 있어요
+print(heavy[0])  # → 1호차
+double = lambda n: n * 2  # 변수에 담아서 함수처럼 부를 수도 있어요
+print(double(21))  # → 42`,
+                    `trucks = [("Truck1", 800), ("Truck2", 300), ("Truck3", 500)]
+light = sorted(trucks, key=lambda t: t[1])  # lambda params: result, sorts by weight t[1]
+print(light[0])  # → ('Truck2', 300)
+heavy = max(trucks, key=lambda t: t[1])  # max / min take key too
+print(heavy[0])  # → Truck1
+double = lambda n: n * 2  # you can also store it and call it like a function
+print(double(21))  # → 42`,
+                ),
             },
         ],
         predict: {
@@ -219,10 +235,25 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('<code>zip</code> 과 나눠 담기', '<code>zip</code> and unpacking'),
                 body: t(
-                    '<code>zip(a, b)</code> 는 같은 자리끼리 <code>(a값, b값)</code> 으로 묶어요. 짧은 쪽에 맞춰 끝나요. <code>x, y = 값1, 값2</code> 처럼 여러 변수에 나눠 담을 수 있어서, 두 값 바꾸기도 한 줄이에요.',
-                    '<code>zip(a, b)</code> pairs items by position as <code>(a_item, b_item)</code>, stopping at the shorter one. You can unpack into several variables, <code>x, y = v1, v2</code>, so swapping two values is one line.',
+                    '<code>zip</code> 으로 두 리스트를 같은 자리끼리 짝지어 돌고, 여러 변수에 나눠 담아요. 예제 주석을 보세요.',
+                    'Loop over two lists in pairs with <code>zip</code>, and unpack into several variables. See the comments.',
                 ),
-                code: 'ids = ["A1", "A2", "A3"]\nkgs = [3, 12, 8]\nfor oid, kg in zip(ids, kgs):\n    print(oid, kg)\na, b = 10, 20\na, b = b, a\nprint(a, b)',
+                code: t(
+                    `ids = ["A1", "A2", "A3"]
+kgs = [3, 12, 8]
+for oid, kg in zip(ids, kgs):  # zip(a, b): 같은 자리끼리 (a값, b값), 짧은 쪽에 맞춰 끝나요
+    print(oid, kg)  # → A1 3, A2 12, A3 8
+a, b = 10, 20  # x, y = 값1, 값2: 여러 변수에 나눠 담기
+a, b = b, a  # 두 값 바꾸기도 한 줄
+print(a, b)  # → 20 10`,
+                    `ids = ["A1", "A2", "A3"]
+kgs = [3, 12, 8]
+for oid, kg in zip(ids, kgs):  # zip(a, b): pairs by position, stops at the shorter one
+    print(oid, kg)  # → A1 3, A2 12, A3 8
+a, b = 10, 20  # x, y = v1, v2: unpack into several variables
+a, b = b, a  # swapping two values is one line too
+print(a, b)  # → 20 10`,
+                ),
             },
         ],
         predict: {
@@ -506,10 +537,37 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('데코레이터 <code>@</code>', 'Decorators <code>@</code>'),
                 body: t(
-                    '함수 위에 <code>@log</code> 라고 쓰면 <code>fee = log(fee)</code> 와 같아요. 이걸 <b>데코레이터</b>라고 해요. wrapper 가 <code>*args</code> 로 받아 넘기면 매개변수가 있는 함수도 감쌀 수 있어요.',
-                    'Writing <code>@log</code> above a function is the same as <code>fee = log(fee)</code>. This is a <b>decorator</b>. If the wrapper takes and passes <code>*args</code>, it can wrap functions with parameters.',
+                    '함수 위에 <code>@이름</code> 을 쓰면 그 함수가 감싸져요. 이걸 <b>데코레이터</b>라고 해요. 흐름은 예제 주석을 보세요.',
+                    'Writing <code>@name</code> above a function wraps it. This is a <b>decorator</b>. See the comments for the flow.',
                 ),
-                code: `def log(fn):\n    def wrapper(*args):\n        print(f"[${t('기록', 'log')}] {fn.__name__} ${t('시작', 'start')}")\n        result = fn(*args)\n        print(f"[${t('기록', 'log')}] ${t('결과', 'result')} {result}")\n        return result\n    return wrapper\n\n@log\ndef fee(kg):\n    return kg * 100\n\nfee(5)`,
+                code: t(
+                    `def log(fn):
+    def wrapper(*args):  # *args 로 받아 넘기면 매개변수가 있는 함수도 감쌀 수 있어요
+        print(f"[기록] {fn.__name__} 시작")
+        result = fn(*args)  # 원래 함수 부르기
+        print(f"[기록] 결과 {result}")
+        return result
+    return wrapper
+
+@log  # fee = log(fee) 와 같아요
+def fee(kg):
+    return kg * 100
+
+fee(5)  # 사실은 wrapper(5) 가 불려요`,
+                    `def log(fn):
+    def wrapper(*args):  # taking and passing *args lets it wrap functions with parameters
+        print(f"[log] {fn.__name__} start")
+        result = fn(*args)  # call the original function
+        print(f"[log] result {result}")
+        return result
+    return wrapper
+
+@log  # same as fee = log(fee)
+def fee(kg):
+    return kg * 100
+
+fee(5)  # this really calls wrapper(5)`,
+                ),
             },
         ],
         predict: {
@@ -590,18 +648,52 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('<code>yield</code>: 하나씩 내주기', '<code>yield</code>: handing out one at a time'),
                 body: t(
-                    '함수 안에 <code>yield 값</code> 이 있으면 <b>제너레이터</b>가 돼요. 부르면 바로 실행되지 않고, <code>for</code> 가 하나 달라고 할 때마다 다음 <code>yield</code> 까지 실행해서 값을 내줘요.',
-                    "A function with <code>yield value</code> becomes a <b>generator</b>. Calling it doesn't run it right away; each time a <code>for</code> asks for one, it runs to the next <code>yield</code> and hands out the value.",
+                    '함수 안에 <code>yield</code> 가 있으면 <b>제너레이터</b>가 돼요. 언제 실행되는지는 예제 주석을 보세요.',
+                    'A function with <code>yield</code> in it becomes a <b>generator</b>. See the comments for when it runs.',
                 ),
-                code: 'def box_numbers(n):\n    for i in range(1, n + 1):\n        yield f"BOX-{i:03}"\n\nfor b in box_numbers(3):\n    print(b)',
+                code: t(
+                    `def box_numbers(n):
+    for i in range(1, n + 1):
+        yield f"BOX-{i:03}"  # yield 값: 값을 하나 내주고 여기서 멈춰요
+
+for b in box_numbers(3):  # for 가 하나 달라고 할 때마다 다음 yield 까지 실행
+    print(b)  # → BOX-001, BOX-002, BOX-003`,
+                    `def box_numbers(n):
+    for i in range(1, n + 1):
+        yield f"BOX-{i:03}"  # yield value: hands out one value and pauses here
+
+for b in box_numbers(3):  # each time for asks for one, it runs to the next yield
+    print(b)  # → BOX-001, BOX-002, BOX-003`,
+                ),
             },
             {
                 title: t('<code>next</code> 와 제너레이터 식', '<code>next</code> and generator expressions'),
                 body: t(
-                    '<code>next(제너레이터)</code> 로 하나씩 직접 꺼낼 수도 있어요. <code>(식 for x in 목록)</code> 처럼 괄호로 쓰면 리스트를 만들지 않고 하나씩 흘려보내는 제너레이터 식이에요. <code>sum(...)</code> 같은 함수에 바로 넣어요.',
-                    'You can also take one out with <code>next(generator)</code>. Written with parentheses, <code>(expr for x in list)</code> is a generator expression that flows values one at a time without building a list. Put it straight into functions like <code>sum(...)</code>.',
+                    '제너레이터에서 값을 하나씩 직접 꺼내는 법과, 괄호로 쓰는 제너레이터 식이에요. 예제 주석을 보세요.',
+                    'Taking values out of a generator one at a time yourself, and generator expressions written with parentheses. See the comments.',
                 ),
-                code: `def tape_rolls():\n    yield "${t('1번 테이프', 'Tape 1')}"\n    yield "${t('2번 테이프', 'Tape 2')}"\n\ng = tape_rolls()\nprint(next(g))\nprint(next(g))\ntotal = sum(kg * 2 for kg in [3, 5, 2])\nprint(total)`,
+                code: t(
+                    `def tape_rolls():
+    yield "1번 테이프"
+    yield "2번 테이프"
+
+g = tape_rolls()
+print(next(g))  # next(제너레이터): 하나 꺼내기 → 1번 테이프
+print(next(g))  # → 2번 테이프
+# (식 for x in 목록): 리스트를 만들지 않고 하나씩 흘려보내는 제너레이터 식
+total = sum(kg * 2 for kg in [3, 5, 2])  # 6 + 10 + 4
+print(total)  # → 20`,
+                    `def tape_rolls():
+    yield "Tape 1"
+    yield "Tape 2"
+
+g = tape_rolls()
+print(next(g))  # next(generator): take one out → Tape 1
+print(next(g))  # → Tape 2
+# (expr for x in list): a generator expression that flows values one at a time, no list built
+total = sum(kg * 2 for kg in [3, 5, 2])  # 6 + 10 + 4
+print(total)  # → 20`,
+                ),
             },
         ],
         predict: {
@@ -687,10 +779,33 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('상속 <code>class 자식(부모)</code>', 'Inheritance <code>class Child(Parent)</code>'),
                 body: t(
-                    '<code>class Fragile(Item):</code> 처럼 괄호 안에 부모 클래스를 적으면, 부모의 <code>__init__</code> 과 메서드를 물려받아요. 아무것도 더하지 않을 땐 <code>pass</code>.',
-                    "Put the parent class in parentheses, like <code>class Fragile(Item):</code>, and the child inherits the parent's <code>__init__</code> and methods. Use <code>pass</code> if you add nothing.",
+                    '부모 클래스를 물려받는 자식 클래스를 만드는 법이에요. 예제 주석을 보세요.',
+                    'Making a child class that inherits from a parent class. See the comments.',
                 ),
-                code: `class Item:\n    def __init__(self, name):\n        self.name = name\n\n    def label(self):\n        return f"[${t('상품', 'Item')}] {self.name}"\n\nclass Fragile(Item):\n    pass\n\nprint(Fragile("${t('유리병 토너', 'Glass toner')}").label())`,
+                code: t(
+                    `class Item:
+    def __init__(self, name):
+        self.name = name
+
+    def label(self):
+        return f"[상품] {self.name}"
+
+class Fragile(Item):  # 괄호 안에 부모 클래스: __init__ 과 메서드를 물려받아요
+    pass  # 아무것도 더하지 않을 땐 pass
+
+print(Fragile("유리병 토너").label())  # 물려받은 label() → [상품] 유리병 토너`,
+                    `class Item:
+    def __init__(self, name):
+        self.name = name
+
+    def label(self):
+        return f"[Item] {self.name}"
+
+class Fragile(Item):  # parent class in parentheses: inherits __init__ and the methods
+    pass  # use pass when you add nothing
+
+print(Fragile("Glass toner").label())  # the inherited label() → [Item] Glass toner`,
+                ),
             },
             {
                 title: t('<code>super()</code> 와 덮어쓰기', '<code>super()</code> and overriding'),
@@ -793,10 +908,39 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('<code>__len__</code> 과 <code>__eq__</code>', '<code>__len__</code> and <code>__eq__</code>'),
                 body: t(
-                    '<code>__len__</code> 을 만들면 <code>len(객체)</code> 가, <code>__eq__</code> 를 만들면 <code>==</code> 비교가 그 메서드대로 동작해요.',
-                    'Define <code>__len__</code> and <code>len(obj)</code> works; define <code>__eq__</code> and <code>==</code> compares the way you say.',
+                    '특별 메서드를 만들면 <code>len</code>, <code>==</code> 같은 기본 기능이 내 객체에서 그 메서드대로 동작해요.',
+                    'Define special methods and built-ins like <code>len</code> and <code>==</code> work on your object the way those methods say.',
                 ),
-                code: 'class Pallet:\n    def __init__(self, boxes):\n        self.boxes = boxes\n\n    def __len__(self):\n        return len(self.boxes)\n\n    def __eq__(self, other):\n        return sum(self.boxes) == sum(other.boxes)\n\na = Pallet([3, 5])\nb = Pallet([4, 4])\nprint(len(a))\nprint(a == b)',
+                code: t(
+                    `class Pallet:
+    def __init__(self, boxes):
+        self.boxes = boxes
+
+    def __len__(self):  # len(객체) 가 이 메서드를 불러요
+        return len(self.boxes)
+
+    def __eq__(self, other):  # == 가 이 메서드를 불러요
+        return sum(self.boxes) == sum(other.boxes)
+
+a = Pallet([3, 5])
+b = Pallet([4, 4])
+print(len(a))  # 박스 2개 → 2
+print(a == b)  # 무게 합 8 == 8 → True`,
+                    `class Pallet:
+    def __init__(self, boxes):
+        self.boxes = boxes
+
+    def __len__(self):  # len(obj) calls this method
+        return len(self.boxes)
+
+    def __eq__(self, other):  # == calls this method
+        return sum(self.boxes) == sum(other.boxes)
+
+a = Pallet([3, 5])
+b = Pallet([4, 4])
+print(len(a))  # 2 boxes → 2
+print(a == b)  # total weight 8 == 8 → True`,
+                ),
             },
         ],
         predict: {
@@ -874,10 +1018,39 @@ for i, name in enumerate(couriers, start=1):
             {
                 title: t('예외 만들기와 <code>raise</code>', 'Making an exception, and <code>raise</code>'),
                 body: t(
-                    '<code>class 이름(Exception): pass</code> 로 우리만의 예외를 만들고, <code>raise 이름("메시지")</code> 로 일으켜요. 받는 쪽은 <code>except 이름 as e:</code> 로 잡고, <code>e</code> 를 찍으면 메시지가 나와요.',
-                    'Make your own exception with <code>class Name(Exception): pass</code> and raise it with <code>raise Name("message")</code>. Catch it with <code>except Name as e:</code>; printing <code>e</code> shows the message.',
+                    '<code>Exception</code> 을 상속해서 우리만의 예외를 만들어요. 일으키고 잡는 법은 예제 주석을 보세요.',
+                    'Inherit from <code>Exception</code> to make your own exception. See the comments for how to raise and catch it.',
                 ),
-                code: `class OverloadError(Exception):\n    pass\n\ndef load(kg):\n    if kg > 1000:\n        raise OverloadError(f"{kg}${t('kg 은 너무 무거워요', 'kg is too heavy')}")\n    print(f"{kg}${t('kg 실음', 'kg loaded')}")\n\ntry:\n    load(800)\n    load(1200)\n    load(500)\nexcept OverloadError as e:\n    print("${t('멈춤:', 'Stopped:')}", e)`,
+                code: t(
+                    `class OverloadError(Exception):  # class 이름(Exception): 우리만의 예외
+    pass
+
+def load(kg):
+    if kg > 1000:
+        raise OverloadError(f"{kg}kg 은 너무 무거워요")  # raise 이름("메시지"): 예외 일으키기
+    print(f"{kg}kg 실음")
+
+try:
+    load(800)
+    load(1200)  # 여기서 예외 → 바로 except 로 가서 load(500) 은 실행 안 돼요
+    load(500)
+except OverloadError as e:  # except 이름 as e: 잡기
+    print("멈춤:", e)  # e 를 찍으면 메시지 → 멈춤: 1200kg 은 너무 무거워요`,
+                    `class OverloadError(Exception):  # class Name(Exception): our own exception
+    pass
+
+def load(kg):
+    if kg > 1000:
+        raise OverloadError(f"{kg}kg is too heavy")  # raise Name("message"): raise the exception
+    print(f"{kg}kg loaded")
+
+try:
+    load(800)
+    load(1200)  # exception here → jumps straight to except, so load(500) never runs
+    load(500)
+except OverloadError as e:  # except Name as e: catch it
+    print("Stopped:", e)  # printing e shows the message → Stopped: 1200kg is too heavy`,
+                ),
             },
             {
                 title: t('<code>finally</code> 와 <code>with</code>', '<code>finally</code> and <code>with</code>'),

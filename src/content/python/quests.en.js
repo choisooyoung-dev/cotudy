@@ -15,8 +15,9 @@ export const QUESTS = [
         concepts: [
             {
                 title: 'Print to the screen <code>print</code>',
-                body: '<code>print(…)</code> prints what is inside the parentheses and <b>moves to a new line</b>.<br>Text (a string) goes inside quotes. Double quotes <code>" "</code> and single quotes <code>\' \'</code> both work.',
-                code: 'print("Hello")\nprint(\'I am Kim from logistics\')',
+                body: '<code>print(…)</code> prints what is inside the parentheses and <b>moves to a new line</b>. See the comments for how to wrap text.',
+                code: `print("Hello")  # text (a string) goes inside double quotes " "
+print('I am Kim from logistics')  # single quotes ' ' work too`,
                 note: 'Code runs <b>one line at a time, from the top</b>.',
             },
             {
@@ -273,8 +274,9 @@ export const QUESTS = [
             },
             {
                 title: 'Repeat with <code>*</code>, numbers to text with <code>str()</code>',
-                body: 'A string <code>*</code> a number repeats it that many times. To join a number to a string with <code>+</code>, turn it into text with <code>str(number)</code>.',
-                code: 'print("Box" * 3)\nprint("Pallet" + str(2))',
+                body: 'Using <code>*</code> and <code>+</code> with strings. What each line does is in the comments.',
+                code: `print("Box" * 3)  # string * number: repeats it → BoxBoxBox
+print("Pallet" + str(2))  # to join a number with +, turn it into text with str(number) → Pallet2`,
             },
         ],
         predict: {
@@ -339,8 +341,10 @@ export const QUESTS = [
             },
             {
                 title: 'String → number <code>int("10")</code>',
-                body: 'If a value from the system comes in as the string <code>"10"</code>, you can\'t do math with it like a number. Turn it into an integer with <code>int("10")</code>. For text with a decimal point, use <code>float("2.5")</code>.',
-                code: 'total = "10"\nprint(total * 2)\nprint(int(total) * 2)',
+                body: 'If a value from the system is a string, you can not do math with it like a number. See the comments for how to convert it.',
+                code: `total = "10"  # it has quotes, so it is a string, not a number
+print(total * 2)  # string * 2 repeats it twice → 1010
+print(int(total) * 2)  # int(…): string to whole number → 20 (for text with a decimal point, float("2.5"))`,
             },
         ],
         predict: {

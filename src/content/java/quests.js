@@ -241,8 +241,11 @@ export const QUESTS = [
         concepts: [
             {
                 title: '큰 정수 <code>long</code>',
-                body: '<code>int</code> 는 약 <b>21억</b>까지만 담을 수 있어요. 바코드 <code>8801234567890</code> 은 그보다 커요.<br>더 큰 정수는 <code>long</code> 에 담고, 숫자 끝에 <code>L</code> 을 붙여요.',
-                code: main('long barcode = 8801234567890L;\nSystem.out.println(barcode);'),
+                body: '<code>int</code> 는 약 <b>21억</b>까지만 담을 수 있어서, 그보다 큰 정수는 <code>long</code> 에 담아요. 담는 법은 예제 주석을 보세요.',
+                code: main(`// 8801234567890 은 21억보다 커서 int 에 못 담아요
+// long 에 담고, 숫자 끝에 L 을 붙여요
+long barcode = 8801234567890L;
+System.out.println(barcode);`),
                 note: '<code>L</code> 을 빼면 "integer number too large" 에러가 나요. 숫자를 먼저 int 로 읽으려고 해서예요.',
             },
             {
@@ -313,10 +316,12 @@ export const QUESTS = [
             },
             {
                 title: '문자열 <code>String</code>',
-                body: '<code>String</code> 은 글자 여러 개를 담아요. <code>S</code> 는 대문자예요.<br><code>+</code> 는 왼쪽부터 차례로 계산해요. 그래서 숫자가 먼저 나오면 더하기, 글자가 먼저 나오면 이어 붙이기가 돼요.',
-                code: main(
-                    'String name = "쿠션 팩트";\nSystem.out.println(name + " 입고");\nSystem.out.println(1 + 2 + "박스");\nSystem.out.println("박스" + 1 + 2);',
-                ),
+                body: '<code>String</code> 은 글자 여러 개(문자열)를 담는 타입이에요. <code>+</code> 가 어떻게 계산되는지는 예제 주석을 보세요.',
+                code: main(`String name = "쿠션 팩트"; // String 의 S 는 대문자
+System.out.println(name + " 입고");
+// + 는 왼쪽부터 차례로 계산해요
+System.out.println(1 + 2 + "박스"); // 1 + 2 = 3 먼저, 그다음 "박스" 붙이기 → 3박스
+System.out.println("박스" + 1 + 2); // "박스" + 1 → "박스1", 그다음 + 2 → 박스12`),
             },
         ],
         predict: {

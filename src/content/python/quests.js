@@ -17,8 +17,9 @@ export const QUESTS = [
         concepts: [
             {
                 title: '화면에 찍기 <code>print</code>',
-                body: '<code>print(…)</code> 는 괄호 안의 내용을 찍고 <b>줄을 바꿔요</b>.<br>글자(문자열)는 따옴표로 감싸요. 큰따옴표 <code>" "</code>, 작은따옴표 <code>\' \'</code> 둘 다 돼요.',
-                code: 'print("안녕하세요")\nprint(\'물류팀 김사원입니다\')',
+                body: '<code>print(…)</code> 는 괄호 안의 내용을 찍고 <b>줄을 바꿔요</b>. 글자(문자열)를 감싸는 법은 예제 주석을 보세요.',
+                code: `print("안녕하세요")  # 글자(문자열)는 큰따옴표 " " 로 감싸요
+print('물류팀 김사원입니다')  # 작은따옴표 ' ' 도 돼요`,
                 note: '코드는 <b>위에서부터 한 줄씩</b> 차례대로 실행돼요.',
             },
             {
@@ -268,8 +269,9 @@ export const QUESTS = [
             },
             {
                 title: '문자열 반복 <code>*</code>, 숫자를 글자로 <code>str()</code>',
-                body: '문자열에 <code>*</code> 숫자를 하면 그만큼 반복해요. 숫자를 문자열에 <code>+</code> 로 붙이려면 <code>str(숫자)</code> 로 바꿔요.',
-                code: 'print("박스" * 3)\nprint("팔레트" + str(2))',
+                body: '문자열에 쓰는 <code>*</code> 와 <code>+</code> 예요. 줄마다 하는 일은 예제 주석에 있어요.',
+                code: `print("박스" * 3)  # 문자열 * 숫자: 그만큼 반복 → 박스박스박스
+print("팔레트" + str(2))  # 숫자를 + 로 붙이려면 str(숫자) 로 바꿔요 → 팔레트2`,
             },
         ],
         predict: {
@@ -334,8 +336,10 @@ export const QUESTS = [
             },
             {
                 title: '문자열 → 숫자 <code>int("10")</code>',
-                body: '전산에서 받은 값이 문자열 <code>"10"</code> 이면 숫자처럼 계산할 수 없어요. <code>int("10")</code> 으로 정수로 바꿔요. 소수가 있는 글자는 <code>float("2.5")</code>.',
-                code: 'total = "10"\nprint(total * 2)\nprint(int(total) * 2)',
+                body: '전산에서 받은 값이 문자열이면 숫자처럼 계산할 수 없어요. 바꾸는 법은 예제 주석을 보세요.',
+                code: `total = "10"  # 따옴표가 있어서 숫자가 아니라 문자열
+print(total * 2)  # 문자열 * 2 는 두 번 반복 → 1010
+print(int(total) * 2)  # int(…): 문자열을 정수로 → 20 (소수가 있는 글자는 float("2.5"))`,
             },
         ],
         predict: {
