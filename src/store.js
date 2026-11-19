@@ -145,6 +145,18 @@ export const store = {
         d[qid] = Math.max(d[qid] || 0, stars);
         write(state);
     },
+    /** 정답 보기를 누르고 끝낸 퀘스트 id 들 (휴게실 재도전 게시판에 붙는다). */
+    get peeked() {
+        return langState().peeked || [];
+    },
+    /** 정답을 보고 끝냈으면 붙이고(on = true), 정답 없이 다시 풀었으면 뗀다(on = false). */
+    setPeeked(qid, on) {
+        const l = langState();
+        const list = (l.peeked ||= []).filter((x) => x !== qid);
+        if (on) list.push(qid);
+        l.peeked = list;
+        write(state);
+    },
     /** 마지막으로 저장된 김사원 위치 {x, z}. */
     get pos() {
         return langState().pos;
