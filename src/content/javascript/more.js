@@ -28,18 +28,26 @@ export const QUESTS = [
                     'The four operations and the remainder. Multiply and divide first, and parentheses before that. The result of each line is in the comments.',
                 ),
                 code: t(
-                    `console.log(10 + 3 * 2); // 곱하기 먼저: 10 + 6 → 16
-console.log((10 + 3) * 2); // 괄호 먼저: 13 * 2 → 26
-console.log(23 / 5); // / 는 소수점까지 → 4.6
+                    `// 곱하기 먼저: 10 + 6 → 16
+console.log(10 + 3 * 2);
+// 괄호 먼저: 13 * 2 → 26
+console.log((10 + 3) * 2);
+// / 는 소수점까지 → 4.6
+console.log(23 / 5);
 // Math.floor: 소수점 버리기, 몫만 → 4
 console.log(Math.floor(23 / 5));
-console.log(23 % 5); // % 는 나눈 나머지 → 3`,
-                    `console.log(10 + 3 * 2); // multiply first: 10 + 6 → 16
-console.log((10 + 3) * 2); // parentheses first: 13 * 2 → 26
-console.log(23 / 5); // / keeps decimals → 4.6
+// % 는 나눈 나머지 → 3
+console.log(23 % 5);`,
+                    `// multiply first: 10 + 6 → 16
+console.log(10 + 3 * 2);
+// parentheses first: 13 * 2 → 26
+console.log((10 + 3) * 2);
+// / keeps decimals → 4.6
+console.log(23 / 5);
 // Math.floor: drops decimals, the whole part → 4
 console.log(Math.floor(23 / 5));
-console.log(23 % 5); // % is the remainder → 3`,
+// % is the remainder → 3
+console.log(23 % 5);`,
                 ),
             },
             {
@@ -144,16 +152,22 @@ console.log(count);`,
                 code: t(
                     `// 비교 연산자: >  <  >=  <=  ===  !==
 const price = 35000;
-console.log(price >= 30000); // >= 크거나 같다 → true
-console.log(price === 30000); // === 같다 (등호 세 개) → false
-console.log(price !== 30000); // !== 다르다 → true
+// >= 크거나 같다 → true
+console.log(price >= 30000);
+// === 같다 (등호 세 개) → false
+console.log(price === 30000);
+// !== 다르다 → true
+console.log(price !== 30000);
 // == 는 타입을 멋대로 바꿔서 true, === 는 false
 console.log(5 == "5", 5 === "5");`,
                     `// Comparison operators: >  <  >=  <=  ===  !==
 const price = 35000;
-console.log(price >= 30000); // >= greater than or equal → true
-console.log(price === 30000); // === equal (three signs) → false
-console.log(price !== 30000); // !== not equal → true
+// >= greater than or equal → true
+console.log(price >= 30000);
+// === equal (three signs) → false
+console.log(price === 30000);
+// !== not equal → true
+console.log(price !== 30000);
 // == converts types on its own, so true; === gives false
 console.log(5 == "5", 5 === "5");`,
                 ),
@@ -174,14 +188,16 @@ const heavy = false;
 console.log(fragile && heavy);
 // || 또는: 하나만 참이어도 참 → true
 console.log(fragile || heavy);
-console.log(!heavy); // ! 아니다: 반대로 바꾸기 → true`,
+// ! 아니다: 반대로 바꾸기 → true
+console.log(!heavy);`,
                     `const fragile = true;
 const heavy = false;
 // && and: true only when both are true → false
 console.log(fragile && heavy);
 // || or: true when either is true → true
 console.log(fragile || heavy);
-console.log(!heavy); // ! not: flips it → true`,
+// ! not: flips it → true
+console.log(!heavy);`,
                 ),
             },
         ],
@@ -789,14 +805,18 @@ switch (zone) { // looks for the case equal to zone
 const couriers = ["번개택배", "하늘택배", "바다택배"];
 // 이름[번호], 번호는 0 부터 → 번개택배
 console.log(couriers[0]);
-console.log(couriers[2]); // → 바다택배
-console.log(couriers.length); // .length: 개수 → 3`,
+// → 바다택배
+console.log(couriers[2]);
+// .length: 개수 → 3
+console.log(couriers.length);`,
                     `// [value, value, …]
 const couriers = ["Lightning", "Sky", "Ocean"];
 // name[index], indexes start at 0 → Lightning
 console.log(couriers[0]);
-console.log(couriers[2]); // → Ocean
-console.log(couriers.length); // .length: how many → 3`,
+// → Ocean
+console.log(couriers[2]);
+// .length: how many → 3
+console.log(couriers.length);`,
                 ),
             },
             {
@@ -995,7 +1015,8 @@ console.log(list);`,
 console.log(list.includes("C"));
 // indexOf(값): 몇 번째인가 (없으면 -1) → 1
 console.log(list.indexOf("B"));
-list.splice(1, 1); // splice(번호, 1): 1번에서 하나 빼기 ("B")
+// splice(번호, 1): 1번에서 하나 빼기 ("B")
+list.splice(1, 1);
 console.log(list);`,
                     `const list = ["A", "B", "C"];
 // includes(value): is it there? → true
@@ -1095,10 +1116,12 @@ console.log(code.length); // .length: 글자 수 → 10
 console.log(code[0]); // s[번호]: 그 위치의 글자 하나 → K
 console.log(code.at(-1)); // at(-1): 맨 끝 글자 → 2`,
                     `const code = "KR20261112";
-console.log(code.length); // .length: number of characters → 10
+// .length: number of characters → 10
+console.log(code.length);
 // s[index]: the character at that spot → K
 console.log(code[0]);
-console.log(code.at(-1)); // at(-1): the last character → 2`,
+// at(-1): the last character → 2
+console.log(code.at(-1));`,
                 ),
             },
             {
@@ -1111,7 +1134,8 @@ console.log(code.at(-1)); // at(-1): the last character → 2`,
                     `const code = "  kr-778  ";
 // trim(): 앞뒤 공백 지우기, toUpperCase(): 대문자로 (toLowerCase() 는 소문자로)
 const clean = code.trim().toUpperCase();
-console.log(clean); // → KR-778
+// → KR-778
+console.log(clean);
 // slice(시작, 끝): 0번부터 2번 바로 앞까지 → KR
 console.log(clean.slice(0, 2));
 // slice(시작): 3번부터 끝까지 → 778
@@ -1119,7 +1143,8 @@ console.log(clean.slice(3));`,
                     `const code = "  kr-778  ";
 // trim(): remove spaces at both ends, toUpperCase(): upper case (toLowerCase() for lower case)
 const clean = code.trim().toUpperCase();
-console.log(clean); // → KR-778
+// → KR-778
+console.log(clean);
 // slice(start, end): from 0 up to just before 2 → KR
 console.log(clean.slice(0, 2));
 // slice(start): from 3 to the end → 778
@@ -1722,13 +1747,15 @@ console.log(stock);`,
                     `const stock = { toner: 12 };
 // "키" in obj: 그 키가 있나? → false
 console.log("cushion" in stock);
-console.log(stock.cushion); // 없는 키를 꺼내면 → undefined
+// 없는 키를 꺼내면 → undefined
+console.log(stock.cushion);
 // Object.keys(obj).length: 키 개수 → 1
 console.log(Object.keys(stock).length);`,
                     `const stock = { toner: 12 };
 // "key" in obj: is the key there? → false
 console.log("cushion" in stock);
-console.log(stock.cushion); // a missing key gives → undefined
+// a missing key gives → undefined
+console.log(stock.cushion);
 // Object.keys(obj).length: number of keys → 1
 console.log(Object.keys(stock).length);`,
                 ),
@@ -2036,7 +2063,8 @@ console.log(t.label()); // → 토너 (9)`,
     this.name = name;
     this.stock = stock;
   }
-  sell(n) { // a method: name() { … }
+  // a method: name() { … }
+  sell(n) {
     // this: the object the method was called on
     this.stock -= n;
   }
@@ -2048,7 +2076,8 @@ console.log(t.label()); // → 토너 (9)`,
 const t = new Item("Toner", 12);
 // call it with object.method() → stock goes from 12 to 9
 t.sell(3);
-console.log(t.label()); // → Toner (9)`,
+// → Toner (9)
+console.log(t.label());`,
                 ),
             },
             {
@@ -2159,12 +2188,15 @@ console.log(t.label()); // → Toner (9)`,
 }
 
 try {
-  console.log(toQty("12")); // → 12
-  console.log(toQty("ab")); // 여기서 에러 → catch 로
+  // → 12
+  console.log(toQty("12"));
+  // 여기서 에러 → catch 로
+  console.log(toQty("ab"));
 } catch (e) {
   // e.message: 에러 메시지 → 숫자 아님: ab
   console.log(e.message);
-} finally { // finally: 에러가 나든 안 나든 마지막에 실행
+// finally: 에러가 나든 안 나든 마지막에 실행
+} finally {
   console.log("확인 끝");
 }`,
                     `function toQty(s) {
@@ -2175,12 +2207,15 @@ try {
 }
 
 try {
-  console.log(toQty("12")); // → 12
-  console.log(toQty("ab")); // error here → goes to catch
+  // → 12
+  console.log(toQty("12"));
+  // error here → goes to catch
+  console.log(toQty("ab"));
 } catch (e) {
   // e.message: the error message → not a number: ab
   console.log(e.message);
-} finally { // finally: runs at the end, error or not
+// finally: runs at the end, error or not
+} finally {
   console.log("Check done");
 }`,
                 ),

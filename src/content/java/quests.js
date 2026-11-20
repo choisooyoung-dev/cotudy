@@ -317,7 +317,8 @@ System.out.println(barcode);`),
             {
                 title: '문자열 <code>String</code>',
                 body: '<code>String</code> 은 글자 여러 개(문자열)를 담는 타입이에요. <code>+</code> 가 어떻게 계산되는지는 예제 주석을 보세요.',
-                code: main(`String name = "쿠션 팩트"; // String 의 S 는 대문자
+                code: main(`// String 의 S 는 대문자
+String name = "쿠션 팩트";
 System.out.println(name + " 입고");
 // + 는 왼쪽부터 차례로 계산해요
 // 1 + 2 = 3 먼저, 그다음 "박스" 붙이기 → 3박스

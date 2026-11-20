@@ -45,7 +45,8 @@ console.log("밖:", zone); // 블록 밖에서는 바깥 zone → 밖: A`,
 if (true) {
   // a different variable made inside the { } block
   const zone = "B";
-  console.log("in:", zone); // → in: B
+  // → in: B
+  console.log("in:", zone);
 }
 // outside the block it is the outer zone → out: A
 console.log("out:", zone);`,
@@ -206,7 +207,8 @@ truck1();
 console.log(truck1()); // truck1 의 count 는 세 번째 → 3
 console.log(truck2()); // truck2 는 자기 count 를 따로 → 1`,
                     `function makeCounter() {
-  let count = 0; // a new count is made on every call
+  // a new count is made on every call
+  let count = 0;
   return () => {
     // the inner function keeps using the outer count (closure)
     count++;
@@ -217,8 +219,10 @@ const truck1 = makeCounter();
 const truck2 = makeCounter();
 truck1();
 truck1();
-console.log(truck1()); // third time for truck1's count → 3
-console.log(truck2()); // truck2 has its own count → 1`,
+// third time for truck1's count → 3
+console.log(truck1());
+// truck2 has its own count → 1
+console.log(truck2());`,
                 ),
             },
         ],
@@ -483,12 +487,14 @@ console.log(kgs);`,
 // 콜백이 true 를 돌려준 칸만 모으기 (15, 22)
 const heavy = kgs.filter((kg) => kg >= 10);
 console.log(heavy);
-console.log(heavy.length + "개"); // → 2개`,
+// → 2개
+console.log(heavy.length + "개");`,
                     `const kgs = [2, 15, 3, 22];
 // keeps the items where the callback returns true (15, 22)
 const heavy = kgs.filter((kg) => kg >= 10);
 console.log(heavy);
-console.log(heavy.length + " boxes"); // → 2 boxes`,
+// → 2 boxes
+console.log(heavy.length + " boxes");`,
                 ),
             },
         ],
@@ -1119,9 +1125,11 @@ console.log("${t('기다리는 중', 'Waiting')}");`,
 }
 // .then(값 => …): 결과가 나오면 받기
 arrive("1호차").then((msg) => {
-  console.log(msg); // → 1호차 도착 (두 번째로 찍혀요)
+  // → 1호차 도착 (두 번째로 찍혀요)
+  console.log(msg);
 });
-console.log("먼저 찍혀요"); // 기다리지 않고 바로 실행`,
+// 기다리지 않고 바로 실행
+console.log("먼저 찍혀요");`,
                     `function arrive(truck) {
   return new Promise((resolve) => {
     // after 0.1 s, resolve(value): give the result
@@ -1130,7 +1138,8 @@ console.log("먼저 찍혀요"); // 기다리지 않고 바로 실행`,
 }
 // .then(value => …): receive the result when it is ready
 arrive("Truck 1").then((msg) => {
-  console.log(msg); // → Truck 1 arrived (printed second)
+  // → Truck 1 arrived (printed second)
+  console.log(msg);
 });
 // runs right away, without waiting
 console.log("Printed first");`,
