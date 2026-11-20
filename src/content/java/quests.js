@@ -320,8 +320,10 @@ System.out.println(barcode);`),
                 code: main(`String name = "쿠션 팩트"; // String 의 S 는 대문자
 System.out.println(name + " 입고");
 // + 는 왼쪽부터 차례로 계산해요
-System.out.println(1 + 2 + "박스"); // 1 + 2 = 3 먼저, 그다음 "박스" 붙이기 → 3박스
-System.out.println("박스" + 1 + 2); // "박스" + 1 → "박스1", 그다음 + 2 → 박스12`),
+// 1 + 2 = 3 먼저, 그다음 "박스" 붙이기 → 3박스
+System.out.println(1 + 2 + "박스");
+// "박스" + 1 → "박스1", 그다음 + 2 → 박스12
+System.out.println("박스" + 1 + 2);`),
             },
         ],
         predict: {

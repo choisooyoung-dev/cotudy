@@ -16,8 +16,10 @@ export const QUESTS = [
             {
                 title: 'Print to the screen <code>console.log</code>',
                 body: '<code>console.log(…)</code> prints what is inside the parentheses and <b>moves to a new line</b>. See the comments for how to wrap text.',
-                code: `console.log("Hello"); // text (a string) goes inside double quotes " "
-console.log('I am Kim from logistics'); // single quotes ' ' work too`,
+                code: `// text (a string) goes inside double quotes " "
+console.log("Hello");
+// single quotes ' ' work too
+console.log('I am Kim from logistics');`,
                 note: 'Code runs <b>one line at a time, from the top</b>.',
             },
             {
@@ -150,7 +152,7 @@ console.log('I am Kim from logistics'); // single quotes ' ' work too`,
             {
                 title: 'Joining text and numbers with <code>+</code>',
                 body: 'Two ways to print text together with numbers and variables on one line. See the comments.',
-                code: 'let boxCount = 12;\nconsole.log("Boxes: " + boxCount); // attach with + next to a string → Boxes: 12\nconsole.log(`Boxes: ${boxCount}`); // inside backticks `, the value goes into ${variable} → Boxes: 12',
+                code: 'let boxCount = 12;\n// attach with + next to a string → Boxes: 12\nconsole.log("Boxes: " + boxCount);\n// inside backticks `, the value goes into ${variable} → Boxes: 12\nconsole.log(`Boxes: ${boxCount}`);',
             },
         ],
         predict: {
@@ -354,9 +356,11 @@ console.log('I am Kim from logistics'); // single quotes ' ' work too`,
             {
                 title: 'Turning strings into numbers and back',
                 body: 'If a value from the system is a string, <code>+</code> joins instead of adding. See the comments for how to convert it.',
-                code: `let input = "12"; // it has quotes, so it is a string, not a number
+                code: `// it has quotes, so it is a string, not a number
+let input = "12";
 console.log(input + 3); // string + number joins → 123
-console.log(Number(input) + 3); // Number(…): string to number → 15 (the other way is String(12))`,
+// Number(…): string to number → 15 (the other way is String(12))
+console.log(Number(input) + 3);`,
             },
         ],
         predict: {

@@ -276,7 +276,8 @@ print('I am Kim from logistics')  # single quotes ' ' work too`,
                 title: 'Repeat with <code>*</code>, numbers to text with <code>str()</code>',
                 body: 'Using <code>*</code> and <code>+</code> with strings. What each line does is in the comments.',
                 code: `print("Box" * 3)  # string * number: repeats it → BoxBoxBox
-print("Pallet" + str(2))  # to join a number with +, turn it into text with str(number) → Pallet2`,
+# to join a number with +, turn it into text with str(number) → Pallet2
+print("Pallet" + str(2))`,
             },
         ],
         predict: {
@@ -344,7 +345,8 @@ print("Pallet" + str(2))  # to join a number with +, turn it into text with str(
                 body: 'If a value from the system is a string, you can not do math with it like a number. See the comments for how to convert it.',
                 code: `total = "10"  # it has quotes, so it is a string, not a number
 print(total * 2)  # string * 2 repeats it twice → 1010
-print(int(total) * 2)  # int(…): string to whole number → 20 (for text with a decimal point, float("2.5"))`,
+# int(…): string to whole number → 20 (for text with a decimal point, float("2.5"))
+print(int(total) * 2)`,
             },
         ],
         predict: {

@@ -18,7 +18,8 @@ export const QUESTS = [
             {
                 title: '화면에 찍기 <code>console.log</code>',
                 body: '<code>console.log(…)</code> 는 괄호 안의 내용을 찍고 <b>줄을 바꿔요</b>. 글자(문자열)를 감싸는 법은 예제 주석을 보세요.',
-                code: `console.log("안녕하세요"); // 글자(문자열)는 큰따옴표 " " 로 감싸요
+                code: `// 글자(문자열)는 큰따옴표 " " 로 감싸요
+console.log("안녕하세요");
 console.log('물류팀 김사원입니다'); // 작은따옴표 ' ' 도 돼요`,
                 note: '코드는 <b>위에서부터 한 줄씩</b> 차례대로 실행돼요.',
             },
@@ -149,7 +150,7 @@ console.log('물류팀 김사원입니다'); // 작은따옴표 ' ' 도 돼요`,
             {
                 title: '글자와 숫자 이어 붙이기 <code>+</code>',
                 body: '문자열과 숫자·변수를 한 줄로 이어 찍는 두 가지 방법이에요. 예제 주석을 보세요.',
-                code: 'let boxCount = 12;\nconsole.log("박스: " + boxCount + "개"); // 문자열 옆에 + 로 붙이기 → 박스: 12개\nconsole.log(`박스: ${boxCount}개`); // 백틱 ` 으로 감싸면 ${변수} 자리에 값이 들어가요 → 박스: 12개',
+                code: 'let boxCount = 12;\n// 문자열 옆에 + 로 붙이기 → 박스: 12개\nconsole.log("박스: " + boxCount + "개");\n// 백틱 ` 으로 감싸면 ${변수} 자리에 값이 들어가요 → 박스: 12개\nconsole.log(`박스: ${boxCount}개`);',
             },
         ],
         predict: {
@@ -354,7 +355,8 @@ console.log('물류팀 김사원입니다'); // 작은따옴표 ' ' 도 돼요`,
                 body: '전산에서 받은 값이 문자열이면 <code>+</code> 가 더하기가 아니라 이어 붙이기가 돼요. 바꾸는 법은 예제 주석을 보세요.',
                 code: `let input = "12"; // 따옴표가 있어서 숫자가 아니라 문자열
 console.log(input + 3); // 문자열 + 숫자는 이어 붙이기 → 123
-console.log(Number(input) + 3); // Number(…): 문자열을 숫자로 → 15 (반대는 String(12))`,
+// Number(…): 문자열을 숫자로 → 15 (반대는 String(12))
+console.log(Number(input) + 3);`,
             },
         ],
         predict: {

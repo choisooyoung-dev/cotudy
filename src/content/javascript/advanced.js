@@ -43,10 +43,12 @@ if (true) {
 console.log("밖:", zone); // 블록 밖에서는 바깥 zone → 밖: A`,
                     `const zone = "A";
 if (true) {
-  const zone = "B"; // a different variable made inside the { } block
+  // a different variable made inside the { } block
+  const zone = "B";
   console.log("in:", zone); // → in: B
 }
-console.log("out:", zone); // outside the block it is the outer zone → out: A`,
+// outside the block it is the outer zone → out: A
+console.log("out:", zone);`,
                 ),
             },
             {
@@ -206,7 +208,8 @@ console.log(truck2()); // truck2 는 자기 count 를 따로 → 1`,
                     `function makeCounter() {
   let count = 0; // a new count is made on every call
   return () => {
-    count++; // the inner function keeps using the outer count (closure)
+    // the inner function keeps using the outer count (closure)
+    count++;
     return count;
   };
 }
@@ -477,11 +480,13 @@ console.log(kgs);`,
                 ),
                 code: t(
                     `const kgs = [2, 15, 3, 22];
-const heavy = kgs.filter((kg) => kg >= 10); // 콜백이 true 를 돌려준 칸만 모으기 (15, 22)
+// 콜백이 true 를 돌려준 칸만 모으기 (15, 22)
+const heavy = kgs.filter((kg) => kg >= 10);
 console.log(heavy);
 console.log(heavy.length + "개"); // → 2개`,
                     `const kgs = [2, 15, 3, 22];
-const heavy = kgs.filter((kg) => kg >= 10); // keeps the items where the callback returns true (15, 22)
+// keeps the items where the callback returns true (15, 22)
+const heavy = kgs.filter((kg) => kg >= 10);
 console.log(heavy);
 console.log(heavy.length + " boxes"); // → 2 boxes`,
                 ),
@@ -583,13 +588,17 @@ console.log(total);`,
                 ),
                 code: t(
                     `const kgs = [12, 3, 25, 8];
-kgs.sort((a, b) => a - b); // a - b: 작은 순 (b - a 는 큰 순) → 3, 8, 12, 25
+// a - b: 작은 순 (b - a 는 큰 순) → 3, 8, 12, 25
+kgs.sort((a, b) => a - b);
 console.log(kgs);
-console.log([10, 9, 100].sort()); // 아무것도 안 넘기면 글자 순서라 10, 100, 9`,
+// 아무것도 안 넘기면 글자 순서라 10, 100, 9
+console.log([10, 9, 100].sort());`,
                     `const kgs = [12, 3, 25, 8];
-kgs.sort((a, b) => a - b); // a - b: smallest first (b - a is largest first) → 3, 8, 12, 25
+// a - b: smallest first (b - a is largest first) → 3, 8, 12, 25
+kgs.sort((a, b) => a - b);
 console.log(kgs);
-console.log([10, 9, 100].sort()); // with nothing passed it sorts as text: 10, 100, 9`,
+// with nothing passed it sorts as text: 10, 100, 9
+console.log([10, 9, 100].sort());`,
                 ),
             },
         ],
@@ -1104,22 +1113,27 @@ console.log("${t('기다리는 중', 'Waiting')}");`,
                 code: t(
                     `function arrive(truck) {
   return new Promise((resolve) => {
-    setTimeout(() => resolve(truck + " 도착"), 100); // 0.1초 뒤 resolve(값): 결과 주기
+    // 0.1초 뒤 resolve(값): 결과 주기
+    setTimeout(() => resolve(truck + " 도착"), 100);
   });
 }
-arrive("1호차").then((msg) => { // .then(값 => …): 결과가 나오면 받기
+// .then(값 => …): 결과가 나오면 받기
+arrive("1호차").then((msg) => {
   console.log(msg); // → 1호차 도착 (두 번째로 찍혀요)
 });
 console.log("먼저 찍혀요"); // 기다리지 않고 바로 실행`,
                     `function arrive(truck) {
   return new Promise((resolve) => {
-    setTimeout(() => resolve(truck + " arrived"), 100); // after 0.1 s, resolve(value): give the result
+    // after 0.1 s, resolve(value): give the result
+    setTimeout(() => resolve(truck + " arrived"), 100);
   });
 }
-arrive("Truck 1").then((msg) => { // .then(value => …): receive the result when it is ready
+// .then(value => …): receive the result when it is ready
+arrive("Truck 1").then((msg) => {
   console.log(msg); // → Truck 1 arrived (printed second)
 });
-console.log("Printed first"); // runs right away, without waiting`,
+// runs right away, without waiting
+console.log("Printed first");`,
                 ),
             },
         ],
@@ -1252,10 +1266,13 @@ loadTruck();`,
 
 async function inspect() {
   try {
-    console.log(await checkTruck(true)); // await: Promise 가 준 값을 돌려줘요 → 통과
-    console.log(await checkTruck(false)); // reject 되면 이 줄에서 에러 → catch 로
+    // await: Promise 가 준 값을 돌려줘요 → 통과
+    console.log(await checkTruck(true));
+    // reject 되면 이 줄에서 에러 → catch 로
+    console.log(await checkTruck(false));
   } catch (e) {
-    console.log("멈춤: " + e.message); // → 멈춤: 타이어 점검 필요
+    // → 멈춤: 타이어 점검 필요
+    console.log("멈춤: " + e.message);
   }
 }
 inspect();`,
@@ -1268,10 +1285,13 @@ inspect();`,
 
 async function inspect() {
   try {
-    console.log(await checkTruck(true)); // await: gives back the value the Promise produced → passed
-    console.log(await checkTruck(false)); // if it is rejected, this line throws → goes to catch
+    // await: gives back the value the Promise produced → passed
+    console.log(await checkTruck(true));
+    // if it is rejected, this line throws → goes to catch
+    console.log(await checkTruck(false));
   } catch (e) {
-    console.log("Stopped: " + e.message); // → Stopped: tires need a check
+    // → Stopped: tires need a check
+    console.log("Stopped: " + e.message);
   }
 }
 inspect();`,
