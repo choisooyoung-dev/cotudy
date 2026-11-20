@@ -147,7 +147,8 @@ int price = 35000;
 System.out.println(price >= 30000);
 // == 같다 (등호 두 개) → false
 System.out.println(price == 30000);
-System.out.println(price != 30000); // != 다르다 → true`),
+// != 다르다 → true
+System.out.println(price != 30000);`),
                     main(`// Comparison operators: >  <  >=  <=  ==  !=
 int price = 35000;
 // >= greater than or equal → true
@@ -182,7 +183,8 @@ boolean heavy = false;
 System.out.println(fragile && heavy);
 // || or: true when either is true → true
 System.out.println(fragile || heavy);
-System.out.println(!heavy); // ! not: flips it → true`),
+// ! not: flips it → true
+System.out.println(!heavy);`),
                 ),
             },
         ],
@@ -869,14 +871,16 @@ switch (zone) { // looks for the case equal to zone
 String[] couriers = {"번개택배", "하늘택배", "바다택배"};
 // 이름[번호], 번호는 0 부터 → 번개택배
 System.out.println(couriers[0]);
-System.out.println(couriers[2]); // → 바다택배
+// → 바다택배
+System.out.println(couriers[2]);
 // .length: 개수 → 3
 System.out.println(couriers.length);`),
                     main(`// type[] name = {value, value, …};
 String[] couriers = {"Lightning", "Sky", "Ocean"};
 // name[index], indexes start at 0 → Lightning
 System.out.println(couriers[0]);
-System.out.println(couriers[2]); // → Ocean
+// → Ocean
+System.out.println(couriers[2]);
 // .length: how many → 3
 System.out.println(couriers.length);`),
                 ),
@@ -1069,23 +1073,29 @@ System.out.println(couriers.length);`),
                     main(
                         `// 빈 리스트 만들기
 ArrayList<String> list = new ArrayList<>();
-list.add("토너"); // add: 맨 뒤에 넣기
+// add: 맨 뒤에 넣기
+list.add("토너");
 list.add("립밤");
-System.out.println(list.size()); // size(): 개수 → 2
+// size(): 개수 → 2
+System.out.println(list.size());
 // get(번호): 번호는 0 부터 → 립밤
 System.out.println(list.get(1));
-System.out.println(list); // → [토너, 립밤]`,
+// → [토너, 립밤]
+System.out.println(list);`,
                         UTIL,
                     ),
                     main(
                         `// make an empty list
 ArrayList<String> list = new ArrayList<>();
-list.add("Toner"); // add: put at the end
+// add: put at the end
+list.add("Toner");
 list.add("Lip balm");
-System.out.println(list.size()); // size(): how many → 2
+// size(): how many → 2
+System.out.println(list.size());
 // get(index): indexes start at 0 → Lip balm
 System.out.println(list.get(1));
-System.out.println(list); // → [Toner, Lip balm]`,
+// → [Toner, Lip balm]
+System.out.println(list);`,
                         UTIL,
                     ),
                 ),
@@ -1102,8 +1112,10 @@ System.out.println(list); // → [Toner, Lip balm]`,
 list.add("A");
 list.add("B");
 list.add("C");
-list.remove(0); // remove(번호): 0번 "A" 빼기
-System.out.println(list); // → [B, C]
+// remove(번호): 0번 "A" 빼기
+list.remove(0);
+// → [B, C]
+System.out.println(list);
 // contains(값): 들어 있나? → true
 System.out.println(list.contains("C"));`,
                         UTIL,
@@ -1113,8 +1125,10 @@ System.out.println(list.contains("C"));`,
 list.add("A");
 list.add("B");
 list.add("C");
-list.remove(0); // remove(index): removes "A" at index 0
-System.out.println(list); // → [B, C]
+// remove(index): removes "A" at index 0
+list.remove(0);
+// → [B, C]
+System.out.println(list);
 // contains(value): is it there? → true
 System.out.println(list.contains("C"));`,
                         UTIL,
@@ -1217,7 +1231,8 @@ System.out.println(list.contains("C"));`,
                     main(`String code = "  kr-778  ";
 // trim(): 앞뒤 공백 지우기, toUpperCase(): 대문자로 (toLowerCase() 는 소문자로)
 String clean = code.trim().toUpperCase();
-System.out.println(clean); // → KR-778
+// → KR-778
+System.out.println(clean);
 // substring(시작, 끝): 0번부터 2번 바로 앞까지 → KR
 System.out.println(clean.substring(0, 2));
 // substring(시작): 3번부터 끝까지 → 778
@@ -1225,7 +1240,8 @@ System.out.println(clean.substring(3));`),
                     main(`String code = "  kr-778  ";
 // trim(): remove spaces at both ends, toUpperCase(): upper case (toLowerCase() for lower case)
 String clean = code.trim().toUpperCase();
-System.out.println(clean); // → KR-778
+// → KR-778
+System.out.println(clean);
 // substring(start, end): from 0 up to just before 2 → KR
 System.out.println(clean.substring(0, 2));
 // substring(start): from 3 to the end → 778
@@ -1464,7 +1480,8 @@ System.out.println(sb.toString());`),
                     main(`// an empty StringBuilder
 StringBuilder sb = new StringBuilder();
 for (int i = 1; i <= 3; i++) {
-    sb.append(i).append(">"); // append: add to the end
+    // append: add to the end
+    sb.append(i).append(">");
 }
 // toString(): turn it into a String → 1>2>3>
 System.out.println(sb.toString());`),
@@ -1866,13 +1883,15 @@ System.out.println(sb.toString());`),
                     main(
                         `// HashMap<키타입, 값타입>
 HashMap<String, Integer> stock = new HashMap<>();
-stock.put("토너", 12); // put(키, 값): 넣기
+// put(키, 값): 넣기
+stock.put("토너", 12);
 stock.put("립밤", 30);
 // get(키): 꺼내기 → 12
 System.out.println(stock.get("토너"));
 // 같은 키로 다시 넣으면 값이 바뀌어요
 stock.put("토너", 10);
-System.out.println(stock.get("토너")); // → 10
+// → 10
+System.out.println(stock.get("토너"));
 // size(): 짝의 개수 → 2
 System.out.println(stock.size());`,
                         UTIL,
@@ -1880,13 +1899,15 @@ System.out.println(stock.size());`,
                     main(
                         `// HashMap<KeyType, ValueType>
 HashMap<String, Integer> stock = new HashMap<>();
-stock.put("toner", 12); // put(key, value): add
+// put(key, value): add
+stock.put("toner", 12);
 stock.put("lipbalm", 30);
 // get(key): read → 12
 System.out.println(stock.get("toner"));
 // putting the same key again replaces the value
 stock.put("toner", 10);
-System.out.println(stock.get("toner")); // → 10
+// → 10
+System.out.println(stock.get("toner"));
 // size(): number of pairs → 2
 System.out.println(stock.size());`,
                         UTIL,
@@ -2331,7 +2352,8 @@ try {
     System.out.println(a[5]);
 } catch (ArrayIndexOutOfBoundsException e) {
     System.out.println("No such slot");
-} finally { // finally: runs at the end, error or not
+// finally: runs at the end, error or not
+} finally {
     System.out.println("Check done");
 }`),
                 ),

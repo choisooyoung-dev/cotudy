@@ -860,7 +860,8 @@ System.out.println("${t('출력: ', 'Printed: ')}" + Label.printed${t(' + "장"'
                 code: t(
                     prog(
                         `Status s = Status.LOADING;
-System.out.println(s); // → LOADING
+// → LOADING
+System.out.println(s);
 // enum 비교는 == → true
 System.out.println(s == Status.LOADING);
 // ordinal(): 0 부터 센 순서 → 1
@@ -869,7 +870,8 @@ System.out.println(s.ordinal());`,
                     ),
                     prog(
                         `Status s = Status.LOADING;
-System.out.println(s); // → LOADING
+// → LOADING
+System.out.println(s);
 // compare enums with == → true
 System.out.println(s == Status.LOADING);
 // ordinal(): position counted from 0 → 1
@@ -892,7 +894,8 @@ System.out.println(s.ordinal());`,
                         `// values(): 모든 값을 순서대로 담은 배열
 for (Status s : Status.values()) {
     switch (s) {
-        case READY: // case 에는 Status. 없이 값 이름만
+        // case 에는 Status. 없이 값 이름만
+        case READY:
             System.out.println(s + ": 대기");
             break;
         case LOADING:
@@ -1036,7 +1039,8 @@ System.out.println(Zone.{{1}}().length + "${t('개 구역', ' zones')}");`,
                         `// T 를 String 으로 정하기 (뒤쪽 <> 는 비워도 돼요)
 Box<String> a = new Box<>();
 a.put("립밤");
-Box<Integer> b = new Box<>(); // 숫자는 int 대신 Integer
+// 숫자는 int 대신 Integer
+Box<Integer> b = new Box<>();
 b.put(12);
 // → 립밤 13
 System.out.println(a.get() + " " + (b.get() + 1));`,
@@ -1257,23 +1261,31 @@ class Shelf<{{0}}> {
                     prog(
                         `// 값이 든 리스트를 바로 만들기
 List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8));
-Collections.sort(kgs); // 작은 순으로 줄 세우기
-System.out.println(kgs); // → [3, 8, 12, 25]
+// 작은 순으로 줄 세우기
+Collections.sort(kgs);
+// → [3, 8, 12, 25]
+System.out.println(kgs);
 // 가장 큰 값, 작은 값 → 25 3
 System.out.println(Collections.max(kgs) + " " + Collections.min(kgs));
-Collections.reverse(kgs); // 순서 뒤집기
-System.out.println(kgs); // → [25, 12, 8, 3]`,
+// 순서 뒤집기
+Collections.reverse(kgs);
+// → [25, 12, 8, 3]
+System.out.println(kgs);`,
                         UTIL,
                     ),
                     prog(
                         `// a list with values right away
 List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8));
-Collections.sort(kgs); // sort smallest first
-System.out.println(kgs); // → [3, 8, 12, 25]
+// sort smallest first
+Collections.sort(kgs);
+// → [3, 8, 12, 25]
+System.out.println(kgs);
 // largest, smallest → 25 3
 System.out.println(Collections.max(kgs) + " " + Collections.min(kgs));
-Collections.reverse(kgs); // flip the order
-System.out.println(kgs); // → [25, 12, 8, 3]`,
+// flip the order
+Collections.reverse(kgs);
+// → [25, 12, 8, 3]
+System.out.println(kgs);`,
                         UTIL,
                     ),
                 ),
@@ -1290,8 +1302,10 @@ System.out.println(kgs); // → [25, 12, 8, 3]`,
 Set<String> zones = new TreeSet<>();
 zones.add("B");
 zones.add("A");
-zones.add("B"); // 이미 있는 값이라 안 늘어나요
-System.out.println(zones); // → [A, B]
+// 이미 있는 값이라 안 늘어나요
+zones.add("B");
+// → [A, B]
+System.out.println(zones);
 // → 2 false
 System.out.println(zones.size() + " " + zones.contains("C"));`,
                         UTIL,
@@ -1301,8 +1315,10 @@ System.out.println(zones.size() + " " + zones.contains("C"));`,
 Set<String> zones = new TreeSet<>();
 zones.add("B");
 zones.add("A");
-zones.add("B"); // already there, so nothing is added
-System.out.println(zones); // → [A, B]
+// already there, so nothing is added
+zones.add("B");
+// → [A, B]
+System.out.println(zones);
 // → 2 false
 System.out.println(zones.size() + " " + zones.contains("C"));`,
                         UTIL,
@@ -1425,7 +1441,8 @@ System.out.println(${t('"택배사 " + uniq.size() + "곳: " + uniq', '"Couriers
 items.forEach(x -> System.out.println("- " + x));
 // removeIf: 람다가 true 인 칸 빼기 (3글자 이상)
 items.removeIf(x -> x.length() > 2);
-System.out.println(items); // → [토너, 립밤]`,
+// → [토너, 립밤]
+System.out.println(items);`,
                         UTIL,
                     ),
                     prog(
@@ -1434,7 +1451,8 @@ System.out.println(items); // → [토너, 립밤]`,
 items.forEach(x -> System.out.println("- " + x));
 // removeIf: removes items where the lambda is true (over 5 letters)
 items.removeIf(x -> x.length() > 5);
-System.out.println(items); // → [Toner, Balm]`,
+// → [Toner, Balm]
+System.out.println(items);`,
                         UTIL,
                     ),
                 ),
@@ -1448,8 +1466,10 @@ System.out.println(items); // → [Toner, Balm]`,
                 code: t(
                     prog(
                         `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25));
-kgs.sort((a, b) -> b - a); // b - a: 숫자 큰 순
-System.out.println(kgs); // → [25, 12, 3]
+// b - a: 숫자 큰 순
+kgs.sort((a, b) -> b - a);
+// → [25, 12, 3]
+System.out.println(kgs);
 List<String> names = new ArrayList<>(Arrays.asList("한빛로지스", "번개", "새벽배송"));
 // 글자 수 적은 순
 names.sort((a, b) -> a.length() - b.length());
@@ -1459,8 +1479,10 @@ System.out.println(names);`,
                     ),
                     prog(
                         `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25));
-kgs.sort((a, b) -> b - a); // b - a: largest first
-System.out.println(kgs); // → [25, 12, 3]
+// b - a: largest first
+kgs.sort((a, b) -> b - a);
+// → [25, 12, 3]
+System.out.println(kgs);
 List<String> names = new ArrayList<>(Arrays.asList("Lightning", "Dawn", "Hanbit"));
 // shortest name first
 names.sort((a, b) -> a.length() - b.length());
@@ -1580,7 +1602,8 @@ long heavy = kgs.stream().filter(k -> k >= 10).count();
 // mapToInt(…).sum(): 합계
 // 4 + 18 + 7 + 25 → 54
 int total = kgs.stream().mapToInt(k -> k).sum();
-System.out.println(heavy + " " + total); // → 2 54`,
+// → 2 54
+System.out.println(heavy + " " + total);`,
                         UTIL,
                     ),
                     prog(
@@ -1591,7 +1614,8 @@ long heavy = kgs.stream().filter(k -> k >= 10).count();
 // mapToInt(…).sum(): the total
 // 4 + 18 + 7 + 25 → 54
 int total = kgs.stream().mapToInt(k -> k).sum();
-System.out.println(heavy + " " + total); // → 2 54`,
+// → 2 54
+System.out.println(heavy + " " + total);`,
                         UTIL,
                     ),
                 ),
@@ -1607,7 +1631,8 @@ System.out.println(heavy + " " + total); // → 2 54`,
                         `List<String> ids = Arrays.asList("a1", "b2", "c3");
 // map: 값을 바꿔서 흘려보내기, collect(Collectors.toList()): 다시 리스트로 모으기
 List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
-System.out.println(big); // → [A1, B2, C3]
+// → [A1, B2, C3]
+System.out.println(big);
 // String.join: 사이에 ", " 를 넣어 붙이기 → A1, B2, C3
 System.out.println(String.join(", ", big));`,
                         STREAM,
@@ -1616,7 +1641,8 @@ System.out.println(String.join(", ", big));`,
                         `List<String> ids = Arrays.asList("a1", "b2", "c3");
 // map: change each value as it flows, collect(Collectors.toList()): gather back into a list
 List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
-System.out.println(big); // → [A1, B2, C3]
+// → [A1, B2, C3]
+System.out.println(big);
 // String.join: joins with ", " in between → A1, B2, C3
 System.out.println(String.join(", ", big));`,
                         STREAM,

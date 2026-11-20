@@ -358,7 +358,8 @@ console.log('I am Kim from logistics');`,
                 body: 'If a value from the system is a string, <code>+</code> joins instead of adding. See the comments for how to convert it.',
                 code: `// it has quotes, so it is a string, not a number
 let input = "12";
-console.log(input + 3); // string + number joins → 123
+// string + number joins → 123
+console.log(input + 3);
 // Number(…): string to number → 15 (the other way is String(12))
 console.log(Number(input) + 3);`,
             },

@@ -116,14 +116,16 @@ print(lens)`,
                 ),
                 code: t(
                     `kgs = [12, 3, 25, 8]
-print(sorted(kgs))  # 작은 순 → [3, 8, 12, 25]
+# 작은 순 → [3, 8, 12, 25]
+print(sorted(kgs))
 # reverse=True: 큰 순 → [25, 12, 8, 3]
 print(sorted(kgs, reverse=True))
 names = ["한빛로지스", "번개", "새벽배송"]
 # key=함수: 그 함수가 돌려준 값(글자 수)으로 정렬 → ['번개', '새벽배송', '한빛로지스']
 print(sorted(names, key=len))`,
                     `kgs = [12, 3, 25, 8]
-print(sorted(kgs))  # smallest first → [3, 8, 12, 25]
+# smallest first → [3, 8, 12, 25]
+print(sorted(kgs))
 # reverse=True: largest first → [25, 12, 8, 3]
 print(sorted(kgs, reverse=True))
 names = ["Lightning", "Dawn", "Hanbit"]
@@ -144,23 +146,29 @@ print(sorted(names, key=len))`,
                     `trucks = [("1호차", 800), ("2호차", 300), ("3호차", 500)]
 # lambda 매개변수: 결과, t[1] 무게로 정렬
 light = sorted(trucks, key=lambda t: t[1])
-print(light[0])  # → ('2호차', 300)
+# → ('2호차', 300)
+print(light[0])
 # max / min 에도 key 를 줄 수 있어요
 heavy = max(trucks, key=lambda t: t[1])
-print(heavy[0])  # → 1호차
+# → 1호차
+print(heavy[0])
 # 변수에 담아서 함수처럼 부를 수도 있어요
 double = lambda n: n * 2
-print(double(21))  # → 42`,
+# → 42
+print(double(21))`,
                     `trucks = [("Truck1", 800), ("Truck2", 300), ("Truck3", 500)]
 # lambda params: result, sorts by weight t[1]
 light = sorted(trucks, key=lambda t: t[1])
-print(light[0])  # → ('Truck2', 300)
+# → ('Truck2', 300)
+print(light[0])
 # max / min take key too
 heavy = max(trucks, key=lambda t: t[1])
-print(heavy[0])  # → Truck1
+# → Truck1
+print(heavy[0])
 # you can also store it and call it like a function
 double = lambda n: n * 2
-print(double(21))  # → 42`,
+# → 42
+print(double(21))`,
                 ),
             },
         ],
@@ -253,18 +261,26 @@ for i, name in enumerate(couriers, start=1):
 kgs = [3, 12, 8]
 # zip(a, b): 같은 자리끼리 (a값, b값), 짧은 쪽에 맞춰 끝나요
 for oid, kg in zip(ids, kgs):
-    print(oid, kg)  # → A1 3, A2 12, A3 8
-a, b = 10, 20  # x, y = 값1, 값2: 여러 변수에 나눠 담기
-a, b = b, a  # 두 값 바꾸기도 한 줄
-print(a, b)  # → 20 10`,
+    # → A1 3, A2 12, A3 8
+    print(oid, kg)
+# x, y = 값1, 값2: 여러 변수에 나눠 담기
+a, b = 10, 20
+# 두 값 바꾸기도 한 줄
+a, b = b, a
+# → 20 10
+print(a, b)`,
                     `ids = ["A1", "A2", "A3"]
 kgs = [3, 12, 8]
 # zip(a, b): pairs by position, stops at the shorter one
 for oid, kg in zip(ids, kgs):
-    print(oid, kg)  # → A1 3, A2 12, A3 8
-a, b = 10, 20  # x, y = v1, v2: unpack into several variables
-a, b = b, a  # swapping two values is one line too
-print(a, b)  # → 20 10`,
+    # → A1 3, A2 12, A3 8
+    print(oid, kg)
+# x, y = v1, v2: unpack into several variables
+a, b = 10, 20
+# swapping two values is one line too
+a, b = b, a
+# → 20 10
+print(a, b)`,
                 ),
             },
         ],
@@ -557,30 +573,36 @@ print(a, b)  # → 20 10`,
     # *args 로 받아 넘기면 매개변수가 있는 함수도 감쌀 수 있어요
     def wrapper(*args):
         print(f"[기록] {fn.__name__} 시작")
-        result = fn(*args)  # 원래 함수 부르기
+        # 원래 함수 부르기
+        result = fn(*args)
         print(f"[기록] 결과 {result}")
         return result
     return wrapper
 
-@log  # fee = log(fee) 와 같아요
+# fee = log(fee) 와 같아요
+@log
 def fee(kg):
     return kg * 100
 
-fee(5)  # 사실은 wrapper(5) 가 불려요`,
+# 사실은 wrapper(5) 가 불려요
+fee(5)`,
                     `def log(fn):
     # taking and passing *args lets it wrap functions with parameters
     def wrapper(*args):
         print(f"[log] {fn.__name__} start")
-        result = fn(*args)  # call the original function
+        # call the original function
+        result = fn(*args)
         print(f"[log] result {result}")
         return result
     return wrapper
 
-@log  # same as fee = log(fee)
+# same as fee = log(fee)
+@log
 def fee(kg):
     return kg * 100
 
-fee(5)  # this really calls wrapper(5)`,
+# this really calls wrapper(5)
+fee(5)`,
                 ),
             },
         ],
@@ -673,7 +695,8 @@ fee(5)  # this really calls wrapper(5)`,
 
 # for 가 하나 달라고 할 때마다 다음 yield 까지 실행
 for b in box_numbers(3):
-    print(b)  # → BOX-001, BOX-002, BOX-003`,
+    # → BOX-001, BOX-002, BOX-003
+    print(b)`,
                     `def box_numbers(n):
     for i in range(1, n + 1):
         # yield value: hands out one value and pauses here
@@ -681,7 +704,8 @@ for b in box_numbers(3):
 
 # each time for asks for one, it runs to the next yield
 for b in box_numbers(3):
-    print(b)  # → BOX-001, BOX-002, BOX-003`,
+    # → BOX-001, BOX-002, BOX-003
+    print(b)`,
                 ),
             },
             {
@@ -810,7 +834,8 @@ print(total)  # → 20`,
 
 # 괄호 안에 부모 클래스: __init__ 과 메서드를 물려받아요
 class Fragile(Item):
-    pass  # 아무것도 더하지 않을 땐 pass
+    # 아무것도 더하지 않을 땐 pass
+    pass
 
 # 물려받은 label() → [상품] 유리병 토너
 print(Fragile("유리병 토너").label())`,
@@ -823,7 +848,8 @@ print(Fragile("유리병 토너").label())`,
 
 # parent class in parentheses: inherits __init__ and the methods
 class Fragile(Item):
-    pass  # use pass when you add nothing
+    # use pass when you add nothing
+    pass
 
 # the inherited label() → [Item] Glass toner
 print(Fragile("Glass toner").label())`,
@@ -1059,7 +1085,8 @@ try:
     # 여기서 예외 → 바로 except 로 가서 load(500) 은 실행 안 돼요
     load(1200)
     load(500)
-except OverloadError as e:  # except 이름 as e: 잡기
+# except 이름 as e: 잡기
+except OverloadError as e:
     # e 를 찍으면 메시지 → 멈춤: 1200kg 은 너무 무거워요
     print("멈춤:", e)`,
                     `# class Name(Exception): our own exception
@@ -1077,7 +1104,8 @@ try:
     # exception here → jumps straight to except, so load(500) never runs
     load(1200)
     load(500)
-except OverloadError as e:  # except Name as e: catch it
+# except Name as e: catch it
+except OverloadError as e:
     # printing e shows the message → Stopped: 1200kg is too heavy
     print("Stopped:", e)`,
                 ),
