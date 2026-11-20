@@ -143,14 +143,19 @@ System.out.println(count);`),
                 code: t(
                     main(`// 비교 연산자: >  <  >=  <=  ==  !=
 int price = 35000;
-System.out.println(price >= 30000); // >= 크거나 같다 → true
-System.out.println(price == 30000); // == 같다 (등호 두 개) → false
+// >= 크거나 같다 → true
+System.out.println(price >= 30000);
+// == 같다 (등호 두 개) → false
+System.out.println(price == 30000);
 System.out.println(price != 30000); // != 다르다 → true`),
                     main(`// Comparison operators: >  <  >=  <=  ==  !=
 int price = 35000;
-System.out.println(price >= 30000); // >= greater than or equal → true
-System.out.println(price == 30000); // == equal (two signs) → false
-System.out.println(price != 30000); // != not equal → true`),
+// >= greater than or equal → true
+System.out.println(price >= 30000);
+// == equal (two signs) → false
+System.out.println(price == 30000);
+// != not equal → true
+System.out.println(price != 30000);`),
                 ),
             },
             {
@@ -165,13 +170,18 @@ System.out.println(price != 30000); // != not equal → true`),
                 code: t(
                     main(`boolean fragile = true;
 boolean heavy = false;
-System.out.println(fragile && heavy); // && 그리고: 둘 다 참일 때만 참 → false
-System.out.println(fragile || heavy); // || 또는: 하나만 참이어도 참 → true
-System.out.println(!heavy); // ! 아니다: 반대로 바꾸기 → true`),
+// && 그리고: 둘 다 참일 때만 참 → false
+System.out.println(fragile && heavy);
+// || 또는: 하나만 참이어도 참 → true
+System.out.println(fragile || heavy);
+// ! 아니다: 반대로 바꾸기 → true
+System.out.println(!heavy);`),
                     main(`boolean fragile = true;
 boolean heavy = false;
-System.out.println(fragile && heavy); // && and: true only when both are true → false
-System.out.println(fragile || heavy); // || or: true when either is true → true
+// && and: true only when both are true → false
+System.out.println(fragile && heavy);
+// || or: true when either is true → true
+System.out.println(fragile || heavy);
 System.out.println(!heavy); // ! not: flips it → true`),
                 ),
             },
@@ -362,13 +372,19 @@ System.out.println(!heavy); // ! not: flips it → true`),
                 ),
                 code: t(
                     main(`String zone = "A";
-System.out.println(zone.equals("A")); // 글자가 같아요 → true
-System.out.println(zone.equals("B")); // 글자가 달라요 → false
-System.out.println("a".equalsIgnoreCase("A")); // equalsIgnoreCase: 대소문자 무시하고 비교 → true`),
+// 글자가 같아요 → true
+System.out.println(zone.equals("A"));
+// 글자가 달라요 → false
+System.out.println(zone.equals("B"));
+// equalsIgnoreCase: 대소문자 무시하고 비교 → true
+System.out.println("a".equalsIgnoreCase("A"));`),
                     main(`String zone = "A";
-System.out.println(zone.equals("A")); // same text → true
-System.out.println(zone.equals("B")); // different text → false
-System.out.println("a".equalsIgnoreCase("A")); // equalsIgnoreCase: ignores upper/lower case → true`),
+// same text → true
+System.out.println(zone.equals("A"));
+// different text → false
+System.out.println(zone.equals("B"));
+// equalsIgnoreCase: ignores upper/lower case → true
+System.out.println("a".equalsIgnoreCase("A"));`),
                 ),
             },
             {
@@ -851,14 +867,18 @@ switch (zone) { // looks for the case equal to zone
                 code: t(
                     main(`// 타입[] 이름 = {값, 값, …};
 String[] couriers = {"번개택배", "하늘택배", "바다택배"};
-System.out.println(couriers[0]); // 이름[번호], 번호는 0 부터 → 번개택배
+// 이름[번호], 번호는 0 부터 → 번개택배
+System.out.println(couriers[0]);
 System.out.println(couriers[2]); // → 바다택배
-System.out.println(couriers.length); // .length: 개수 → 3`),
+// .length: 개수 → 3
+System.out.println(couriers.length);`),
                     main(`// type[] name = {value, value, …};
 String[] couriers = {"Lightning", "Sky", "Ocean"};
-System.out.println(couriers[0]); // name[index], indexes start at 0 → Lightning
+// name[index], indexes start at 0 → Lightning
+System.out.println(couriers[0]);
 System.out.println(couriers[2]); // → Ocean
-System.out.println(couriers.length); // .length: how many → 3`),
+// .length: how many → 3
+System.out.println(couriers.length);`),
                 ),
             },
             {
@@ -1047,20 +1067,24 @@ System.out.println(couriers.length); // .length: how many → 3`),
                 ),
                 code: t(
                     main(
-                        `ArrayList<String> list = new ArrayList<>(); // 빈 리스트 만들기
+                        `// 빈 리스트 만들기
+ArrayList<String> list = new ArrayList<>();
 list.add("토너"); // add: 맨 뒤에 넣기
 list.add("립밤");
 System.out.println(list.size()); // size(): 개수 → 2
-System.out.println(list.get(1)); // get(번호): 번호는 0 부터 → 립밤
+// get(번호): 번호는 0 부터 → 립밤
+System.out.println(list.get(1));
 System.out.println(list); // → [토너, 립밤]`,
                         UTIL,
                     ),
                     main(
-                        `ArrayList<String> list = new ArrayList<>(); // make an empty list
+                        `// make an empty list
+ArrayList<String> list = new ArrayList<>();
 list.add("Toner"); // add: put at the end
 list.add("Lip balm");
 System.out.println(list.size()); // size(): how many → 2
-System.out.println(list.get(1)); // get(index): indexes start at 0 → Lip balm
+// get(index): indexes start at 0 → Lip balm
+System.out.println(list.get(1));
 System.out.println(list); // → [Toner, Lip balm]`,
                         UTIL,
                     ),
@@ -1080,7 +1104,8 @@ list.add("B");
 list.add("C");
 list.remove(0); // remove(번호): 0번 "A" 빼기
 System.out.println(list); // → [B, C]
-System.out.println(list.contains("C")); // contains(값): 들어 있나? → true`,
+// contains(값): 들어 있나? → true
+System.out.println(list.contains("C"));`,
                         UTIL,
                     ),
                     main(
@@ -1090,7 +1115,8 @@ list.add("B");
 list.add("C");
 list.remove(0); // remove(index): removes "A" at index 0
 System.out.println(list); // → [B, C]
-System.out.println(list.contains("C")); // contains(value): is it there? → true`,
+// contains(value): is it there? → true
+System.out.println(list.contains("C"));`,
                         UTIL,
                     ),
                 ),
@@ -1192,14 +1218,18 @@ System.out.println(list.contains("C")); // contains(value): is it there? → tru
 // trim(): 앞뒤 공백 지우기, toUpperCase(): 대문자로 (toLowerCase() 는 소문자로)
 String clean = code.trim().toUpperCase();
 System.out.println(clean); // → KR-778
-System.out.println(clean.substring(0, 2)); // substring(시작, 끝): 0번부터 2번 바로 앞까지 → KR
-System.out.println(clean.substring(3)); // substring(시작): 3번부터 끝까지 → 778`),
+// substring(시작, 끝): 0번부터 2번 바로 앞까지 → KR
+System.out.println(clean.substring(0, 2));
+// substring(시작): 3번부터 끝까지 → 778
+System.out.println(clean.substring(3));`),
                     main(`String code = "  kr-778  ";
 // trim(): remove spaces at both ends, toUpperCase(): upper case (toLowerCase() for lower case)
 String clean = code.trim().toUpperCase();
 System.out.println(clean); // → KR-778
-System.out.println(clean.substring(0, 2)); // substring(start, end): from 0 up to just before 2 → KR
-System.out.println(clean.substring(3)); // substring(start): from 3 to the end → 778`),
+// substring(start, end): from 0 up to just before 2 → KR
+System.out.println(clean.substring(0, 2));
+// substring(start): from 3 to the end → 778
+System.out.println(clean.substring(3));`),
                 ),
             },
         ],
@@ -1297,13 +1327,19 @@ System.out.println(clean.substring(3)); // substring(start): from 3 to the end �
                 ),
                 code: t(
                     main(`String addr = "서울시 강남구 테헤란로";
-System.out.println(addr.contains("강남")); // contains(글자): 들어 있나? → true
-System.out.println(addr.indexOf("강남")); // indexOf(글자): 몇 번째에 있나 (없으면 -1) → 4
-System.out.println(addr.replace("서울시", "서울특별시")); // replace(옛것, 새것): 바꾼 새 문자열`),
+// contains(글자): 들어 있나? → true
+System.out.println(addr.contains("강남"));
+// indexOf(글자): 몇 번째에 있나 (없으면 -1) → 4
+System.out.println(addr.indexOf("강남"));
+// replace(옛것, 새것): 바꾼 새 문자열
+System.out.println(addr.replace("서울시", "서울특별시"));`),
                     main(`String addr = "Teheran-ro, Gangnam, Seoul";
-System.out.println(addr.contains("Gangnam")); // contains(text): is it there? → true
-System.out.println(addr.indexOf("Gangnam")); // indexOf(text): where it starts (-1 if missing) → 12
-System.out.println(addr.replace("Seoul", "Seoul City")); // replace(old, new): a new, changed string`),
+// contains(text): is it there? → true
+System.out.println(addr.contains("Gangnam"));
+// indexOf(text): where it starts (-1 if missing) → 12
+System.out.println(addr.indexOf("Gangnam"));
+// replace(old, new): a new, changed string
+System.out.println(addr.replace("Seoul", "Seoul City"));`),
                 ),
             },
             {
@@ -1392,14 +1428,22 @@ System.out.println(addr.replace("Seoul", "Seoul City")); // replace(old, new): a
                     '<code>String.format</code> builds a string by putting values into format codes. What each code means is in the comments.',
                 ),
                 code: t(
-                    main(`System.out.println(String.format("%s: %d", "box", 3)); // %s 문자열, %d 정수 → box: 3
-System.out.println(String.format("%,d", 1250000)); // %,d 천 단위 쉼표 → 1,250,000
-System.out.println(String.format("%05d", 42)); // %05d 5자리, 앞을 0 으로 채우기 → 00042
-System.out.println(String.format("%.1f", 2.345)); // %.1f 소수 한 자리 → 2.3`),
-                    main(`System.out.println(String.format("%s: %d", "box", 3)); // %s string, %d whole number → box: 3
-System.out.println(String.format("%,d", 1250000)); // %,d thousands commas → 1,250,000
-System.out.println(String.format("%05d", 42)); // %05d 5 digits, padded with 0 → 00042
-System.out.println(String.format("%.1f", 2.345)); // %.1f one decimal place → 2.3`),
+                    main(`// %s 문자열, %d 정수 → box: 3
+System.out.println(String.format("%s: %d", "box", 3));
+// %,d 천 단위 쉼표 → 1,250,000
+System.out.println(String.format("%,d", 1250000));
+// %05d 5자리, 앞을 0 으로 채우기 → 00042
+System.out.println(String.format("%05d", 42));
+// %.1f 소수 한 자리 → 2.3
+System.out.println(String.format("%.1f", 2.345));`),
+                    main(`// %s string, %d whole number → box: 3
+System.out.println(String.format("%s: %d", "box", 3));
+// %,d thousands commas → 1,250,000
+System.out.println(String.format("%,d", 1250000));
+// %05d 5 digits, padded with 0 → 00042
+System.out.println(String.format("%05d", 42));
+// %.1f one decimal place → 2.3
+System.out.println(String.format("%.1f", 2.345));`),
                 ),
             },
             {
@@ -1409,16 +1453,21 @@ System.out.println(String.format("%.1f", 2.345)); // %.1f one decimal place → 
                     'When you keep adding to a string in a loop, <code>StringBuilder</code> is fast and handy.',
                 ),
                 code: t(
-                    main(`StringBuilder sb = new StringBuilder(); // 빈 StringBuilder
+                    main(`// 빈 StringBuilder
+StringBuilder sb = new StringBuilder();
 for (int i = 1; i <= 3; i++) {
-    sb.append(i).append(">"); // append: 뒤에 이어 붙이기
+    // append: 뒤에 이어 붙이기
+    sb.append(i).append(">");
 }
-System.out.println(sb.toString()); // toString(): 다 붙인 걸 String 으로 → 1>2>3>`),
-                    main(`StringBuilder sb = new StringBuilder(); // an empty StringBuilder
+// toString(): 다 붙인 걸 String 으로 → 1>2>3>
+System.out.println(sb.toString());`),
+                    main(`// an empty StringBuilder
+StringBuilder sb = new StringBuilder();
 for (int i = 1; i <= 3; i++) {
     sb.append(i).append(">"); // append: add to the end
 }
-System.out.println(sb.toString()); // toString(): turn it into a String → 1>2>3>`),
+// toString(): turn it into a String → 1>2>3>
+System.out.println(sb.toString());`),
                 ),
             },
         ],
@@ -1815,23 +1864,31 @@ System.out.println(sb.toString()); // toString(): turn it into a String → 1>2>
                 ),
                 code: t(
                     main(
-                        `HashMap<String, Integer> stock = new HashMap<>(); // HashMap<키타입, 값타입>
+                        `// HashMap<키타입, 값타입>
+HashMap<String, Integer> stock = new HashMap<>();
 stock.put("토너", 12); // put(키, 값): 넣기
 stock.put("립밤", 30);
-System.out.println(stock.get("토너")); // get(키): 꺼내기 → 12
-stock.put("토너", 10); // 같은 키로 다시 넣으면 값이 바뀌어요
+// get(키): 꺼내기 → 12
+System.out.println(stock.get("토너"));
+// 같은 키로 다시 넣으면 값이 바뀌어요
+stock.put("토너", 10);
 System.out.println(stock.get("토너")); // → 10
-System.out.println(stock.size()); // size(): 짝의 개수 → 2`,
+// size(): 짝의 개수 → 2
+System.out.println(stock.size());`,
                         UTIL,
                     ),
                     main(
-                        `HashMap<String, Integer> stock = new HashMap<>(); // HashMap<KeyType, ValueType>
+                        `// HashMap<KeyType, ValueType>
+HashMap<String, Integer> stock = new HashMap<>();
 stock.put("toner", 12); // put(key, value): add
 stock.put("lipbalm", 30);
-System.out.println(stock.get("toner")); // get(key): read → 12
-stock.put("toner", 10); // putting the same key again replaces the value
+// get(key): read → 12
+System.out.println(stock.get("toner"));
+// putting the same key again replaces the value
+stock.put("toner", 10);
 System.out.println(stock.get("toner")); // → 10
-System.out.println(stock.size()); // size(): number of pairs → 2`,
+// size(): number of pairs → 2
+System.out.println(stock.size());`,
                         UTIL,
                     ),
                 ),
@@ -1846,17 +1903,23 @@ System.out.println(stock.size()); // size(): number of pairs → 2`,
                     main(
                         `HashMap<String, Integer> stock = new HashMap<>();
 stock.put("토너", 12);
-System.out.println(stock.containsKey("쿠션")); // containsKey(키): 그 키가 있나? → false
-System.out.println(stock.get("쿠션")); // 없는 키를 get 하면 → null
-System.out.println(stock.getOrDefault("쿠션", 0)); // getOrDefault(키, 기본값): 없으면 기본값 → 0`,
+// containsKey(키): 그 키가 있나? → false
+System.out.println(stock.containsKey("쿠션"));
+// 없는 키를 get 하면 → null
+System.out.println(stock.get("쿠션"));
+// getOrDefault(키, 기본값): 없으면 기본값 → 0
+System.out.println(stock.getOrDefault("쿠션", 0));`,
                         UTIL,
                     ),
                     main(
                         `HashMap<String, Integer> stock = new HashMap<>();
 stock.put("toner", 12);
-System.out.println(stock.containsKey("cushion")); // containsKey(key): is the key there? → false
-System.out.println(stock.get("cushion")); // get on a missing key → null
-System.out.println(stock.getOrDefault("cushion", 0)); // getOrDefault(key, default): the default when missing → 0`,
+// containsKey(key): is the key there? → false
+System.out.println(stock.containsKey("cushion"));
+// get on a missing key → null
+System.out.println(stock.get("cushion"));
+// getOrDefault(key, default): the default when missing → 0
+System.out.println(stock.getOrDefault("cushion", 0));`,
                         UTIL,
                     ),
                 ),
@@ -2254,15 +2317,18 @@ System.out.println(stock.getOrDefault("cushion", 0)); // getOrDefault(key, defau
                 code: t(
                     main(`int[] a = {1, 2, 3};
 try {
-    System.out.println(a[5]); // 5번 칸이 없어서 ArrayIndexOutOfBoundsException
+    // 5번 칸이 없어서 ArrayIndexOutOfBoundsException
+    System.out.println(a[5]);
 } catch (ArrayIndexOutOfBoundsException e) {
     System.out.println("없는 칸이에요");
-} finally { // finally: 에러가 나든 안 나든 마지막에 실행
+// finally: 에러가 나든 안 나든 마지막에 실행
+} finally {
     System.out.println("확인 끝");
 }`),
                     main(`int[] a = {1, 2, 3};
 try {
-    System.out.println(a[5]); // there is no slot 5, so ArrayIndexOutOfBoundsException
+    // there is no slot 5, so ArrayIndexOutOfBoundsException
+    System.out.println(a[5]);
 } catch (ArrayIndexOutOfBoundsException e) {
     System.out.println("No such slot");
 } finally { // finally: runs at the end, error or not

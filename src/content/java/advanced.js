@@ -52,13 +52,15 @@ export const QUESTS = [
 // s.qty 를 쓰면 컴파일 에러 (private 이라서)
 System.out.println(s.getQty()); // getter 로 읽기 → 12`,
                         `class Stock {
-    private int qty; // private: 이 클래스 안에서만 쓸 수 있어요
+    // private: 이 클래스 안에서만 쓸 수 있어요
+    private int qty;
 
     Stock(int qty) {
         this.qty = qty;
     }
 
-    int getQty() { // getter: 밖에서 읽을 수 있게 열어 둔 메서드
+    // getter: 밖에서 읽을 수 있게 열어 둔 메서드
+    int getQty() {
         return qty;
     }
 }`,
@@ -66,15 +68,18 @@ System.out.println(s.getQty()); // getter 로 읽기 → 12`,
                     prog(
                         `Stock s = new Stock(12);
 // writing s.qty here is a compile error (it is private)
-System.out.println(s.getQty()); // read it through the getter → 12`,
+// read it through the getter → 12
+System.out.println(s.getQty());`,
                         `class Stock {
-    private int qty; // private: only usable inside this class
+    // private: only usable inside this class
+    private int qty;
 
     Stock(int qty) {
         this.qty = qty;
     }
 
-    int getQty() { // getter: a method opened so others can read it
+    // getter: a method opened so others can read it
+    int getQty() {
         return qty;
     }
 }`,
@@ -462,27 +467,35 @@ class Driver extends Staff {
                 ),
                 code: t(
                     prog(
-                        `Packer p = new BubblePacker(); // 인터페이스 타입 변수에 채운 클래스의 객체를 담아요
+                        `// 인터페이스 타입 변수에 채운 클래스의 객체를 담아요
+Packer p = new BubblePacker();
 System.out.println(p.pack("유리병"));`,
                         `interface Packer {
-    String pack(String item); // 약속: { } 몸통 없이 메서드 모양만
+    // 약속: { } 몸통 없이 메서드 모양만
+    String pack(String item);
 }
 
-class BubblePacker implements Packer { // implements: 이 약속을 채우겠다
-    public String pack(String item) { // 인터페이스 메서드는 public 이라 public 을 붙여요
+// implements: 이 약속을 채우겠다
+class BubblePacker implements Packer {
+    // 인터페이스 메서드는 public 이라 public 을 붙여요
+    public String pack(String item) {
         return item + " → 뽁뽁이";
     }
 }`,
                     ),
                     prog(
-                        `Packer p = new BubblePacker(); // an interface-type variable holds an object of the class that fills it in
+                        `// an interface-type variable holds an object of the class that fills it in
+Packer p = new BubblePacker();
 System.out.println(p.pack("Glass bottle"));`,
                         `interface Packer {
-    String pack(String item); // the promise: just the method shape, no { } body
+    // the promise: just the method shape, no { } body
+    String pack(String item);
 }
 
-class BubblePacker implements Packer { // implements: this class fills in the promise
-    public String pack(String item) { // interface methods are public, so add public
+// implements: this class fills in the promise
+class BubblePacker implements Packer {
+    // interface methods are public, so add public
+    public String pack(String item) {
         return item + " → bubble wrap";
     }
 }`,
@@ -698,8 +711,10 @@ System.out.println(a.mine + " " + b.mine + " " + Forklift.total);`,
                 ),
                 code: t(
                     prog(
-                        `System.out.println(Calc.fee(10)); // 클래스이름.메서드(), new 없이 → 1500
-System.out.println(Math.max(3, 7)); // Math.max 도 static 메서드 (main 도 static) → 7`,
+                        `// 클래스이름.메서드(), new 없이 → 1500
+System.out.println(Calc.fee(10));
+// Math.max 도 static 메서드 (main 도 static) → 7
+System.out.println(Math.max(3, 7));`,
                         `class Calc {
     static int fee(int kg) { // static 메서드
         return kg * 150;
@@ -707,8 +722,10 @@ System.out.println(Math.max(3, 7)); // Math.max 도 static 메서드 (main 도 s
 }`,
                     ),
                     prog(
-                        `System.out.println(Calc.fee(10)); // ClassName.method(), no new → 1500
-System.out.println(Math.max(3, 7)); // Math.max is a static method too (so is main) → 7`,
+                        `// ClassName.method(), no new → 1500
+System.out.println(Calc.fee(10));
+// Math.max is a static method too (so is main) → 7
+System.out.println(Math.max(3, 7));`,
                         `class Calc {
     static int fee(int kg) { // a static method
         return kg * 150;
@@ -844,16 +861,20 @@ System.out.println("${t('출력: ', 'Printed: ')}" + Label.printed${t(' + "장"'
                     prog(
                         `Status s = Status.LOADING;
 System.out.println(s); // → LOADING
-System.out.println(s == Status.LOADING); // enum 비교는 == → true
-System.out.println(s.ordinal()); // ordinal(): 0 부터 센 순서 → 1`,
-                        'enum Status { READY, LOADING, DONE } // enum 이름 { 값, 값, 값 }',
+// enum 비교는 == → true
+System.out.println(s == Status.LOADING);
+// ordinal(): 0 부터 센 순서 → 1
+System.out.println(s.ordinal());`,
+                        '// enum 이름 { 값, 값, 값 }\nenum Status { READY, LOADING, DONE }',
                     ),
                     prog(
                         `Status s = Status.LOADING;
 System.out.println(s); // → LOADING
-System.out.println(s == Status.LOADING); // compare enums with == → true
-System.out.println(s.ordinal()); // ordinal(): position counted from 0 → 1`,
-                        'enum Status { READY, LOADING, DONE } // enum Name { value, value, value }',
+// compare enums with == → true
+System.out.println(s == Status.LOADING);
+// ordinal(): position counted from 0 → 1
+System.out.println(s.ordinal());`,
+                        '// enum Name { value, value, value }\nenum Status { READY, LOADING, DONE }',
                     ),
                 ),
             },
@@ -868,7 +889,8 @@ System.out.println(s.ordinal()); // ordinal(): position counted from 0 → 1`,
                 ),
                 code: t(
                     prog(
-                        `for (Status s : Status.values()) { // values(): 모든 값을 순서대로 담은 배열
+                        `// values(): 모든 값을 순서대로 담은 배열
+for (Status s : Status.values()) {
     switch (s) {
         case READY: // case 에는 Status. 없이 값 이름만
             System.out.println(s + ": 대기");
@@ -883,9 +905,11 @@ System.out.println(s.ordinal()); // ordinal(): position counted from 0 → 1`,
                         'enum Status { READY, LOADING, DONE }',
                     ),
                     prog(
-                        `for (Status s : Status.values()) { // values(): an array of every value in order
+                        `// values(): an array of every value in order
+for (Status s : Status.values()) {
     switch (s) {
-        case READY: // case labels use just the value name, no Status.
+        // case labels use just the value name, no Status.
+        case READY:
             System.out.println(s + ": waiting");
             break;
         case LOADING:
@@ -1009,11 +1033,13 @@ System.out.println(Zone.{{1}}().length + "${t('개 구역', ' zones')}");`,
                 ),
                 code: t(
                     prog(
-                        `Box<String> a = new Box<>(); // T 를 String 으로 정하기 (뒤쪽 <> 는 비워도 돼요)
+                        `// T 를 String 으로 정하기 (뒤쪽 <> 는 비워도 돼요)
+Box<String> a = new Box<>();
 a.put("립밤");
 Box<Integer> b = new Box<>(); // 숫자는 int 대신 Integer
 b.put(12);
-System.out.println(a.get() + " " + (b.get() + 1)); // → 립밤 13`,
+// → 립밤 13
+System.out.println(a.get() + " " + (b.get() + 1));`,
                         `class Box<T> { // T: 아직 정하지 않은 타입 자리
     private T item;
 
@@ -1027,11 +1053,14 @@ System.out.println(a.get() + " " + (b.get() + 1)); // → 립밤 13`,
 }`,
                     ),
                     prog(
-                        `Box<String> a = new Box<>(); // T is String here (the <> on the right can stay empty)
+                        `// T is String here (the <> on the right can stay empty)
+Box<String> a = new Box<>();
 a.put("Lip balm");
-Box<Integer> b = new Box<>(); // numbers use Integer, not int
+// numbers use Integer, not int
+Box<Integer> b = new Box<>();
 b.put(12);
-System.out.println(a.get() + " " + (b.get() + 1)); // → Lip balm 13`,
+// → Lip balm 13
+System.out.println(a.get() + " " + (b.get() + 1));`,
                         `class Box<T> { // T: a slot for a type not decided yet
     private T item;
 
@@ -1066,7 +1095,8 @@ public class Main {
         names.add("A");
         names.add("B");
         List<Integer> kgs = Arrays.asList(3, 8, 5);
-        System.out.println(last(names) + " " + last(kgs)); // T 가 String, Integer 로 정해져요 → B 5
+        // T 가 String, Integer 로 정해져요 → B 5
+        System.out.println(last(names) + " " + last(kgs));
     }
 }`,
                     `${UTIL}
@@ -1082,7 +1112,8 @@ public class Main {
         names.add("A");
         names.add("B");
         List<Integer> kgs = Arrays.asList(3, 8, 5);
-        System.out.println(last(names) + " " + last(kgs)); // T becomes String, then Integer → B 5
+        // T becomes String, then Integer → B 5
+        System.out.println(last(names) + " " + last(kgs));
     }
 }`,
                 ),
@@ -1224,19 +1255,23 @@ class Shelf<{{0}}> {
                 ),
                 code: t(
                     prog(
-                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8)); // 값이 든 리스트를 바로 만들기
+                        `// 값이 든 리스트를 바로 만들기
+List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8));
 Collections.sort(kgs); // 작은 순으로 줄 세우기
 System.out.println(kgs); // → [3, 8, 12, 25]
-System.out.println(Collections.max(kgs) + " " + Collections.min(kgs)); // 가장 큰 값, 작은 값 → 25 3
+// 가장 큰 값, 작은 값 → 25 3
+System.out.println(Collections.max(kgs) + " " + Collections.min(kgs));
 Collections.reverse(kgs); // 순서 뒤집기
 System.out.println(kgs); // → [25, 12, 8, 3]`,
                         UTIL,
                     ),
                     prog(
-                        `List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8)); // a list with values right away
+                        `// a list with values right away
+List<Integer> kgs = new ArrayList<>(Arrays.asList(12, 3, 25, 8));
 Collections.sort(kgs); // sort smallest first
 System.out.println(kgs); // → [3, 8, 12, 25]
-System.out.println(Collections.max(kgs) + " " + Collections.min(kgs)); // largest, smallest → 25 3
+// largest, smallest → 25 3
+System.out.println(Collections.max(kgs) + " " + Collections.min(kgs));
 Collections.reverse(kgs); // flip the order
 System.out.println(kgs); // → [25, 12, 8, 3]`,
                         UTIL,
@@ -1251,21 +1286,25 @@ System.out.println(kgs); // → [25, 12, 8, 3]`,
                 ),
                 code: t(
                     prog(
-                        `Set<String> zones = new TreeSet<>(); // TreeSet: 작은 순서로 정렬해서 보관
+                        `// TreeSet: 작은 순서로 정렬해서 보관
+Set<String> zones = new TreeSet<>();
 zones.add("B");
 zones.add("A");
 zones.add("B"); // 이미 있는 값이라 안 늘어나요
 System.out.println(zones); // → [A, B]
-System.out.println(zones.size() + " " + zones.contains("C")); // → 2 false`,
+// → 2 false
+System.out.println(zones.size() + " " + zones.contains("C"));`,
                         UTIL,
                     ),
                     prog(
-                        `Set<String> zones = new TreeSet<>(); // TreeSet: keeps values sorted
+                        `// TreeSet: keeps values sorted
+Set<String> zones = new TreeSet<>();
 zones.add("B");
 zones.add("A");
 zones.add("B"); // already there, so nothing is added
 System.out.println(zones); // → [A, B]
-System.out.println(zones.size() + " " + zones.contains("C")); // → 2 false`,
+// → 2 false
+System.out.println(zones.size() + " " + zones.contains("C"));`,
                         UTIL,
                     ),
                 ),
@@ -1382,15 +1421,19 @@ System.out.println(${t('"택배사 " + uniq.size() + "곳: " + uniq', '"Couriers
                 code: t(
                     prog(
                         `List<String> items = new ArrayList<>(Arrays.asList("토너", "립밤", "쿠션팩트"));
-items.forEach(x -> System.out.println("- " + x)); // forEach: 칸마다 람다 부르기
-items.removeIf(x -> x.length() > 2); // removeIf: 람다가 true 인 칸 빼기 (3글자 이상)
+// forEach: 칸마다 람다 부르기
+items.forEach(x -> System.out.println("- " + x));
+// removeIf: 람다가 true 인 칸 빼기 (3글자 이상)
+items.removeIf(x -> x.length() > 2);
 System.out.println(items); // → [토너, 립밤]`,
                         UTIL,
                     ),
                     prog(
                         `List<String> items = new ArrayList<>(Arrays.asList("Toner", "Balm", "Cushion"));
-items.forEach(x -> System.out.println("- " + x)); // forEach: calls the lambda for each item
-items.removeIf(x -> x.length() > 5); // removeIf: removes items where the lambda is true (over 5 letters)
+// forEach: calls the lambda for each item
+items.forEach(x -> System.out.println("- " + x));
+// removeIf: removes items where the lambda is true (over 5 letters)
+items.removeIf(x -> x.length() > 5);
 System.out.println(items); // → [Toner, Balm]`,
                         UTIL,
                     ),
@@ -1408,8 +1451,10 @@ System.out.println(items); // → [Toner, Balm]`,
 kgs.sort((a, b) -> b - a); // b - a: 숫자 큰 순
 System.out.println(kgs); // → [25, 12, 3]
 List<String> names = new ArrayList<>(Arrays.asList("한빛로지스", "번개", "새벽배송"));
-names.sort((a, b) -> a.length() - b.length()); // 글자 수 적은 순
-System.out.println(names); // → [번개, 새벽배송, 한빛로지스]`,
+// 글자 수 적은 순
+names.sort((a, b) -> a.length() - b.length());
+// → [번개, 새벽배송, 한빛로지스]
+System.out.println(names);`,
                         UTIL,
                     ),
                     prog(
@@ -1417,8 +1462,10 @@ System.out.println(names); // → [번개, 새벽배송, 한빛로지스]`,
 kgs.sort((a, b) -> b - a); // b - a: largest first
 System.out.println(kgs); // → [25, 12, 3]
 List<String> names = new ArrayList<>(Arrays.asList("Lightning", "Dawn", "Hanbit"));
-names.sort((a, b) -> a.length() - b.length()); // shortest name first
-System.out.println(names); // → [Dawn, Hanbit, Lightning]`,
+// shortest name first
+names.sort((a, b) -> a.length() - b.length());
+// → [Dawn, Hanbit, Lightning]
+System.out.println(names);`,
                         UTIL,
                     ),
                 ),
@@ -1528,18 +1575,22 @@ System.out.println(kgs);`,
                     prog(
                         `List<Integer> kgs = Arrays.asList(4, 18, 7, 25);
 // stream(): 흘려보내기, filter: 조건에 맞는 것만 통과, count(): 개수 (long)
-long heavy = kgs.stream().filter(k -> k >= 10).count(); // 18, 25 → 2
+// 18, 25 → 2
+long heavy = kgs.stream().filter(k -> k >= 10).count();
 // mapToInt(…).sum(): 합계
-int total = kgs.stream().mapToInt(k -> k).sum(); // 4 + 18 + 7 + 25 → 54
+// 4 + 18 + 7 + 25 → 54
+int total = kgs.stream().mapToInt(k -> k).sum();
 System.out.println(heavy + " " + total); // → 2 54`,
                         UTIL,
                     ),
                     prog(
                         `List<Integer> kgs = Arrays.asList(4, 18, 7, 25);
 // stream(): let values flow, filter: only matching ones pass, count(): how many (a long)
-long heavy = kgs.stream().filter(k -> k >= 10).count(); // 18, 25 → 2
+// 18, 25 → 2
+long heavy = kgs.stream().filter(k -> k >= 10).count();
 // mapToInt(…).sum(): the total
-int total = kgs.stream().mapToInt(k -> k).sum(); // 4 + 18 + 7 + 25 → 54
+// 4 + 18 + 7 + 25 → 54
+int total = kgs.stream().mapToInt(k -> k).sum();
 System.out.println(heavy + " " + total); // → 2 54`,
                         UTIL,
                     ),
@@ -1557,7 +1608,8 @@ System.out.println(heavy + " " + total); // → 2 54`,
 // map: 값을 바꿔서 흘려보내기, collect(Collectors.toList()): 다시 리스트로 모으기
 List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
 System.out.println(big); // → [A1, B2, C3]
-System.out.println(String.join(", ", big)); // String.join: 사이에 ", " 를 넣어 붙이기 → A1, B2, C3`,
+// String.join: 사이에 ", " 를 넣어 붙이기 → A1, B2, C3
+System.out.println(String.join(", ", big));`,
                         STREAM,
                     ),
                     prog(
@@ -1565,7 +1617,8 @@ System.out.println(String.join(", ", big)); // String.join: 사이에 ", " 를 �
 // map: change each value as it flows, collect(Collectors.toList()): gather back into a list
 List<String> big = ids.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
 System.out.println(big); // → [A1, B2, C3]
-System.out.println(String.join(", ", big)); // String.join: joins with ", " in between → A1, B2, C3`,
+// String.join: joins with ", " in between → A1, B2, C3
+System.out.println(String.join(", ", big));`,
                         STREAM,
                     ),
                 ),
@@ -1679,7 +1732,8 @@ System.out.println(${t('"1만 원 이상: " + n + "건, " + sum + "원"', '"1000
                     'Extend <code>Exception</code> to make your own exception. See the comments for how to throw and catch it.',
                 ),
                 code: t(
-                    `class OverloadException extends Exception { // extends Exception: 우리만의 예외
+                    `// extends Exception: 우리만의 예외
+class OverloadException extends Exception {
     OverloadException(String msg) {
         super(msg);
     }
@@ -1688,21 +1742,25 @@ System.out.println(${t('"1만 원 이상: " + n + "건, " + sum + "원"', '"1000
 public class Main {
     // throws: 이 메서드가 이 예외를 던질 수 있다고 적기
     static void load(int kg) throws OverloadException {
-        if (kg > 1000) throw new OverloadException(kg + "kg 은 너무 무거워요"); // throw: 예외 던지기
+        // throw: 예외 던지기
+        if (kg > 1000) throw new OverloadException(kg + "kg 은 너무 무거워요");
         System.out.println(kg + "kg 실음");
     }
 
     public static void main(String[] args) {
         try {
             load(800);
-            load(1200); // 여기서 예외 → 바로 catch 로 가서 load(500) 은 실행 안 돼요
+            // 여기서 예외 → 바로 catch 로 가서 load(500) 은 실행 안 돼요
+            load(1200);
             load(500);
-        } catch (OverloadException e) { // 던진 예외 받기
+        // 던진 예외 받기
+        } catch (OverloadException e) {
             System.out.println("멈춤: " + e.getMessage());
         }
     }
 }`,
-                    `class OverloadException extends Exception { // extends Exception: our own exception
+                    `// extends Exception: our own exception
+class OverloadException extends Exception {
     OverloadException(String msg) {
         super(msg);
     }
@@ -1711,16 +1769,19 @@ public class Main {
 public class Main {
     // throws: says this method may throw this exception
     static void load(int kg) throws OverloadException {
-        if (kg > 1000) throw new OverloadException(kg + "kg is too heavy"); // throw: throw the exception
+        // throw: throw the exception
+        if (kg > 1000) throw new OverloadException(kg + "kg is too heavy");
         System.out.println(kg + "kg loaded");
     }
 
     public static void main(String[] args) {
         try {
             load(800);
-            load(1200); // exception here → jumps straight to catch, so load(500) never runs
+            // exception here → jumps straight to catch, so load(500) never runs
+            load(1200);
             load(500);
-        } catch (OverloadException e) { // catch the thrown exception
+        // catch the thrown exception
+        } catch (OverloadException e) {
             System.out.println("Stopped: " + e.getMessage());
         }
     }

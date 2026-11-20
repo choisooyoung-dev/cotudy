@@ -99,12 +99,14 @@ export function codeView(code, { title = 'Main.java', blanks = null, badge, badg
  * 문자열·글자·주석 안의 괄호는 세지 않고, switch 의 case 아래 줄은 한 칸 더 들여쓴다.
  * 여러 줄에 걸친 JS 템플릿 문자열(`…`) 안의 줄은 건드리지 않는다.
  */
-export function reindentBraces(src) {
+export function reindentBraces(src, unit = 4) {
     const out = [];
     let depth = 0;
     let inBlock = false; // /* … */ 안
     let inTpl = false; // ` … ` 안 (여러 줄)
     const caseAt = []; // caseAt[d] = 이 깊이에서 case 를 만났는지
+    const extraAt = []; // extraAt[d] = 깊이 d 의 줄들에 더할 들여쓰기 (case 아래, 점 이어 쓰기 안쪽)
+    const openerExtra = []; // openerExtra[d] = 깊이 d 를 연 줄의 추가 들여쓰기 (닫는 } 를 거기에 맞춘다)
     for (const raw of src.split('\n')) {
         const startedInTpl = inTpl;
         const t = raw.trim();
@@ -156,25 +158,37 @@ export function reindentBraces(src) {
             continue;
         }
         // 맨 앞의 } 들은 이 줄부터 한 단계씩 내린다
+        // 맨 앞의 } 는 그 { 를 연 줄과 같은 들여쓰기로 맞춘다
+        let closeExtra = null;
         for (let k = 0; k < leading; k++) {
             caseAt[depth] = false;
+            closeExtra = openerExtra[depth] || 0;
             depth = Math.max(0, depth - 1);
         }
         const isCase = /^(case\b.*|default\s*):/.test(t);
-        let level = depth + (caseAt[depth] && !isCase ? 1 : 0);
+        // .then(…) 처럼 점으로 이어지는 줄은 한 칸 더 (JS 메서드 이어 쓰기)
+        const lineExtra = (extraAt[depth] || 0) + (t.startsWith('.') ? 1 : 0) + (caseAt[depth] && !isCase ? 1 : 0);
+        const level = depth + (closeExtra ?? lineExtra);
         if (isCase) caseAt[depth] = true;
-        out.push(t ? ' '.repeat(level * 4) + t : '');
+        out.push(t ? ' '.repeat(level * unit) + t : '');
         for (let k = 0; k < closes; k++) {
             caseAt[depth] = false;
             depth = Math.max(0, depth - 1);
         }
-        for (let k = 0; k < opens; k++) caseAt[++depth] = false;
+        const ex = closeExtra ?? lineExtra;
+        for (let k = 0; k < opens; k++) {
+            caseAt[++depth] = false;
+            extraAt[depth] = ex; // 이 { 안쪽 줄들이 물려받는 추가 들여쓰기
+            openerExtra[depth] = ex; // 이 { 를 닫는 } 의 추가 들여쓰기
+        }
     }
     return out.join('\n');
 }
 
-/** Editable code box with highlight overlay, line numbers, Tab = 4 spaces. */
-export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor, braces = true } = {}) {
+/** Editable code box with highlight overlay, line numbers, Tab = one indent unit (4 spaces, JavaScript 2). */
+export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeColor, braces = true, unit = 4 } = {}) {
+    // unit: 들여쓰기 한 단계의 칸 수. JavaScript 예제·정답은 2칸, Java·Python 은 4칸.
+    const pad = ' '.repeat(unit);
     // braces: 중괄호 언어(Java, JavaScript)면 true → 「정렬」 버튼과 } 자동 내어쓰기. Python 은 false.
     const el = document.createElement('div');
     el.className = 'editor grow';
@@ -223,7 +237,7 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
         const row = before.length - 1;
         const oldLine = ta.value.split('\n')[row];
         const col = Math.max(0, before[row].length - oldLine.match(/^ */)[0].length);
-        const next = reindentBraces(ta.value);
+        const next = reindentBraces(ta.value, unit);
         if (next === ta.value) return;
         ta.value = next;
         const lines = next.split('\n');
@@ -245,7 +259,7 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
             const block = ta.value.slice(a, b);
             const moved = block
                 .split('\n')
-                .map((l) => (e.shiftKey ? l.replace(/^ {1,4}/, '') : l ? '    ' + l : l))
+                .map((l) => (e.shiftKey ? l.replace(new RegExp(`^ {1,${unit}}`), '') : l ? pad + l : l))
                 .join('\n');
             ta.setRangeText(moved, a, b, 'select');
             if (s === en) {
@@ -255,7 +269,7 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
             changed();
         } else if (e.key === 'Tab') {
             e.preventDefault();
-            ta.setRangeText('    ', s, en, 'end');
+            ta.setRangeText(pad, s, en, 'end');
             changed();
         } else if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
             // 들여쓰기 유지, { 나 : 뒤면 한 칸 더, {|} 사이면 } 를 다음 줄로
@@ -265,20 +279,20 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
             const opens = prev.endsWith('{') || (!braces && prev.endsWith(':'));
             if (braces && prev.endsWith('{') && ta.value.slice(en).match(/^ *\}/) && s === en) {
                 const after = ta.value.slice(en).match(/^ */)[0].length;
-                ta.setRangeText('\n' + indent + '    ' + '\n' + indent, s, en + after, 'start');
-                const p = s + 1 + indent.length + 4;
+                ta.setRangeText('\n' + indent + pad + '\n' + indent, s, en + after, 'start');
+                const p = s + 1 + indent.length + unit;
                 ta.setSelectionRange(p, p);
             } else {
                 // Python: return·break·continue·pass·raise 다음 줄은 한 칸 내어 쓴다
                 const out = !braces && /^\s*(return|break|continue|pass|raise)\b/.test(prev);
-                const ind = out ? indent.slice(4) : indent + (opens ? '    ' : '');
+                const ind = out ? indent.slice(unit) : indent + (opens ? pad : '');
                 ta.setRangeText('\n' + ind, s, en, 'end');
             }
             changed();
-        } else if (braces && e.key === '}' && /^ *$/.test(beforeCursor) && beforeCursor.length >= 4) {
+        } else if (braces && e.key === '}' && /^ *$/.test(beforeCursor) && beforeCursor.length >= unit) {
             // 빈 줄에서 } 를 치면 한 칸 내어 쓴다
             e.preventDefault();
-            ta.setRangeText('}', s - 4, en, 'end');
+            ta.setRangeText('}', s - unit, en, 'end');
             changed();
         } else if (braces && e.code === 'KeyF' && e.shiftKey && e.altKey) {
             e.preventDefault();

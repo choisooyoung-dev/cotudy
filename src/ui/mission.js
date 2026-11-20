@@ -83,12 +83,13 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
         <div class="title">${quest.title}<small>${test ? tr(`${who}의 코딩테스트`, `Coding test from ${who}`) : tr(`${who}의 퀘스트`, `Quest from ${who}`)}</small></div>
         <div class="steps"><span class="step-now"></span>${STEP_NAMES.map(() => '<i></i>').join('')}</div>
       </div>
-      <div class="body"><div class="left"></div><div class="right"></div></div>
+      <div class="body"><div class="left"></div><div class="right"></div><div class="foot"></div></div>
     </div>`;
         root.appendChild(bg);
         const left = bg.querySelector('.left'); // 왼쪽 칸: 부탁한 사람 말풍선, 문제 카드, 배운 것
         const right = bg.querySelector('.right'); // 오른쪽 칸: 개념 설명·코드·실행 결과
         const win = bg.querySelector('.win');
+        const foot = bg.querySelector('.foot'); // 오른쪽 칸 아래 버튼 줄 (이전 / 다음)
         const stepEls = [...bg.querySelectorAll('.steps i')]; // 위쪽 단계 칸 5개
 
         // 미션 진행 상태
@@ -170,7 +171,9 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             reactEl = document.createElement('div');
             reactEl.className = 'react' + (ok ? '' : ' err');
             reactEl.innerHTML = `<div class="rface">${faceHTML(npc.look, { bust: true })}</div><div><b>${ok ? '🎉 ' : ''}${title}</b><p>${npc.name}: "${text}"</p></div><button class="rclose" aria-label="${tr('닫기', 'Close')}">✕</button>`;
-            win.appendChild(reactEl);
+            // 휴대폰에서는 버튼 줄 안(버튼 바로 위)에 넣어서 보기·코드를 덮지 않게 한다
+            if (matchMedia('(max-width: 700px)').matches && foot.querySelector('.nav')) foot.prepend(reactEl);
+            else win.appendChild(reactEl);
             // 누르면 닫힌다 (휴대폰에서 아래쪽 「다음」 버튼을 가리던 문제, 2026-11-19)
             const el = reactEl;
             el.addEventListener('click', () => {
@@ -589,6 +592,7 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
             const ed = codeEditor(st.writeCode ?? w.starter, {
                 ...look,
                 braces: rt.name !== 'Python',
+                unit: rt.name === 'JavaScript' ? 2 : 4, // JS 예제·정답은 2칸 들여쓰기
                 onRun: () => run(),
             });
             right.appendChild(ed.el);
@@ -681,6 +685,9 @@ export function openMission(root, quest, npc, rt, who = `${npc.role} ${npc.name}
                 write: renderWrite,
                 done: renderDone,
             })[st.step]();
+            // 단계 화면이 오른쪽 칸 끝에 붙인 버튼 줄(.nav)을 아래 버튼 줄 칸으로 옮긴다
+            const nav = right.querySelector('.nav');
+            foot.replaceChildren(...(nav ? [nav] : []));
             right.scrollTop = 0;
         }
         render();

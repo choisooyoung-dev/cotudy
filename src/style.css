@@ -550,7 +550,26 @@ kbd {
     flex: 1;
     display: grid;
     grid-template-columns: 360px 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
     min-height: 0;
+}
+.win .left {
+    grid-row: 1 / 3;
+}
+/* 이전/다음 버튼 줄은 오른쪽 칸 아래 따로 된 줄(.foot)에 있다: 스크롤되는 내용을 가리지 않는다 (2026-11-20 QA 💡) */
+.win .foot {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 10px 18px 14px 16px;
+    border-top: 3px solid var(--sand);
+    background: var(--paper);
+}
+.win .foot:empty {
+    display: none;
+}
+.win .foot .nav {
+    margin-top: 0;
+    padding-top: 0;
 }
 .win .left {
     padding: 18px;
@@ -564,7 +583,7 @@ kbd {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    padding: 16px 18px 0 16px;
+    padding: 16px 18px 16px 16px;
     gap: 12px;
     overflow: auto;
 }
@@ -578,13 +597,6 @@ kbd {
 .win .right .editor.grow {
     flex: 1 0 auto;
     min-height: 320px;
-}
-.win .right .nav {
-    position: sticky;
-    bottom: 0;
-    background: var(--paper);
-    padding: 10px 0 14px;
-    z-index: 2;
 }
 .npc {
     display: flex;
@@ -1207,6 +1219,14 @@ kbd {
 @media (max-width: 860px) {
     .win .body {
         grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    .win .left {
+        grid-row: auto;
+    }
+    .win .foot {
+        grid-column: 1;
+        grid-row: 3;
     }
     .win .left {
         border-right: 0;
@@ -1319,14 +1339,20 @@ kbd {
         left: 10px;
         right: 10px;
         top: auto;
-        bottom: 92px; /* 아래쪽 이전/다음 버튼 위에 뜬다 (버튼을 가리지 않게) */
+        bottom: 92px;
         max-width: none;
     }
-    .nav {
+    /* 휴대폰: 버튼 줄은 화면 아래에 붙고, 반응 말풍선은 그 줄 안(버튼 바로 위)에 들어가서 내용을 덮지 않는다 */
+    .win .foot {
         position: sticky;
         bottom: 0;
-        background: var(--paper);
-        padding: 8px 0;
+        z-index: 2;
+        padding: 8px 12px;
+    }
+    .win .foot .react {
+        position: static;
+        margin: 0 0 8px;
+        animation: none;
     }
     .hint-row {
         margin-top: 0;

@@ -171,7 +171,8 @@ print(fragile or heavy)  # or: 하나만 참이어도 참 → True
 print(not heavy)  # not: 반대로 바꾸기 → True`,
                     `fragile = True
 heavy = False
-print(fragile and heavy)  # and: true only when both are true → False
+# and: true only when both are true → False
+print(fragile and heavy)
 print(fragile or heavy)  # or: true when either is true → True
 print(not heavy)  # not: flips it → True`,
                 ),
@@ -271,15 +272,18 @@ print(not heavy)  # not: flips it → True`,
                     `stock = 3
 order = 5
 if stock >= order:  # if 조건: (콜론 : 을 잊지 마세요)
-    print("피킹 가능")  # 앞에 띄어쓰기 4칸(들여쓰기): 조건이 True 일 때만 실행
+    # 앞에 띄어쓰기 4칸(들여쓰기): 조건이 True 일 때만 실행
+    print("피킹 가능")
 else:  # else: 조건이 False 일 때
     print("재고 부족")  # 3 >= 5 는 False 라서 이 줄이 실행돼요`,
                     `stock = 3
 order = 5
 if stock >= order:  # if condition: (do not forget the colon :)
-    print("Ready to pick")  # 4 spaces in front (indentation): runs only when True
+    # 4 spaces in front (indentation): runs only when True
+    print("Ready to pick")
 else:  # else: when the condition is False
-    print("Not enough stock")  # 3 >= 5 is False, so this line runs`,
+    # 3 >= 5 is False, so this line runs
+    print("Not enough stock")`,
                 ),
             },
             {
@@ -356,13 +360,16 @@ else:  # else: when the condition is False
                     `zone = "A"
 print(zone == "A")  # 글자가 같아요 → True
 print(zone == "a")  # 대소문자가 달라서 → False
-print(zone.lower() == "a")  # lower(): 소문자로 바꿔서 비교 → True
+# lower(): 소문자로 바꿔서 비교 → True
+print(zone.lower() == "a")
 print(zone in ["A", "B"])  # in: 여러 값 중 하나인가? → True`,
                     `zone = "A"
 print(zone == "A")  # same text → True
 print(zone == "a")  # different case → False
-print(zone.lower() == "a")  # lower(): compare after making it lower case → True
-print(zone in ["A", "B"])  # in: is it one of these values? → True`,
+# lower(): compare after making it lower case → True
+print(zone.lower() == "a")
+# in: is it one of these values? → True
+print(zone in ["A", "B"])`,
                 ),
             },
             {
@@ -727,7 +734,8 @@ print("■" * 4)  # 같은 글자 반복은 곱하기로도 돼요 → ■■■
     for col in range(4):
         print("■", end="")  # end="": prints without a new line
     print()  # new line at the end of each row
-print("■" * 4)  # repeating a string with * works too → ■■■■`,
+# repeating a string with * works too → ■■■■
+print("■" * 4)`,
                 ),
             },
         ],
@@ -808,7 +816,8 @@ print(couriers[0])  # 이름[번호], 번호는 0 부터 → 번개택배
 print(couriers[-1])  # [-1]: 맨 끝 → 바다택배
 print(len(couriers))  # len(리스트): 개수 → 3`,
                     `couriers = ["Lightning", "Sky", "Ocean"]  # [value, value, …]
-print(couriers[0])  # name[index], indexes start at 0 → Lightning
+# name[index], indexes start at 0 → Lightning
+print(couriers[0])
 print(couriers[-1])  # [-1]: the last one → Ocean
 print(len(couriers))  # len(list): how many → 3`,
                 ),
@@ -902,11 +911,13 @@ print(len(couriers))  # len(list): how many → 3`,
                     `w = [4, 9, 2]
 w[2] = 6  # 리스트[번호] = 새 값: 2번 칸을 6 으로
 print(w)  # → [4, 9, 6]
-print(sum(w), max(w), min(w))  # sum 합계, max 최댓값, min 최솟값 → 19 9 4`,
+# sum 합계, max 최댓값, min 최솟값 → 19 9 4
+print(sum(w), max(w), min(w))`,
                     `w = [4, 9, 2]
 w[2] = 6  # list[index] = new value: slot 2 becomes 6
 print(w)  # → [4, 9, 6]
-print(sum(w), max(w), min(w))  # sum total, max largest, min smallest → 19 9 4`,
+# sum total, max largest, min smallest → 19 9 4
+print(sum(w), max(w), min(w))`,
                 ),
             },
             {
@@ -1144,7 +1155,8 @@ print(clean[3:])  # s[3:]: 3번부터 끝까지 → 778`,
 # strip(): remove spaces at both ends, upper(): upper case (lower() for lower case)
 clean = code.strip().upper()
 print(clean)  # → KR-778
-print(clean[0:2])  # s[start:end]: from 0 up to just before 2 → KR
+# s[start:end]: from 0 up to just before 2 → KR
+print(clean[0:2])
 print(clean[3:])  # s[3:]: from 3 to the end → 778`,
                 ),
             },
@@ -1240,12 +1252,16 @@ print(clean[3:])  # s[3:]: from 3 to the end → 778`,
                 code: t(
                     `addr = "서울시 강남구 테헤란로"
 print("강남" in addr)  # "글자" in s: 들어 있나? → True
-print(addr.find("강남"))  # find(글자): 몇 번째에 있나 (없으면 -1) → 4
-print("A-B-C".replace("-", "/"))  # replace(옛것, 새것): 전부 바꾼 문자열 → A/B/C`,
+# find(글자): 몇 번째에 있나 (없으면 -1) → 4
+print(addr.find("강남"))
+# replace(옛것, 새것): 전부 바꾼 문자열 → A/B/C
+print("A-B-C".replace("-", "/"))`,
                     `addr = "Teheran-ro, Gangnam, Seoul"
 print("Gangnam" in addr)  # "text" in s: is it there? → True
-print(addr.find("Gangnam"))  # find(text): where it starts (-1 if missing) → 12
-print("A-B-C".replace("-", "/"))  # replace(old, new): every one replaced → A/B/C`,
+# find(text): where it starts (-1 if missing) → 12
+print(addr.find("Gangnam"))
+# replace(old, new): every one replaced → A/B/C
+print("A-B-C".replace("-", "/"))`,
                 ),
             },
             {
@@ -1727,10 +1743,12 @@ print(len(stock))  # len(d): number of pairs → 3`,
                 code: t(
                     `stock = {"토너": 12}
 print("쿠션" in stock)  # 키 in d: 그 키가 있나? → False
-print(stock.get("쿠션", 0))  # d.get(키, 기본값): 없으면 기본값 → 0`,
+# d.get(키, 기본값): 없으면 기본값 → 0
+print(stock.get("쿠션", 0))`,
                     `stock = {"toner": 12}
 print("cushion" in stock)  # key in d: is the key there? → False
-print(stock.get("cushion", 0))  # d.get(key, default): the default when missing → 0`,
+# d.get(key, default): the default when missing → 0
+print(stock.get("cushion", 0))`,
                 ),
             },
         ],
@@ -1904,15 +1922,18 @@ print(stock.get("cushion", 0))  # d.get(key, default): the default when missing 
                 ),
                 code: t(
                     `class Product:  # class 이름:
-    def __init__(self, name, price):  # __init__: 객체를 만들 때 실행
+    # __init__: 객체를 만들 때 실행
+    def __init__(self, name, price):
         self.name = name  # self.필드 = 값: 객체에 값 담기
         self.price = price
 
 p = Product("토너", 15000)  # 이름(…): 객체 만들기
 print(p.name, p.price)  # → 토너 15000`,
                     `class Product:  # class Name:
-    def __init__(self, name, price):  # __init__: runs when an object is made
-        self.name = name  # self.field = value: store a value in the object
+    # __init__: runs when an object is made
+    def __init__(self, name, price):
+        # self.field = value: store a value in the object
+        self.name = name
         self.price = price
 
 p = Product("Toner", 15000)  # Name(…): make an object
@@ -2036,7 +2057,8 @@ print(p.name, p.price)  # → Toner 15000`,
         return f"{self.name} ({self.stock})"
 
 t = Item("토너", 12)
-t.sell(3)  # 객체.메서드(), self 는 넘기지 않아요 → stock 이 12 에서 9 로
+# 객체.메서드(), self 는 넘기지 않아요 → stock 이 12 에서 9 로
+t.sell(3)
 print(t.label())  # → 토너 (9)`,
                     `class Item:
     def __init__(self, name, stock):
@@ -2044,13 +2066,15 @@ print(t.label())  # → 토너 (9)`,
         self.stock = stock
 
     def sell(self, n):  # a method: def name(self, …):
-        self.stock -= n  # self: the object the method was called on
+        # self: the object the method was called on
+        self.stock -= n
 
     def label(self):
         return f"{self.name} ({self.stock})"
 
 t = Item("Toner", 12)
-t.sell(3)  # object.method(), you do not pass self → stock goes from 12 to 9
+# object.method(), you do not pass self → stock goes from 12 to 9
+t.sell(3)
 print(t.label())  # → Toner (9)`,
                 ),
             },

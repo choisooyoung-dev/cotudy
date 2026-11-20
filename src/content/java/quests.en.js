@@ -318,11 +318,14 @@ System.out.println(barcode);`),
             {
                 title: 'Text <code>String</code>',
                 body: 'A <code>String</code> holds many characters (text). See the comments in the example for how <code>+</code> is worked out.',
-                code: main(`String name = "Cushion compact"; // the S in String is uppercase
+                code: main(`// the S in String is uppercase
+String name = "Cushion compact";
 System.out.println(name + " arrived");
 // + works from left to right
-System.out.println(1 + 2 + " boxes"); // 1 + 2 = 3 first, then " boxes" is joined → 3 boxes
-System.out.println("Box" + 1 + 2); // "Box" + 1 → "Box1", then + 2 → Box12`),
+// 1 + 2 = 3 first, then " boxes" is joined → 3 boxes
+System.out.println(1 + 2 + " boxes");
+// "Box" + 1 → "Box1", then + 2 → Box12
+System.out.println("Box" + 1 + 2);`),
             },
         ],
         predict: {
