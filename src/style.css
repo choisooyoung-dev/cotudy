@@ -10,11 +10,49 @@
     --red: #e2523f;
     --yellow: #ffd84d;
     --orange: #f2b134;
+    /* code boxes: light by default, dark with <html data-code="dark"> (toggle in src/ui/code.js) */
+    --code-bg: #fffdf7;
+    --code-bar: #f1ebdc;
+    --code-line: #e2d8c3;
+    --code-fg: #2b2f3a;
+    --code-dim: #a59a86;
+    --code-tabfg: #5b4a35;
+    --code-btn: #cdbf9f;
+    --code-err: #ffe1dc;
+    --code-caret: #3d2a17;
+    --code-sel: #3d6fd633;
+    --hl-k: #c2185b;
+    --hl-t: #0b6aa8;
+    --hl-s: #2e7d32;
+    --hl-f: #9a5b00;
+    --hl-c: #8a8f98;
+    --hl-num: #b45309;
+    --code-ok: #2e8b20;
+    --code-bad: #c62828;
+    --code-h5: #7a6e5a;
+    --font: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    --mono: 'JetBrains Mono', 'D2Coding', Menlo, Consolas, monospace;
+}
+:root[data-code='dark'] {
     --code-bg: #232733;
     --code-bar: #1b1e27;
     --code-line: #2f3442;
-    --font: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    --mono: 'JetBrains Mono', 'D2Coding', Menlo, Consolas, monospace;
+    --code-fg: #e6e9ef;
+    --code-dim: #5d6577;
+    --code-tabfg: #cfd6e4;
+    --code-btn: #4b5263;
+    --code-err: #5a2a2a;
+    --code-caret: #ffd166;
+    --code-sel: #ffffff33;
+    --hl-k: #ff8fab;
+    --hl-t: #7fd1ff;
+    --hl-s: #b5e08c;
+    --hl-f: #ffd166;
+    --hl-c: #7d8597;
+    --hl-num: #f6c177;
+    --code-ok: #9be37a;
+    --code-bad: #ff8a80;
+    --code-h5: #9aa3b5;
 }
 * {
     box-sizing: border-box;
@@ -858,7 +896,7 @@ kbd {
     gap: 8px;
     background: var(--code-bar);
     padding: 7px 12px;
-    color: #cfd6e4;
+    color: var(--code-tabfg);
     font-size: 12px;
     font-family: var(--mono);
 }
@@ -878,8 +916,8 @@ kbd {
 }
 .tabbar .reset {
     background: none;
-    border: 1px solid #4b5263;
-    color: #cfd6e4;
+    border: 1px solid var(--code-btn);
+    color: var(--code-tabfg);
     border-radius: 6px;
     padding: 1px 8px;
     font-size: 11px;
@@ -890,7 +928,7 @@ kbd {
     font-family: var(--mono);
     font-size: 15px;
     line-height: 1.7;
-    color: #e6e9ef;
+    color: var(--code-fg);
     overflow: auto;
 }
 .codeview .ln {
@@ -902,11 +940,11 @@ kbd {
     width: 44px;
     text-align: right;
     padding-right: 14px;
-    color: #5d6577;
+    color: var(--code-dim);
     user-select: none;
 }
 .codeview .ln.err {
-    background: #5a2a2a;
+    background: var(--code-err);
 }
 .codeview input.blank {
     font: inherit;
@@ -927,23 +965,23 @@ kbd {
     box-shadow: 0 0 0 2px #ffd84d66;
 }
 .k {
-    color: #ff8fab;
+    color: var(--hl-k);
 }
 .t {
-    color: #7fd1ff;
+    color: var(--hl-t);
 }
 .s {
-    color: #b5e08c;
+    color: var(--hl-s);
 }
 .f {
-    color: #ffd166;
+    color: var(--hl-f);
 }
 .c {
-    color: #7d8597;
+    color: var(--hl-c);
     font-style: italic;
 }
 .num {
-    color: #f6c177;
+    color: var(--hl-num);
 }
 
 .ed-wrap {
@@ -958,7 +996,7 @@ kbd {
     width: 44px;
     padding: 10px 14px 10px 0;
     text-align: right;
-    color: #5d6577;
+    color: var(--code-dim);
     font-family: var(--mono);
     font-size: 15px;
     line-height: 1.7;
@@ -983,7 +1021,7 @@ kbd {
     letter-spacing: 0;
 }
 .ed-area pre {
-    color: #e6e9ef;
+    color: var(--code-fg);
     pointer-events: none;
     min-height: 100%;
 }
@@ -995,12 +1033,12 @@ kbd {
     resize: none;
     background: transparent;
     color: transparent;
-    caret-color: #ffd166;
+    caret-color: var(--code-caret);
     outline: none;
     overflow: hidden;
 }
 .ed-area textarea::selection {
-    background: #ffffff33;
+    background: var(--code-sel);
     color: transparent;
 }
 
@@ -1025,7 +1063,7 @@ kbd {
     background: var(--code-bar);
     border-radius: 14px;
     border: 3px solid var(--code-line);
-    color: #e6e9ef;
+    color: var(--code-fg);
     font-family: var(--mono);
     font-size: 14px;
     display: grid;
@@ -1050,13 +1088,13 @@ kbd {
     margin: 0 0 6px;
     font-family: var(--font);
     font-size: 12px;
-    color: #9aa3b5;
+    color: var(--code-h5);
 }
 .console .ok {
-    color: #9be37a;
+    color: var(--code-ok);
 }
 .console .bad {
-    color: #ff8a80;
+    color: var(--code-bad);
 }
 .console .plain {
     font-family: var(--font);
@@ -1541,7 +1579,7 @@ kbd {
 .iv-code {
     margin: 0 0 10px;
     background: var(--code-bg);
-    color: #e8e8e8;
+    color: var(--code-fg);
     border-radius: 10px;
     padding: 10px 12px;
     font: 13px/1.5 var(--mono);
@@ -1820,7 +1858,7 @@ kbd {
 .dlg .iv-answer {
     margin: 6px 0 4px;
     background: var(--code-bg);
-    color: #e8e8e8;
+    color: var(--code-fg);
     border-radius: 8px;
     padding: 6px 10px;
     font: 13px/1.5 var(--mono);

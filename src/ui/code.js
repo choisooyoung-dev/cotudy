@@ -14,6 +14,26 @@ const TYPES = new Set(
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Code editor screen colors: light by default, dark if the player picked it in ⚙️ Settings. Kept for this browser (all characters).
+const THEME_KEY = 'cotudy.codeTheme';
+let codeTheme = 'light';
+try {
+    if (localStorage.getItem(THEME_KEY) === 'dark') codeTheme = 'dark';
+} catch {}
+const applyTheme = () => {
+    if (codeTheme === 'dark') document.documentElement.dataset.code = 'dark';
+    else delete document.documentElement.dataset.code;
+};
+applyTheme();
+export const getCodeTheme = () => codeTheme;
+export function setCodeTheme(v) {
+    codeTheme = v === 'dark' ? 'dark' : 'light';
+    try {
+        localStorage.setItem(THEME_KEY, codeTheme);
+    } catch {}
+    applyTheme();
+}
+
 /** Returns highlighted HTML for one line of Java. */
 export function highlightLine(line) {
     let out = '';

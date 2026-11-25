@@ -12,6 +12,7 @@ import { QUESTS as PY_QUESTS } from './content/python/quests.js';
 import { RUNTIMES } from './runner/index.js';
 import { openMission, faceHTML } from './ui/mission.js';
 import { runHiring, askQuestion, conceptQuestion } from './ui/hire.js';
+import { getCodeTheme, setCodeTheme } from './ui/code.js';
 import { warmUpJava, runJava } from './runner/java.js';
 import { runJs } from './runner/javascript.js';
 import { codeKey, savedOutputs } from './runner/cache.js';
@@ -73,7 +74,7 @@ app.innerHTML = `
   <button class="goto-btn hide">${tr('▶ 바로 가기', '▶ Go there')}</button>
   <div class="toast hide"></div>
   <div class="pad"><button class="u">▲</button><button class="l">◀</button><button class="act off"></button><button class="r">▶</button><button class="d">▼</button></div>
-  <button class="menu-btn" title="${tr('언어 · 저장 파일 · 초기화', 'Language · save file · reset')}"><span class="ico">⚙️</span>${tr('설정', 'Settings')}</button>
+  <button class="menu-btn" title="${tr('언어 · 코드 에디터 화면 · 저장 파일 · 초기화', 'Language · code editor · save file · reset')}"><span class="ico">⚙️</span>${tr('설정', 'Settings')}</button>
   <div class="credit"><span class="java-state">${tr('☕ 자바 준비 중…', '☕ Getting Java ready…')}</span> · <a href="https://cheerpj.com" target="_blank" rel="noopener">Built with CheerpJ</a> · © 2026 choisooyoung-dev. All rights reserved.</div>`;
 
 /** 화면 안에서 요소 하나 찾기. */
@@ -1374,6 +1375,9 @@ $('.menu-btn').addEventListener('click', async () => {
             { label: tr('👥 캐릭터 바꾸기', '👥 Switch character'), value: 'char' },
             { label: tr('💻 코딩 언어 바꾸기', '💻 Change coding language'), value: 'lang' },
             { label: tr('🌐 화면 언어: English', '🌐 Display language: 한국어'), value: 'ui' },
+            getCodeTheme() === 'dark'
+                ? { label: tr('☀️ 코드 에디터 화면: 밝게', '☀️ Code editor: light'), value: 'theme' }
+                : { label: tr('🌙 코드 에디터 화면: 어둡게', '🌙 Code editor: dark'), value: 'theme' },
             { label: tr('💾 저장 파일 받기', '💾 Download save file'), value: 'export' },
             { label: tr('📂 저장 파일 불러오기', '📂 Load save file'), value: 'import' },
             {
@@ -1406,6 +1410,14 @@ $('.menu-btn').addEventListener('click', async () => {
     }
     if (v === 'lang') chooseLanguage();
     if (v === 'ui') setUiLang(UI_LANG === 'en' ? 'ko' : 'en');
+    if (v === 'theme') {
+        setCodeTheme(getCodeTheme() === 'dark' ? 'light' : 'dark');
+        toast(
+            getCodeTheme() === 'dark'
+                ? tr('🌙 코드 에디터 화면을 어둡게 바꿨어요', '🌙 Code editor is now dark')
+                : tr('☀️ 코드 에디터 화면을 밝게 바꿨어요', '☀️ Code editor is now light'),
+        );
+    }
     if (v === 'export') exportSave();
     if (v === 'errors') exportErrors();
     if (v === 'import') importSave();
