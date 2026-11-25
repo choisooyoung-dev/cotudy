@@ -50,7 +50,8 @@ export const QUESTS = [
                     prog(
                         `Stock s = new Stock(12);
 // s.qty 를 쓰면 컴파일 에러 (private 이라서)
-System.out.println(s.getQty()); // getter 로 읽기 → 12`,
+// getter 로 읽기 → 12
+System.out.println(s.getQty());`,
                         `class Stock {
     // private: 이 클래스 안에서만 쓸 수 있어요
     private int qty;
@@ -716,7 +717,8 @@ System.out.println(Calc.fee(10));
 // Math.max 도 static 메서드 (main 도 static) → 7
 System.out.println(Math.max(3, 7));`,
                         `class Calc {
-    static int fee(int kg) { // static 메서드
+    // static 메서드
+    static int fee(int kg) {
         return kg * 150;
     }
 }`,
@@ -727,7 +729,8 @@ System.out.println(Calc.fee(10));
 // Math.max is a static method too (so is main) → 7
 System.out.println(Math.max(3, 7));`,
                         `class Calc {
-    static int fee(int kg) { // a static method
+    // a static method
+    static int fee(int kg) {
         return kg * 150;
     }
 }`,
@@ -1044,7 +1047,8 @@ Box<Integer> b = new Box<>();
 b.put(12);
 // → 립밤 13
 System.out.println(a.get() + " " + (b.get() + 1));`,
-                        `class Box<T> { // T: 아직 정하지 않은 타입 자리
+                        `// T: 아직 정하지 않은 타입 자리
+class Box<T> {
     private T item;
 
     void put(T item) {
@@ -1065,7 +1069,8 @@ Box<Integer> b = new Box<>();
 b.put(12);
 // → Lip balm 13
 System.out.println(a.get() + " " + (b.get() + 1));`,
-                        `class Box<T> { // T: a slot for a type not decided yet
+                        `// T: a slot for a type not decided yet
+class Box<T> {
     private T item;
 
     void put(T item) {

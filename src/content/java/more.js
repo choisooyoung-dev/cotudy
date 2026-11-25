@@ -1584,8 +1584,10 @@ System.out.println(sb.toString());`),
     }
 
     public static void main(String[] args) {
-        warn(); // 이름(); 으로 부르기
-        warn(); // 부를 때마다 다시 실행돼요
+        // 이름(); 으로 부르기
+        warn();
+        // 부를 때마다 다시 실행돼요
+        warn();
     }
 }`,
                     `public class Main {
@@ -1595,8 +1597,10 @@ System.out.println(sb.toString());`),
     }
 
     public static void main(String[] args) {
-        warn(); // call it with name();
-        warn(); // it runs again on every call
+        // call it with name();
+        warn();
+        // it runs again on every call
+        warn();
     }
 }`,
                 ),
@@ -2021,11 +2025,11 @@ System.out.println(stock.getOrDefault("cushion", 0));`,
                 ),
                 code: t(
                     main(
-                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    // ② + 1: 하나 더하기\n    // ③ put(p, …): 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A")); // A 는 1 → 2 → 3\nSystem.out.println(count.get("B")); // B 는 1',
+                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    // ② + 1: 하나 더하기\n    // ③ put(p, …): 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\n// A 는 1 → 2 → 3\nSystem.out.println(count.get("A"));\n// B 는 1\nSystem.out.println(count.get("B"));',
                         UTIL,
                     ),
                     main(
-                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): the count so far (0 for a new name)\n    // ② + 1: add one\n    // ③ put(p, …): put it back under the same key (replaces the old value)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\nSystem.out.println(count.get("A")); // A goes 1 → 2 → 3\nSystem.out.println(count.get("B")); // B is 1',
+                        'String[] picks = {"A", "B", "A", "A"};\nHashMap<String, Integer> count = new HashMap<>();\nfor (String p : picks) {\n    // ① getOrDefault(p, 0): the count so far (0 for a new name)\n    // ② + 1: add one\n    // ③ put(p, …): put it back under the same key (replaces the old value)\n    count.put(p, count.getOrDefault(p, 0) + 1);\n}\n// A goes 1 → 2 → 3\nSystem.out.println(count.get("A"));\n// B is 1\nSystem.out.println(count.get("B"));',
                         UTIL,
                     ),
                 ),
@@ -2330,10 +2334,71 @@ System.out.println(stock.getOrDefault("cushion", 0));`,
                 ),
             },
             {
-                title: t('자주 보는 예외들', 'Common exceptions'),
+                title: t('자주 쓰는 예외 4가지', '4 common exceptions'),
                 body: t(
-                    '자주 보는 예외들: <code>ArithmeticException</code> (0 으로 나누기), <code>ArrayIndexOutOfBoundsException</code> (없는 칸), <code>NumberFormatException</code> (숫자로 못 바꿈). <code>finally</code> 는 예제 주석을 보세요.',
-                    'Common exceptions: <code>ArithmeticException</code> (divide by 0), <code>ArrayIndexOutOfBoundsException</code> (no such slot), <code>NumberFormatException</code> (can not make a number). See the comments for <code>finally</code>.',
+                    '예외 이름을 영어 뜻대로 끊어 읽으면 무슨 일이 났는지 보여요.<br><code>ArithmeticException</code>: Arithmetic = 산수. 0 으로 나누기처럼 계산이 안 될 때<br><code>ArrayIndexOutOfBoundsException</code>: Array Index Out Of Bounds = 배열 번호가 범위 밖. 없는 칸 번호를 쓸 때<br><code>NumberFormatException</code>: Number Format = 숫자 모양. <code>"12a"</code> 처럼 숫자 모양이 아닌 글자를 숫자로 바꿀 때<br><code>NullPointerException</code>: Null = 비어 있음. 아무것도 안 담긴(<code>null</code>) 변수에 <code>.length()</code> 같은 메서드를 부를 때<br>어떤 예외가 날지 모르면 <code>catch (Exception e)</code> 로 전부 잡을 수 있어요.',
+                    "Split an exception name into English words and it tells you what went wrong.<br><code>ArithmeticException</code>: arithmetic. A calculation that can't be done, like dividing by 0<br><code>ArrayIndexOutOfBoundsException</code>: array index out of bounds. Using a slot number that doesn't exist<br><code>NumberFormatException</code>: number format. Turning text that isn't shaped like a number, like <code>\"12a\"</code>, into a number<br><code>NullPointerException</code>: null = empty. Calling a method like <code>.length()</code> on a variable that holds nothing (<code>null</code>)<br>If you don't know which one will happen, <code>catch (Exception e)</code> catches them all.",
+                ),
+                code: t(
+                    main(`// 0 으로 나누기: ArithmeticException
+try {
+    int x = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("0 으로 못 나눠요");
+}
+// 없는 칸 번호: ArrayIndexOutOfBoundsException
+try {
+    int[] a = {1, 2, 3};
+    System.out.println(a[5]);
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("없는 칸이에요");
+}
+// 숫자 모양이 아닌 글자: NumberFormatException
+try {
+    int n = Integer.parseInt("12a");
+} catch (NumberFormatException e) {
+    System.out.println("숫자가 아니에요");
+}
+// 비어 있는 변수: NullPointerException
+try {
+    String name = null;
+    System.out.println(name.length());
+} catch (NullPointerException e) {
+    System.out.println("비어 있어요");
+}`),
+                    main(`// divide by 0: ArithmeticException
+try {
+    int x = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Can't divide by 0");
+}
+// no such slot: ArrayIndexOutOfBoundsException
+try {
+    int[] a = {1, 2, 3};
+    System.out.println(a[5]);
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("No such slot");
+}
+// text not shaped like a number: NumberFormatException
+try {
+    int n = Integer.parseInt("12a");
+} catch (NumberFormatException e) {
+    System.out.println("Not a number");
+}
+// an empty variable: NullPointerException
+try {
+    String name = null;
+    System.out.println(name.length());
+} catch (NullPointerException e) {
+    System.out.println("It's empty");
+}`),
+                ),
+            },
+            {
+                title: t('<code>finally</code>', '<code>finally</code>'),
+                body: t(
+                    '<code>finally { }</code> 는 예외가 나든 안 나든 마지막에 꼭 실행돼요. 어디에 붙는지는 예제 주석을 보세요.',
+                    '<code>finally { }</code> always runs at the end, whether an exception happened or not. See the comments for where it goes.',
                 ),
                 code: t(
                     main(`int[] a = {1, 2, 3};

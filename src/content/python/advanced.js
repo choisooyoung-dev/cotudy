@@ -720,21 +720,29 @@ for b in box_numbers(3):
     yield "2번 테이프"
 
 g = tape_rolls()
-print(next(g))  # next(제너레이터): 하나 꺼내기 → 1번 테이프
-print(next(g))  # → 2번 테이프
+# next(제너레이터): 하나 꺼내기 → 1번 테이프
+print(next(g))
+# → 2번 테이프
+print(next(g))
 # (식 for x in 목록): 리스트를 만들지 않고 하나씩 흘려보내는 제너레이터 식
-total = sum(kg * 2 for kg in [3, 5, 2])  # 6 + 10 + 4
-print(total)  # → 20`,
+# 6 + 10 + 4
+total = sum(kg * 2 for kg in [3, 5, 2])
+# → 20
+print(total)`,
                     `def tape_rolls():
     yield "Tape 1"
     yield "Tape 2"
 
 g = tape_rolls()
-print(next(g))  # next(generator): take one out → Tape 1
-print(next(g))  # → Tape 2
+# next(generator): take one out → Tape 1
+print(next(g))
+# → Tape 2
+print(next(g))
 # (expr for x in list): a generator expression that flows values one at a time, no list built
-total = sum(kg * 2 for kg in [3, 5, 2])  # 6 + 10 + 4
-print(total)  # → 20`,
+# 6 + 10 + 4
+total = sum(kg * 2 for kg in [3, 5, 2])
+# → 20
+print(total)`,
                 ),
             },
         ],
