@@ -1169,9 +1169,12 @@ print(code[-1])  # s[-1]: the last character → 2`,
                     `code = "  kr-778  "
 # strip(): 앞뒤 공백 지우기, upper(): 대문자로 (lower() 는 소문자로)
 clean = code.strip().upper()
-print(clean)  # → KR-778
-print(clean[0:2])  # s[시작:끝]: 0번부터 2번 바로 앞까지 → KR
-print(clean[3:])  # s[3:]: 3번부터 끝까지 → 778`,
+# → KR-778
+print(clean)
+# s[시작:끝]: 0번부터 2번 바로 앞까지 → KR
+print(clean[0:2])
+# s[3:]: 3번부터 끝까지 → 778
+print(clean[3:])`,
                     `code = "  kr-778  "
 # strip(): remove spaces at both ends, upper(): upper case (lower() for lower case)
 clean = code.strip().upper()
@@ -1856,8 +1859,8 @@ print(stock.get("cushion", 0))`,
                     'Keep "name: count so far" in a dict, and add 1 each time a name shows up. What the one line in the loop does is written in the example\'s comments ①②③ (it works from the right).<br>Reading a missing key directly with <code>count[p]</code> raises <code>KeyError</code>. That is why we use <code>get(p, 0)</code>.',
                 ),
                 code: t(
-                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    # ② + 1: 하나 더하기\n    # ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])  # A 는 1 → 2 → 3\nprint(count["B"])  # B 는 1',
-                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): the count so far (0 for a new name)\n    # ② + 1: add one\n    # ③ count[p] = …: put it back under the same key (replaces the old value)\n    count[p] = count.get(p, 0) + 1\nprint(count["A"])  # A goes 1 → 2 → 3\nprint(count["B"])  # B is 1',
+                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): 지금까지 센 개수 (처음 나온 이름이면 0)\n    # ② + 1: 하나 더하기\n    # ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n    count[p] = count.get(p, 0) + 1\n# A 는 1 → 2 → 3\nprint(count["A"])\n# B 는 1\nprint(count["B"])',
+                    'picks = ["A", "B", "A", "A"]\ncount = {}\nfor p in picks:\n    # ① count.get(p, 0): the count so far (0 for a new name)\n    # ② + 1: add one\n    # ③ count[p] = …: put it back under the same key (replaces the old value)\n    count[p] = count.get(p, 0) + 1\n# A goes 1 → 2 → 3\nprint(count["A"])\n# B is 1\nprint(count["B"])',
                 ),
             },
             {

@@ -1847,8 +1847,8 @@ console.log(Object.keys(stock).length);`,
                     'Keep "name: count so far" in an object, and add 1 each time a name shows up. What the one line in the loop does is written in the example\'s comments ①②③ (it works from the right).<br>For a new name <code>count[p]</code> is <code>undefined</code>, and <code>undefined + 1</code> is <code>NaN</code>. That is why we add <code>|| 0</code>.',
                 ),
                 code: t(
-                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: 지금까지 센 개수 (처음 나온 이름이면 0)\n  // ② + 1: 하나 더하기\n  // ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n  count[p] = (count[p] || 0) + 1;\n}\nconsole.log(count.A); // A 는 1 → 2 → 3\nconsole.log(count.B); // B 는 1',
-                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: the count so far (0 for a new name)\n  // ② + 1: add one\n  // ③ count[p] = …: put it back under the same key (replaces the old value)\n  count[p] = (count[p] || 0) + 1;\n}\nconsole.log(count.A); // A goes 1 → 2 → 3\nconsole.log(count.B); // B is 1',
+                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: 지금까지 센 개수 (처음 나온 이름이면 0)\n  // ② + 1: 하나 더하기\n  // ③ count[p] = …: 같은 키에 다시 넣기 (예전 값이 바뀜)\n  count[p] = (count[p] || 0) + 1;\n}\n// A 는 1 → 2 → 3\nconsole.log(count.A);\n// B 는 1\nconsole.log(count.B);',
+                    'const picks = ["A", "B", "A", "A"];\nconst count = {};\nfor (const p of picks) {\n  // ① count[p] || 0: the count so far (0 for a new name)\n  // ② + 1: add one\n  // ③ count[p] = …: put it back under the same key (replaces the old value)\n  count[p] = (count[p] || 0) + 1;\n}\n// A goes 1 → 2 → 3\nconsole.log(count.A);\n// B is 1\nconsole.log(count.B);',
                 ),
             },
             {
