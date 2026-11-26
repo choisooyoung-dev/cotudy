@@ -228,7 +228,7 @@ export function codeEditor(initial, { title = 'Main.java', onRun, badge, badgeCo
                 .map((l, i) => {
                     const h = highlightLine(l) || ' ';
                     return i + 1 === errLine
-                        ? `<span style="background:#5a2a2a;display:inline-block;min-width:100%">${h}</span>`
+                        ? `<span style="background:var(--code-err);display:inline-block;min-width:100%">${h}</span>`
                         : h;
                 })
                 .join('\n') + '\n';

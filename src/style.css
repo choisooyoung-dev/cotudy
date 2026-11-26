@@ -25,11 +25,15 @@
     --hl-t: #0b6aa8;
     --hl-s: #2e7d32;
     --hl-f: #9a5b00;
-    --hl-c: #8a8f98;
+    --hl-c: #6b7079;
     --hl-num: #b45309;
-    --code-ok: #2e8b20;
+    --code-ok: #237016;
     --code-bad: #c62828;
-    --code-h5: #7a6e5a;
+    --code-h5: #665b48;
+    --code-strong: #8a4300;
+    --code-muted: #665b48;
+    --code-exp-bg: #f1ebdc;
+    --code-exp-fg: #2b2f3a;
     --font: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
     --mono: 'JetBrains Mono', 'D2Coding', Menlo, Consolas, monospace;
 }
@@ -53,6 +57,10 @@
     --code-ok: #9be37a;
     --code-bad: #ff8a80;
     --code-h5: #9aa3b5;
+    --code-strong: #ffd166;
+    --code-muted: #6b7385;
+    --code-exp-bg: #2b2f3a;
+    --code-exp-fg: #e9f5d9;
 }
 * {
     box-sizing: border-box;
@@ -767,8 +775,8 @@ kbd {
 }
 .expect {
     font-family: var(--mono);
-    background: #2b2f3a;
-    color: #e9f5d9;
+    background: var(--code-exp-bg);
+    color: var(--code-exp-fg);
     border-radius: 8px;
     padding: 8px 10px;
     margin-top: 6px;
@@ -1101,10 +1109,10 @@ kbd {
     line-height: 1.6;
 }
 .console .plain b {
-    color: #ffd166;
+    color: var(--code-strong);
 }
 .console .muted {
-    color: #6b7385;
+    color: var(--code-muted);
 }
 
 .choices {
